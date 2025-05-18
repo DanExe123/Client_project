@@ -3,12 +3,26 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 Use App\Livewire\ContactDeveloper;
+use App\Livewire\Admin\AdminDashboard;
+use App\Livewire\User\UserDashboard;
+
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::get('dashboard', AdminDashboard::class)->name('admin.dashboard');
+    });
+});
+
+Route::middleware(['auth', 'role:user'])->group(function () {
+    Route::prefix('user')->group(function () {
+        Route::get('dashboard', UserDashboard::class)->name('user.dashboard');
+    });
+});
+
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
-
-
 
 
 Route::get('/contact-developer', ContactDeveloper::class)->name('contact-developer');
