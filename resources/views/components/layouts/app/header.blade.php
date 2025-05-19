@@ -4,7 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:header container class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:header  container class="border-b bg-[#00e6e6]  dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <a href="{{ route('dashboard') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0" wire:navigate>
@@ -15,10 +15,21 @@
             <flux:dropdown position="bottom" align="end" class="pl-5">
                 <flux:profile name="MasterFiles" />
             <flux:navmenu>
-                <flux:navmenu.item href="#" icon="user">Customer Master</flux:navmenu.item>
-                <flux:navmenu.item href="#" icon="building-storefront">Product Master</flux:navmenu.item>
-                <flux:navmenu.item href="#" icon="credit-card">Supplier Master</flux:navmenu.item>
-                <flux:navmenu.item href="#" icon="arrow-right-start-on-rectangle">User List</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.customer-master') }}" icon="user">
+                    Customer Master
+                </flux:navmenu.item>
+                
+                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.product-master') }}" icon="building-storefront">
+                    Product Master
+                </flux:navmenu.item>
+                
+                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.supplier-master') }}" icon="credit-card">
+                    Supplier Master
+                </flux:navmenu.item>
+                
+                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.user-list') }}" icon="arrow-right-start-on-rectangle">
+                    User List
+                </flux:navmenu.item>                
             </flux:navmenu>
             </flux:dropdown>
 
@@ -168,6 +179,9 @@
 
         {{ $slot }}
 
-        @fluxScripts
+        @fluxScripts  
+        <wireui:scripts />
+        <script src="//unpkg.com/alpinejs" defer></script>
+        
     </body>
 </html>
