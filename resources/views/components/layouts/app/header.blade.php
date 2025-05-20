@@ -36,10 +36,10 @@
             <flux:dropdown position="bottom" align="end">
                 <flux:profile name="Purchasing" />
             <flux:navmenu>
-                <flux:navmenu.item href="#" icon="user">P.O to Supplier</flux:navmenu.item>
-                <flux:navmenu.item href="#" icon="building-storefront">P.O to Supplier List</flux:navmenu.item>
-                <flux:navmenu.item href="#" icon="credit-card">Customer P.O</flux:navmenu.item>
-                <flux:navmenu.item href="#" icon="arrow-right-start-on-rectangle">Customer P.O List</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.po-to-supplier') }}" icon="user">P.O to Supplier</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.po-to-supplier-list') }}" icon="building-storefront">P.O to Supplier List</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.po-to-supplier') }}" icon="credit-card">Customer P.O</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.customer-po-list') }}" icon="arrow-right-start-on-rectangle">Customer P.O List</flux:navmenu.item>
             </flux:navmenu>
             </flux:dropdown>
 

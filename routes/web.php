@@ -9,7 +9,15 @@ Use App\Livewire\Admin\MasterFiles\CustomerMaster;
 Use App\Livewire\Admin\MasterFiles\ProductMaster;
 Use App\Livewire\Admin\MasterFiles\SupplierMaster;
 Use App\Livewire\Admin\MasterFiles\UserList;
+// Purchasing dropdown 
+Use App\Livewire\Admin\Purchasing\PoToSupplier;
+Use App\Livewire\Admin\Purchasing\CustomerPoList;
+Use App\Livewire\Admin\Purchasing\PoToSupplierList;
+Use App\Livewire\Admin\Purchasing\CustomerPo;
 
+Use App\Livewire\LoginForm;
+
+Route::get('/', CustomerMaster::class)->name('login-form');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('admin')->group(function () {
@@ -19,6 +27,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/ProductMaster', ProductMaster::class)->name('admin.masterfiles.product-master');
         Route::get('/SupplierMaster', SupplierMaster::class)->name('admin.masterfiles.supplier-master');
         Route::get('/UserList', UserList::class)->name('admin.masterfiles.user-list');
+        // purchasing dropdown //
+        Route::get('/po-to-supplier', PoToSupplier::class)->name('admin.purchasing.po-to-supplier');
+        Route::get('/customer-po-list', CustomerPoList::class)->name('admin.purchasing.customer-po-list');
+        Route::get('/po-to-supplier-list', PoToSupplierList::class)->name('admin.purchasing.po-to-supplier-list');
+        Route::get('/customer-po', CustomerPo::class)->name('admin.purchasing.customer-po');
     });
 });
 

@@ -38,6 +38,7 @@
             x-bind:class="selected.length === 0 
               ? 'bg-red-300 text-white cursor-not-allowed' 
               : 'bg-red-600 hover:bg-red-700 text-white'"
+              x-bind:disabled="selected.length === 0"
               x-on:click="$openModal('Delete')">
             </x-button>
                   @include('partials.product-modal.product-delete')      
