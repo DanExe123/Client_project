@@ -3,14 +3,17 @@
     <h2 class="text-2xl font-semibold text-gray-900">Product Master</h2>
     <div class="flex items-center justify-between mb-1 mt-5">
         <!-- 🔍 Search Bar -->
-        <div class="w-full max-w-xs">
+        <div class="w-full sm:max-w-xs flex justify-start relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+              <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
+          </span>
           <input
-            type="text"
-            x-model="search"
-            placeholder="Search by Barcode or Product Description..."
-            class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              type="text"
+              x-model="search"
+              placeholder="Search..."
+              class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-        </div>
+      </div>
       
         <!--  Button Group -->
         <div class="flex items-center gap-2">

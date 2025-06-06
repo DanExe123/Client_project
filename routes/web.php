@@ -2,18 +2,21 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-Use App\Livewire\ContactDeveloper;
+use App\Livewire\ContactDeveloper;
 use App\Livewire\Admin\AdminDashboard;
 use App\Livewire\User\UserDashboard;
-Use App\Livewire\Admin\MasterFiles\CustomerMaster;
-Use App\Livewire\Admin\MasterFiles\ProductMaster;
-Use App\Livewire\Admin\MasterFiles\SupplierMaster;
-Use App\Livewire\Admin\MasterFiles\UserList;
+use App\Livewire\Admin\MasterFiles\CustomerMaster;
+use App\Livewire\Admin\MasterFiles\ProductMaster;
+use App\Livewire\Admin\MasterFiles\SupplierMaster;
+use App\Livewire\Admin\MasterFiles\UserList;
 // Purchasing dropdown 
-Use App\Livewire\Admin\Purchasing\PoToSupplier;
-Use App\Livewire\Admin\Purchasing\CustomerPoList;
-Use App\Livewire\Admin\Purchasing\PoToSupplierList;
-Use App\Livewire\Admin\Purchasing\CustomerPo;
+use App\Livewire\Admin\Purchasing\PoToSupplier;
+use App\Livewire\Admin\Purchasing\CustomerPoList;
+use App\Livewire\Admin\Purchasing\PoToSupplierList;
+use App\Livewire\Admin\Purchasing\CustomerPo;
+use App\Livewire\Admin\Inventory\Recieving;
+use App\Livewire\Admin\Inventory\ReturnByCustomer;
+
 
 Use App\Livewire\LoginForm;
 
@@ -32,6 +35,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/customer-po-list', CustomerPoList::class)->name('admin.purchasing.customer-po-list');
         Route::get('/po-to-supplier-list', PoToSupplierList::class)->name('admin.purchasing.po-to-supplier-list');
         Route::get('/customer-po', CustomerPo::class)->name('admin.purchasing.customer-po');
+        Route::get('/recieving', Recieving::class)->name('admin.inventory.recieving');
+        Route::get('/return-by-customer', ReturnByCustomer::class)->name('admin.inventory.return-by-customer');
     });
 });
 

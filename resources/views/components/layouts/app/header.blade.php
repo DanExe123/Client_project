@@ -46,8 +46,8 @@
             <flux:dropdown position="bottom" align="end">
                 <flux:profile name="Inventory" />
             <flux:navmenu>
-                <flux:navmenu.item href="#" icon="user">Recieving</flux:navmenu.item>
-                <flux:navmenu.item href="#" icon="building-storefront">Returned by Customer</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('admin.inventory.recieving') }}" icon="user">Recieving</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('admin.inventory.return-by-customer') }}" icon="building-storefront">Returned by Customer</flux:navmenu.item>
                 <flux:navmenu.item href="#" icon="credit-card">Damages</flux:navmenu.item>
                 <flux:navmenu.item href="#" icon="arrow-right-start-on-rectangle">Returned To Supplier</flux:navmenu.item>
                 <flux:navmenu.item href="#" icon="trash" variant="danger">Stock Card</flux:navmenu.item>
