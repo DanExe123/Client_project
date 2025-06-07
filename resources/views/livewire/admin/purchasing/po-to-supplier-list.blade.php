@@ -1,9 +1,9 @@
 <div>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-5 w-full" x-data="POTable()">
         <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
-        <div class="lg:col-span-2 space-y-4">
+        <div class="lg:col-span-2 space-y-1">
             <!-- Title -->
-            <h2 class="text-2xl font-semibold text-gray-900">PO to Supplier list</h2>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-2">PO to Supplier list</h2>
     
             <!-- Search and Buttons -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
