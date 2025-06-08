@@ -1,27 +1,23 @@
 <div>
     <div>
-        <div x-data="supplierPOApp()" class="space-y-4">
-    
+        <div x-data="supplierPOApp()" class="space-y-1">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Recieving</h2>
             <!-- Tab Buttons -->
-            <div class="flex gap-2">
-                <button class="px-4 py-2 rounded-lg text-white"
-                    :class="currentTab === 'For Approval' ? 'bg-blue-600' : 'bg-gray-300'"
-                    @click="filterByStatus('For Approval')">
-                    For Approval
-                </button>
-                <button class="px-4 py-2 rounded-lg text-white"
-                    :class="currentTab === 'Approved' ? 'bg-green-600' : 'bg-gray-300'" @click="filterByStatus('Approved')">
-                    Approved
-                </button>
-                <button class="px-4 py-2 rounded-lg text-white"
-                    :class="currentTab === 'Cancelled' ? 'bg-red-600' : 'bg-gray-300'" @click="filterByStatus('Cancelled')">
-                    Cancelled
-                </button>
+            <div class="flex flex-wrap gap-2 pt-2 mb-2">
+                <x-button rounded="lg" light teal  icon="user" label="For Approval"  @click="filterByStatus('For Approval')" 
+                    :class="currentTab === 'For Approval' ? 'bg-blue-600' : 'bg-gray-300'" 
+                    class=""/>
+            
+                    <x-button rounded="lg" light green icon="user" label="Approved" @click="filterByStatus('Approved')" 
+                    :class="currentTab === 'Approved' ? 'bg-green-600' : 'bg-gray-300'" 
+                    class=""/>
+                    
+                    <x-button rounded="lg" light red icon="user" label="Cancelled" @click="filterByStatus('Cancelled')" 
+                    :class="currentTab === 'Cancelled' ? 'bg-green-600' : 'bg-gray-300'" 
+                    class=""/>
             </div>
+           
 
-    
-
-    
             <!-- Action Buttons -->
             <div class="flex gap-2 justify-end">
                 <!-- search barr -->
@@ -41,7 +37,7 @@
                 
 
                 <x-button emerald right-icon="plus" x-on:click="$openModal('Add')" />
-                @include('partials.supplier-modal.supplier-master-create')
+                @include('partials.inventory-modal.recieving-create')
     
                 <x-button right-icon="pencil" interaction="positive"
                     x-bind:class="selected.length === 0 ?
@@ -49,7 +45,7 @@
                         'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
                     x-bind:disabled="selected.length === 0" x-on:click="$openModal('Edit')">
                 </x-button>
-                @include('partials.supplier-modal.supplier-edit')
+                @include('partials.inventory-modal.recieving-edit')
     
                 <x-button right-icon="trash" interaction="negative"
                     x-bind:class="selected.length === 0 ?
@@ -57,7 +53,7 @@
                         'bg-red-600 hover:bg-red-700 text-white'"
                     x-bind:disabled="selected.length === 0" x-on:click="$openModal('Delete')">
                 </x-button>
-                @include('partials.supplier-modal.supplier-delete')
+                @include('partials.inventory-modal.recieving-delete')
             </div>
     
             <!-- Supplier Table -->

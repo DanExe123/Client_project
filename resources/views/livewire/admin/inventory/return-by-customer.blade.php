@@ -1,8 +1,21 @@
 <div>
-    <div x-data="returnToSupplierUI" class="space-y-2">
-
+    <div x-cloak x-data="returnToSupplierUI" class="space-y-2">
+        <!-- Title -->
+        <h2 class="text-2xl font-semibold text-gray-900">Return by customer</h2>
       <!-- Action Buttons -->
   <div class="flex gap-2 justify-end">
+      <!-- Search Bar -->
+      <div class="w-full sm:max-w-xs flex justify-start relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
+        </span>
+        <input
+            type="text"
+            x-model="search"
+            placeholder="Search..."
+            class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
+    </div>
     <!-- Edit Button -->
     <x-button
       right-icon="pencil"
@@ -13,7 +26,7 @@
       x-bind:disabled="selectedReturns.length === 0"
       x-on:click="$openModal('Edit')">
     </x-button>
-    @include('partials.product-modal.product-edit')
+    @include('partials.return-by-customer-modal.return-by-customer-edit')
   
     <!-- Delete Button -->
     <x-button
@@ -25,7 +38,7 @@
       x-bind:disabled="selectedReturns.length === 0"
       x-on:click="$openModal('Delete')">
     </x-button>
-    @include('partials.product-modal.product-delete')
+    @include('partials.return-by-customer-modal.return-by-customer-delete')
   </div>
 
 <div class="overflow-auto rounded-lg border border-gray-200">
@@ -110,14 +123,14 @@
                     <td class="p-2"><input type="number" x-model="item.unitPrice" class="w-full border px-2 py-1 rounded" /></td>
                     <td class="p-2 text-right" x-text="formatPrice(item.qty * item.unitPrice)"></td>
                     <td class="p-2 text-center">
-                      <button @click="form.products.splice(index, 1)" class="text-red-500 hover:underline">Remove</button>
+                      <x-button red label="Remove" @click="form.products.splice(index, 1)" />
                     </td>
                   </tr>
                 </template>
               </tbody>
             </table>
-            <button @click="form.products.push({ barcode: '', product: '', qty: 1, unitPrice: 0 })"
-                    class="mt-2 text-blue-600 hover:underline">+ Add Product</button>
+            <x-button green label="Add Product" class="mt-2 ml-2 mb-1" @click="form.products.push({ barcode: '', product: '', qty: 1, unitPrice: 0 })" />
+           
           </div>
       
           <!-- Grand Total -->
@@ -127,12 +140,9 @@
       
           <!-- Actions -->
           <div class="flex justify-end gap-2">
-            <button @click="showForm = false" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-              Cancel
-            </button>
-            <button @click="saveReturn()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              Save
-            </button>
+            <x-button green label="Save" class=""/>
+          
+          
           </div>
         </div>
       </div>

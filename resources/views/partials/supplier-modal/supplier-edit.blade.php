@@ -1,5 +1,6 @@
 <x-modal-card title="Update Supplier" name="edit">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <x-input label="PO#" placeholder="Enter PO#" />
         <x-input label="Customer Name" placeholder="Enter Customer Name" />
         <x-input label="Customer Address" placeholder="Enter Address" />
         <x-input label="Terms (No. of Days)" type="number" placeholder="Enter number of days" />

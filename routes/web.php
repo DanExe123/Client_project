@@ -16,7 +16,18 @@ use App\Livewire\Admin\Purchasing\PoToSupplierList;
 use App\Livewire\Admin\Purchasing\CustomerPo;
 use App\Livewire\Admin\Inventory\Recieving;
 use App\Livewire\Admin\Inventory\ReturnByCustomer;
-
+use App\Livewire\Admin\Inventory\ReturnToSupplier;
+use App\Livewire\Admin\Inventory\Stockcard;
+use App\Livewire\Admin\Recievables\SalesReleasing;
+use App\Livewire\Admin\Recievables\UnserveredLacking;
+use App\Livewire\Admin\Recievables\AccountRecievables;
+use App\Livewire\Admin\Recievables\CreditDebit;
+use App\Livewire\Admin\Recievables\PaymentApplication;
+use App\Livewire\Admin\Payable\AccountPayable;
+use App\Livewire\Admin\Payable\PayableLedger;
+use App\Livewire\Admin\GeneralLedger\SalesSummary;
+use App\Livewire\Admin\GeneralLedger\SalesBook;
+use App\Livewire\Admin\GeneralLedger\CashFlow;
 
 Use App\Livewire\LoginForm;
 
@@ -37,6 +48,18 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/customer-po', CustomerPo::class)->name('admin.purchasing.customer-po');
         Route::get('/recieving', Recieving::class)->name('admin.inventory.recieving');
         Route::get('/return-by-customer', ReturnByCustomer::class)->name('admin.inventory.return-by-customer');
+        Route::get('/return-by-supplier', ReturnToSupplier::class)->name('admin.inventory.return-by-supplier');
+        Route::get('/stockcard', Stockcard::class)->name('admin.inventory.stockcard');
+        Route::get('/sales-releasing', SalesReleasing::class)->name('admin.recievables.sales-releasing');
+        Route::get('/unservered-lacking', UnserveredLacking::class)->name('admin.recievables.unservered-lacking');
+        Route::get('/account-recievables', AccountRecievables::class)->name('admin.recievables.account-recievables');
+        Route::get('/credit-debit', CreditDebit::class)->name('admin.recievables.credit-debit');
+        Route::get('/payment-application', PaymentApplication::class)->name('admin.recievables.payment-application');
+        Route::get('/account-payable', AccountPayable::class)->name('admin.payable.account-payable');
+        Route::get('/payable-ledger', PayableLedger::class)->name('admin.payable.payable-ledger');
+        Route::get('/sales-summary', SalesSummary::class)->name('admin.general-ledger.sales-summary');
+        Route::get('/sales-book', SalesBook::class)->name('admin.general-ledger.sales-book');
+        Route::get('/cash-flow', CashFlow::class)->name('admin.general-ledger.cash-flow');
     });
 });
 
