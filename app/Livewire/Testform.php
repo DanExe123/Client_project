@@ -3,9 +3,9 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\CustomerTable;
+use App\Models\Testformtable;
 
-class Addcustomer extends Component
+class Testform extends Component
 {
     public $name;
     public $email;
@@ -33,7 +33,7 @@ class Addcustomer extends Component
 {
     $this->validate();
 
-    CustomerTable::create([
+    Testformtable::create([
         'name' => $this->name,
         'email' => $this->email,
         'address' => $this->address,
@@ -43,13 +43,13 @@ class Addcustomer extends Component
         'status' => true,
     ]);
 
-    session()->flash('message', 'Successfully Added New Customer file');
+    session()->flash('message', 'Entry created!');
 
     $this->reset();
 }
 
     public function render()
     {
-        return view('livewire.addcustomer');
+        return view('livewire.testform');
     }
 }

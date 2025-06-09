@@ -22,15 +22,15 @@
                     Customer Master
                 </flux:navmenu.item>
                 
-                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.product-master') }}" icon="building-storefront">
+                <flux:navmenu.item wire:navigate href="{{ route('product-master') }}" icon="building-storefront">
                     Product Master
                 </flux:navmenu.item>
                 
-                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.supplier-master') }}" icon="credit-card">
+                <flux:navmenu.item wire:navigate href="{{ route('supplier-master') }}" icon="credit-card">
                     Supplier Master
                 </flux:navmenu.item>
                 
-                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.user-list') }}" icon="arrow-right-start-on-rectangle">
+                <flux:navmenu.item wire:navigate href="{{ route('user-list') }}" icon="arrow-right-start-on-rectangle">
                     User List
                 </flux:navmenu.item>                
             </flux:navmenu>
@@ -39,21 +39,21 @@
             <flux:dropdown position="bottom" align="end">
                 <flux:profile name="Purchasing" />
             <flux:navmenu>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.po-to-supplier') }}" icon="user">P.O to Supplier</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.po-to-supplier-list') }}" icon="building-storefront">P.O to Supplier List</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.customer-po') }}" icon="credit-card">Customer P.O</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.purchasing.customer-po-list') }}" icon="arrow-right-start-on-rectangle">Customer P.O List</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('po-to-supplier') }}" icon="user">P.O to Supplier</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('po-to-supplier-list') }}" icon="building-storefront">P.O to Supplier List</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('customer-po') }}" icon="credit-card">Customer P.O</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('customer-po-list') }}" icon="arrow-right-start-on-rectangle">Customer P.O List</flux:navmenu.item>
             </flux:navmenu>
             </flux:dropdown>
 
             <flux:dropdown position="bottom" align="end">
                 <flux:profile name="Inventory" />
             <flux:navmenu>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.inventory.recieving') }}" icon="user">Recieving</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.inventory.return-by-customer') }}" icon="building-storefront">Returned by Customer</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('recieving') }}" icon="user">Recieving</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('return-by-customer') }}" icon="building-storefront">Returned by Customer</flux:navmenu.item>
                {{--   <flux:navmenu.item href="#" icon="credit-card">Damages</flux:navmenu.item>--}}
-                <flux:navmenu.item wire:navigate href="{{ route('admin.inventory.return-by-supplier') }}" icon="arrow-right-start-on-rectangle">Returned To Supplier</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.inventory.stockcard') }}" icon="trash" variant="danger">Stock Card</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('return-by-supplier') }}" icon="arrow-right-start-on-rectangle">Returned To Supplier</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('stockcard') }}" icon="trash" variant="danger">Stock Card</flux:navmenu.item>
             </flux:navmenu>
             </flux:dropdown>
 
@@ -61,11 +61,11 @@
             <flux:dropdown position="bottom" align="end">
                 <flux:profile name="Recievables" />
             <flux:navmenu>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.recievables.sales-releasing') }}" icon="user">Sales Releasing</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.recievables.unservered-lacking') }}" icon="building-storefront">Unserved lacking letter</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.recievables.account-recievables') }}" icon="credit-card">Account receivables</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.recievables.credit-debit') }}" icon="arrow-right-start-on-rectangle">Credit/Debit</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.recievables.payment-application') }}" icon="trash" variant="danger">Payment Application</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('sales-releasing') }}" icon="user">Sales Releasing</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('unservered-lacking') }}" icon="building-storefront">Unserved lacking letter</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('account-recievables') }}" icon="credit-card">Account receivables</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('credit-debit') }}" icon="arrow-right-start-on-rectangle">Credit/Debit</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('payment-application') }}" icon="trash" variant="danger">Payment Application</flux:navmenu.item>
             </flux:navmenu>
             </flux:dropdown>
 
@@ -73,8 +73,8 @@
             <flux:dropdown position="bottom" align="end">
                 <flux:profile name="Payable" />
             <flux:navmenu>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.payable.account-payable') }}" icon="user">Account payable</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.payable.payable-ledger') }}" icon="building-storefront">Payable Ledger</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('account-payable') }}" icon="user">Account payable</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('payable-ledger') }}" icon="building-storefront">Payable Ledger</flux:navmenu.item>
             </flux:navmenu>
             </flux:dropdown>
 
@@ -82,9 +82,9 @@
             <flux:dropdown position="bottom" align="end">
                 <flux:profile name="General Ledger" />
             <flux:navmenu>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.general-ledger.sales-summary') }}" icon="user">Sales Summary</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.general-ledger.sales-book') }}" icon="building-storefront">Sales Book</flux:navmenu.item>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.general-ledger.cash-flow') }}" icon="credit-card">Cash Flow</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('sales-summary') }}" icon="user">Sales Summary</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('sales-book') }}" icon="building-storefront">Sales Book</flux:navmenu.item>
+                <flux:navmenu.item wire:navigate href="{{ route('cash-flow') }}" icon="credit-card">Cash Flow</flux:navmenu.item>
             </flux:navmenu>
             </flux:dropdown>
             
