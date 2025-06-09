@@ -33,7 +33,7 @@
         x-bind:disabled="selected.length === 0"
         x-on:click="$openModal('Edit')">
     </x-button>
-          @include('partials.customer-modal.customer-edit')
+          @include('partials.customer-edit')
 
       <!-- Delete Button -->
     <x-button  right-icon="trash" interaction="negative" 
@@ -43,7 +43,7 @@
         x-bind:disabled="selected.length === 0"
         x-on:click="$openModal('Delete')">
       </x-button>
-            @include('partials.customer-modal.customer-delete')
+            @include('partials.customer-delete')
 
     </div>
   </div>
