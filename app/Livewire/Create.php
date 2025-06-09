@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Masterfiles\Includes;
+namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Customer;
@@ -34,7 +34,7 @@ class Create extends Component
         $this->modalOpen = true;
     }
 
-    public function saveCustomer()
+    public function submit()
     {
         $this->validate();
 
@@ -48,13 +48,17 @@ class Create extends Component
             'status' => true,
         ]);
 
-        $this->reset(['name', 'email', 'address', 'contact', 'contact_person', 'term', 'status']);
+        session()->flash('message', 'Entry created!');
+
+        $this->reset([
+            'name', 'email', 'address', 'contact', 'contact_person', 'term'
+        ]);
+
         $this->modalOpen = false;
     }
 
-
     public function render()
     {
-        return view('livewire.admin.masterfiles.includes.create');
+        return view('livewire.create');
     }
 }

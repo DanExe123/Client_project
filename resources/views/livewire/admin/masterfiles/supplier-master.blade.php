@@ -19,7 +19,11 @@
         <div class="flex items-center gap-2">
           <!-- Add Button -->
           <x-button emerald right-icon="plus" x-on:click="$openModal('Add')" />
-          @include('partials.supplier-modal.supplier-master-create')
+          @include('partials.supplier-modal.supplier-edit')
+            
+        
+        
+        
       
           <!-- Edit Button -->
           <x-button
