@@ -5,7 +5,7 @@ use Livewire\Volt\Volt;
 use App\Livewire\ContactDeveloper;
 use App\Livewire\Admin\AdminDashboard;
 use App\Livewire\User\UserDashboard;
-use App\Livewire\Admin\MasterFiles\CustomerMaster;
+use App\Livewire\CustomerMaster;
 use App\Livewire\Admin\MasterFiles\ProductMaster;
 use App\Livewire\Admin\MasterFiles\SupplierMaster;
 use App\Livewire\Admin\MasterFiles\UserList;
@@ -29,6 +29,10 @@ use App\Livewire\Admin\GeneralLedger\SalesSummary;
 use App\Livewire\Admin\GeneralLedger\SalesBook;
 use App\Livewire\Admin\GeneralLedger\CashFlow;
 
+
+use App\Livewire\Testform;
+use App\Livewire\Addcustomer;
+
 Use App\Livewire\LoginForm;
 
 Route::get('/', CustomerMaster::class)->name('login-form');
@@ -37,7 +41,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('admin')->group(function () {
        // Route::get('dashboard', AdminDashboard::class)->name('admin.dashboard');
         Route::get('/contact-developer', ContactDeveloper::class)->name('contact-developer');
-        Route::get('/CustomerMaster', CustomerMaster::class)->name('admin.masterfiles.customer-master');
+        Route::get('/CustomerMaster', CustomerMaster::class)->name('customer-master');
+        Route::get('/add-customer-files', Addcustomer::class)->name('addcustomer');
+
         Route::get('/ProductMaster', ProductMaster::class)->name('admin.masterfiles.product-master');
         Route::get('/SupplierMaster', SupplierMaster::class)->name('admin.masterfiles.supplier-master');
         Route::get('/UserList', UserList::class)->name('admin.masterfiles.user-list');
@@ -60,6 +66,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/sales-summary', SalesSummary::class)->name('admin.general-ledger.sales-summary');
         Route::get('/sales-book', SalesBook::class)->name('admin.general-ledger.sales-book');
         Route::get('/cash-flow', CashFlow::class)->name('admin.general-ledger.cash-flow');
+        Route::get('/testform', Testform::class)->name('testform');
     });
 });
 

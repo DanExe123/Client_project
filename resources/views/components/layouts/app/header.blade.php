@@ -2,9 +2,12 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+        @wireUiStyles
+          @livewireStyles
     </head>
+ 
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:header  container class="border-b bg-[#00e6e6]  dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:header  container class="border-b bg-[#00e6e6]  dark:border-zinc-700 dark:bg-zinc-900 py-4">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <a href="{{ route('dashboard') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0" wire:navigate>
@@ -15,7 +18,7 @@
             <flux:dropdown position="bottom" align="end" class="pl-5">
                 <flux:profile name="MasterFiles" />
             <flux:navmenu>
-                <flux:navmenu.item wire:navigate href="{{ route('admin.masterfiles.customer-master') }}" icon="user">
+                <flux:navmenu.item wire:navigate href="{{ route('customer-master') }}" icon="user">
                     Customer Master
                 </flux:navmenu.item>
                 
@@ -178,7 +181,7 @@
         </flux:sidebar>
 
         {{ $slot }}
-
+        @livewireScripts
         @fluxScripts  
         <wireui:scripts />
         <script src="//unpkg.com/alpinejs" defer></script>
