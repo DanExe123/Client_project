@@ -14,6 +14,7 @@ class Editproduct extends Component
     public $highest_uom;
     public $lowest_uom;
     public $price;
+    public $selling_price;
 
     public function mount($id)
     {
@@ -28,6 +29,8 @@ class Editproduct extends Component
         $this->highest_uom = $product->highest_uom;
         $this->lowest_uom = $product->lowest_uom;
         $this->price = $product->price;
+        $this->selling_price = $product->selling_price;
+        
     }
 
     public function updateProduct()
@@ -39,6 +42,7 @@ class Editproduct extends Component
             'highest_uom' => 'nullable|string',
             'lowest_uom' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
         ]);
 
         Product::where('id', $this->productId)->update([
@@ -48,6 +52,7 @@ class Editproduct extends Component
             'highest_uom' => $this->highest_uom,
             'lowest_uom' => $this->lowest_uom,
             'price' => $this->price,
+            'selling_price' => $this->selling_price,
         ]);
 
         session()->flash('message', 'Product updated successfully.');

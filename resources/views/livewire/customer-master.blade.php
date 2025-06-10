@@ -21,7 +21,7 @@
     </div>
 
     <!-- Button Group -->
-    <div class="flex items-center gap-2 mt-5">
+    <div class="flex items-center gap-2">
       <x-select class="mb-1"
           placeholder="Select year"
           :options="[
@@ -59,7 +59,7 @@
   </div>
 
   <div class="overflow-hidden rounded-lg border border-gray-200 shadow-md">
-    <table class="w-full border-collapse bg-white text-left text-sm text-gray-500">
+    <table wire:poll class="w-full border-collapse bg-white text-left text-sm text-gray-500">
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-4 py-4">

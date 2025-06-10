@@ -36,6 +36,8 @@
             <x-input label="Lowest UOM" wire:model="lowest_uom" id="lowest_uom" placeholder="Enter lowest unit" />
             <x-input label="Price" wire:model="price" id="price" placeholder="Enter price" type="number" step="0.01"
                 :error="$errors->first('price')" />
+            <x-input label="Selling Price" wire:model="selling_price" id="selling_price" placeholder="Enter selling price" type="number" step="0.01"
+                :error="$errors->first('selling_price')" />
         </div>
         <hr>
         <div class="pt-2 flex justify-center">

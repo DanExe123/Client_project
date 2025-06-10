@@ -30,14 +30,17 @@
             <x-input label="Terms (No. of Days)" wire:model="term" id="term" placeholder="Enter term"
                 :error="$errors->first('term')" />
 
-            <x-input label="Contact Number" wire:model="contact" id="contact" placeholder="Enter contact number"
+            <x-input label="Contact Number" wire:model="contact" id="contact" type="number" placeholder="Enter contact number"
                 :error="$errors->first('contact')" />
 
             <x-input label="Contact Person" wire:model="contact_person" id="contact_person"
                 placeholder="Enter contact person" :error="$errors->first('contact_person')" />
         </div>
         <hr>
-        <div class="pt-2 flex justify-center">
+        <div class=" flex justify-center gap-6">
+            <a href="{{ route('supplier-master') }}">
+                <x-button label="Cancel" primary flat class="!text-sm mt-2" />
+            </a>
             <x-button spinner type="submit" primary label="Submit" class="flex justify-center !w-48" />
         </div>
     </form>

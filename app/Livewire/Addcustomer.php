@@ -18,7 +18,7 @@ class Addcustomer extends Component
         'name' => 'required|string|min:3',
         'email' => 'required|email',
         'address' => 'nullable|string',
-        'contact' => 'nullable|string',
+        'contact' => 'required|numeric|min:0',
         'contact_person' => 'nullable|string',
         'term' => 'nullable|string',
     ];

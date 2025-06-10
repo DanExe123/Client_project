@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('address')->nullable();
-            $table->string('contact')->nullable();
+            $table->unsignedInteger('contact')->nullable();
             $table->string('contact_person')->nullable();
             $table->string('term')->nullable();
             $table->boolean('status')->default(true); // Default to active

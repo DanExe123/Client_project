@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('name'); // Supplier Name
             $table->string('address')->nullable();
             $table->string('term')->nullable(); // Terms (No. of Days)
-            $table->string('contact')->nullable();
+            $table->unsignedInteger('contact')->nullable();
             $table->string('contact_person')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();

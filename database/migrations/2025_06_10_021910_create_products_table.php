@@ -12,12 +12,14 @@ return new class extends Migration {
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('barcode')->unique();
+            $table->unsignedInteger('barcode')->unique();
             $table->string('supplier')->nullable();
             $table->string('description');
+            $table->string('quantity')->default(0);
             $table->string('highest_uom')->nullable();
             $table->string('lowest_uom')->nullable();
             $table->decimal('price', 15, 2)->default(0);
+            $table->decimal('selling_price', 15, 2)->default(0);
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

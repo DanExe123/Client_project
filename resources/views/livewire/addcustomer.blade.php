@@ -35,7 +35,7 @@
 
             <x-input label="Address" wire:model="address" id="address" placeholder="Enter your address" />
 
-            <x-input label="Contact Number" wire:model="contact" id="contact" placeholder="Enter contact number" />
+            <x-input label="Contact Number" wire:model="contact" id="contact" type="number" placeholder="Enter contact number" />
 
             <x-input label="Contact Person" wire:model="contact_person" id="contact_person"
                 placeholder="Enter contact person" />

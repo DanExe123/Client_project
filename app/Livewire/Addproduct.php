@@ -13,14 +13,16 @@ class AddProduct extends Component
     public $highest_uom;
     public $lowest_uom;
     public $price;
+    public $selling_price;
 
     protected $rules = [
-        'barcode' => 'required|string|unique:products,barcode',
+        'barcode' => 'required|numeric|min:0|unique:products,barcode',
         'supplier' => 'required|string',
         'description' => 'required|string',
         'highest_uom' => 'nullable|string',
         'lowest_uom' => 'nullable|string',
         'price' => 'required|numeric|min:0',
+        'selling_price' => 'required|numeric|min:0',
     ];
 
     public function submit()
@@ -34,6 +36,7 @@ class AddProduct extends Component
             'highest_uom' => $this->highest_uom,
             'lowest_uom' => $this->lowest_uom,
             'price' => $this->price,
+            'selling_price' => $this->selling_price,
         ]);
 
         session()->flash('message', 'Successfully added new product.');
