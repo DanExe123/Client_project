@@ -38,6 +38,7 @@ use App\Livewire\Addsupplier;
 use App\Livewire\Editcustomer;
 use App\Livewire\Editproduct;
 use App\Livewire\Editsupplier;
+use App\Livewire\AdjustmentStockcard;
 
 use App\Livewire\LoginForm;
 
@@ -67,6 +68,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/return-by-customer', ReturnByCustomer::class)->name('return-by-customer');
         Route::get('/return-by-supplier', ReturnToSupplier::class)->name('return-by-supplier');
         Route::get('/stockcard', Stockcard::class)->name('stockcard');
+        Route::get('/adjustments/{product}',AdjustmentStockcard::class)->name('adjustment-stockcard');
+
+
+
         Route::get('/sales-releasing', SalesReleasing::class)->name('sales-releasing');
         Route::get('/unservered-lacking', UnserveredLacking::class)->name('unservered-lacking');
         Route::get('/account-recievables', AccountRecievables::class)->name('account-recievables');

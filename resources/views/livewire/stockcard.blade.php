@@ -1,8 +1,14 @@
-<div>
-    <div x-cloak x-data="stockCardUI" class="space-y-2">
+<div x-cloak>
+    <div x-cloak class="space-y-2">
         <!-- Title -->
         <h2 class="text-2xl font-semibold text-gray-900">Stock Card</h2>
-    
+        @if (session()->has('message'))
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+            class="mt-2">
+            <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+                class="!bg-green-300 !w-full" />
+        </div>
+      @endif
         <!-- Action Buttons -->
         <div class="flex gap-2 justify-between flex-wrap">
             <!-- Search Bar -->
@@ -17,84 +23,39 @@
                     class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
             </div>
-    
-            <!-- Adjustments Button -->
-            
+
+        
             <x-button
             left-icon="wrench"
             interaction="primary"
-            x-on:click=" $wire.openAdjustmentsModal() "
-            :class="count($selectedProductId) > 0 ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-300 text-white cursor-not-allowed'"
-            :disabled="count($selectedProductId) === 0"
-        >
-            Adjustments
-        </x-button>
-        
-            <x-modal-card title="Adjustments" name="Adjustments">
-                @foreach($products as $product)
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <x-input 
-                        label="Barcode" 
-                        placeholder="Barcode" 
-                        wire:model="barcode" 
-                        value="{{ $product->barcode ?? '' }}" readonly 
-                    />
-                
-                    <x-input 
-                        label="Product Name" 
-                        placeholder="Product Name" 
-                        wire:model="productName" 
-                        value="{{ $product->description ?? '' }}" readonly
-                    />
-                
-                    <x-input 
-                        label="Bag (Highest UoM)" 
-                        placeholder="Bag (Highest UoM)" 
-                        wire:model="highestUom" 
-                        value="{{ $product->highest_uom ?? '' }}" readonly
-                    />
-                
-                    <x-input 
-                        label="PC" 
-                        placeholder="PC" 
-                        wire:model="pc" 
-                        value="{{ $product->pc ?? '' }}" 
-                    />
-                
-                    <x-input 
-                        label="Damages" 
-                        placeholder="Damages" 
-                        wire:model="damages" 
-                        value="{{ $product->damages ?? '' }}" 
-                    />
-                
-                    <x-input 
-                        type="number" 
-                        label="Quantity" 
-                        placeholder="Quantity" 
-                        wire:model="quantity" 
-                        
-                    />
-                </div>
-                @endforeach
-             
-                <x-slot name="footer" class="flex justify-end gap-x-4">
+            wire:click="goToAdjustment"
+            :class="count($selectedProductId ?? []) !== 1
+                ? 'bg-gray-300 text-white cursor-not-allowed'
+                : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
+            :disabled="count($selectedProductId ?? []) !== 1"
+            >
+                Adjustments
+            </x-button>
             
-             
-                    <div class="flex gap-x-4">
-                        <x-button flat label="Cancel" x-on:click="close" />
-                        <x-button primary label="Save" wire:click="save" />
-                    </div>
-                </x-slot>
-            </x-modal-card>
+            
+                @foreach($products as $product)
+                  
+                @endforeach
+
+
+            </div>
+            
         </div>
     
-        <div class="overflow-auto rounded-lg border border-gray-200">
+        <div class="overflow-auto rounded-lg border border-gray-200 mt-2">
             <table class="min-w-[1000px] w-full border-collapse bg-white text-left text-sm text-gray-500">
                 <thead class="bg-gray-50 sticky top-0 z-10">
                     <tr>
                         <th class="px-4 py-4 font-medium text-gray-900">
-                            <input type="checkbox" />
+                            <input type="checkbox"
+                            wire:click="toggleSelectAll"
+                            @if($product->pluck('id')->diff($selectedProductId)->isEmpty()) checked @endif
+                        />
                         </th>
                         <th class="px-4 py-4 font-medium text-gray-900">Barcode</th>
                         <th class="px-4 py-4 font-medium text-gray-900">Product Name</th>
@@ -107,11 +68,16 @@
                 <tbody class="divide-y divide-gray-100 border-t border-gray-100">
                     @foreach($products as $product)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-4"><input type="checkbox" /></td>
+                        <td class="px-4 py-4">
+                            <input type="checkbox"
+                            wire:click="selectedProduct({{ $product->id }})"
+                            @if(in_array($product->id, $selectedProductId)) checked @endif
+                        />
+                        </td>
                         <td class="px-4 py-4">{{ $product->barcode }}</td>
                         <td class="px-4 py-4">{{ $product->description }}</td>
                         <td class="px-4 py-4">{{ $product->highest_uom }}</td>
-                        <td class="px-4 py-4">{{ $product->pc }}</td>
+                        <td class="px-4 py-4">{{ $product->lowest_uom }}</td>
                         <td class="px-4 py-4">{{ $product->damages }}</td>
                     </tr>
                     @endforeach
@@ -146,3 +112,4 @@
     </script>
     
 </div>
+
