@@ -1,8 +1,9 @@
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full md:w-[1400px] " x-data="POTable()">
+<div class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
     <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->
         <h2 class="text-2xl font-semibold text-gray-900 mb-2">PO TO SUPPLIER</h2>
+
 
         <!-- Search and Buttons -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -36,7 +37,7 @@
             </div>
         </div>
 
-        <!-- Supplier Table -->
+        <!-- Po to Supplier Table -->
         <div class="overflow-auto rounded-lg border border-gray-200 shadow-md">
             <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
                 <thead class="bg-gray-50 sticky top-0 z-10">
@@ -46,9 +47,9 @@
                                 class="h-4 w-4 text-blue-600" />
                         </th>
                         <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Supplier</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Receipt Type</th>
                         <th class="px-6 py-4 font-medium text-gray-900">Date</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Status</th>
                         <th class="px-6 py-4 font-medium text-gray-900">Total</th>
                     </tr>
                 </thead>
@@ -71,7 +72,7 @@
         </div>
     </div>
     <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
-    <div class="col-span-1 w-full md:w-[700px] bg-white rounded-lg border shadow-md p-5 space-y-4">
+    <div class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
         <h3 class="text-lg font-bold text-gray-800">
             Add <span class="text-blue-500">PO</span> to <span class="text-blue-500">Supplier</span>
         </h3>
@@ -136,67 +137,120 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="hover:bg-gray-50">
-                        <!-- Barcode input -->
-                        <td class="border px-2 py-2">
-                            <input type="text" placeholder="Scan or enter barcode"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
+                    <template x-for="(item, index) in products" :key="index">
+                        <tr class="hover:bg-gray-50">
+                            <td class="border px-2 py-2">
+                                <input type="text" x-model="item.barcode"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
+                                    placeholder="Scan or enter barcode" />
+                            </td>
+                            <td class="border px-2 py-2">
+                                <select x-model="item.product_id" @change="updatePrice(index)"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm">
+                                    <option value="">Select</option>
+                                    @foreach($products as $product)
+                                        <option value="{{ $product->id }}">{{ $product->description }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="border px-2 py-2">
+                                <input type="number" x-model="item.quantity" @input="updateTotal(index)" min="1"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
 
-                        <!-- Product select dropdown -->
-                        <td class="border px-2 py-2">
-                            <select class="w-full border-gray-300 rounded-md px-2 py-1 text-sm">
-                                <option>Select</option>
-                                @foreach($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->description }}</option>
-                                @endforeach
-                            </select>
-                        </td>
+                            </td>
+                            <td class="border px-2 py-2">
+                                <input type="number" x-model="item.price" step="0.01" readonly
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm bg-gray-100" />
+                            </td>
 
-                        <!-- Quantity input -->
-                        <td class="border px-2 py-2">
-                            <input type="number" value="1" min="1"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
 
-                        <!-- Price input -->
-                        <td class="border px-2 py-2">
-                            <input type="number" value="0.00" step="0.01"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-
-                        <!-- Total (readonly) -->
-                        <td class="border px-2 py-2">
-                            <input type="text" value="0.00" readonly
-                                class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-
-                        <!-- Remove button -->
-                        <td class="border px-1 py-2 text-center">
-                            <x-button red label="Remove" class="px-2 py-1 text-xs h-8" />
-                        </td>
-                    </tr>
+                            <td class="border px-2 py-2">
+                                <input type="text" :value="item . total . toFixed(2)" readonly
+                                    class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
+                            </td>
+                            <td class="border px-2 py-2 text-center">
+                                <x-button red label="Remove" class="px-2 py-1 text-xs h-8"
+                                    x-on:click="removeProduct(index)" />
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
-
                 <tfoot class="bg-gray-50">
                     <tr>
-                        <td colspan="3" class="border px-2 py-2 text-right font-semibold">Total:</td>
-                        <td class="border px-2 py-2">
+                        <td colspan="4" class="border px-2 py-2 text-right font-semibold">Total:</td>
+                        <td class="border px-2 py-2 font-semibold text-right" x-text="grandTotal"></td>
+                        <td class="border px-2 py-2"></td>
+                    </tr>
             </table>
-        </div>
-        <!-- Add Product Button -->
-        <div class="pt-2">
-            <x-button green label="Add Product" />
-        </div>
-        <hr>
-        <!-- Remarks Section -->
-        <div class="pt-4">
-            <x-textarea name="remarks" label="remarks" placeholder="Write your remarks" />
-            <div class="flex justify-end pt-2">
-                <x-button blue label="Submit" />
+
+            <!-- Add Product Button -->
+            <div class="pt-2 ml-2">
+                <x-button green label="Add Product" x-on:click="addProduct()" />
+            </div>
+
+            <!-- Remarks Section -->
+            <div class="pt-4">
+                <x-textarea name="remarks" label="Remarks" placeholder="Write your remarks" />
+                <div class="flex justify-end pt-2">
+                    <x-button blue label="Submit" @click="submitPO()" />
+                </div>
             </div>
         </div>
-        </tr>
-        </tfoot>
     </div>
+
+    </tr>
+    </tfoot>
 </div>
+
+<script>
+    function POTable() {
+        return {
+            products: [],
+
+            // This is the product list with id + price + description from PHP
+            allProducts: @json($products), // includes id, price, description
+
+            grandTotal: 0,
+
+            addProduct() {
+                this.products.push({
+                    barcode: '',
+                    product_id: '',
+                    quantity: 1,
+                    price: 0,
+                    total: 0
+                });
+            },
+
+            removeProduct(index) {
+                this.products.splice(index, 1);
+                this.updateGrandTotal();
+            },
+
+            updatePrice(index) {
+                const productId = this.products[index].product_id;
+                const product = this.allProducts.find(p => p.id == productId);
+
+                if (product) {
+                    this.products[index].price = parseFloat(product.price);
+                    this.updateTotal(index);
+                }
+            },
+
+            updateTotal(index) {
+                const item = this.products[index];
+                item.total = (item.quantity || 0) * (item.price || 0);
+                this.updateGrandTotal();
+            },
+
+            updateGrandTotal() {
+                this.grandTotal = this.products.reduce((sum, item) => sum + item.total, 0).toFixed(2);
+            },
+
+            submitPO() {
+                // Handle form submission here
+                console.log(this.products);
+            }
+        };
+    }
+</script>
