@@ -98,7 +98,7 @@
         <h3 class="text-lg font-bold text-gray-800">
             Csutomer PO <span class="text-blue-500"></span>
         </h3>
-
+ 
         <!-- User and Address Inputs -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <x-select label="Select Transaction type" placeholder="Select some user" option-label="name" option-value="id" />
