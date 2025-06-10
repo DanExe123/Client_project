@@ -31,7 +31,9 @@ use App\Livewire\CashFlow;
 
 
 use App\Livewire\Testform;
+// customer add edit 
 use App\Livewire\Addcustomer;
+use App\Livewire\Editcustomer;
 
 Use App\Livewire\LoginForm;
 
@@ -43,6 +45,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/contact-developer', ContactDeveloper::class)->name('contact-developer');
         Route::get('/CustomerMaster', CustomerMaster::class)->name('customer-master');
         Route::get('/add-customer-files', Addcustomer::class)->name('addcustomer');
+        Route::get('/edit-customer-files', Editcustomer::class)->name('editcustomer');
 
         Route::get('/ProductMaster', ProductMaster::class)->name('product-master');
         Route::get('/SupplierMaster', SupplierMaster::class)->name('supplier-master');
