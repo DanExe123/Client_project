@@ -1,5 +1,5 @@
 <div x-data="payableLedger()" class=" w-full mx-auto">
-
+  <h2 class="text-2xl font-semibold text-gray-900 mb-4">Payable Ledger</h2>
     <!-- Select Supplier -->
     <select id="supplier" x-model="selectedSupplier" @change="loadTransactions()" class="border rounded px-3 py-2 w-full max-w-xs">
         <option value="">Select one supplier</option>

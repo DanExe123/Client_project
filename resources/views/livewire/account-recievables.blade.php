@@ -1,5 +1,5 @@
-<div>
-    <div x-data="customerReceivables">
+<div x-cloak>
+    <div x-cloak x-data="customerReceivables">
         <!-- Header + Button -->
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold">Customer Receivables</h2>
