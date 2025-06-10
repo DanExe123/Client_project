@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ asset('logo/logoweb1-removebg-preview.png') }}" type="image/png">
     <title>Inventory Management System</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -26,7 +27,6 @@
     </div>
     @wireUiScripts
    
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
  @livewireScripts
 </body>
 </html>

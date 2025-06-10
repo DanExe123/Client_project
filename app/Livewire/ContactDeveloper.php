@@ -14,7 +14,7 @@ class ContactDeveloper extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
-        'message' => 'required|string|max:5000',
+        'message' => 'nullable|string|max:5000',
     ];
 
     public function submit()
