@@ -2,7 +2,7 @@
     <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->
-        <h2 class="text-2xl font-semibold text-gray-900 mb-2">Supplier Master</h2>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-2">PO TO SUPPLIER</h2>
 
         <!-- Search and Buttons -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -11,34 +11,25 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
                 </span>
-                <input
-                    type="text"
-                    x-model="search"
-                    placeholder="Search..."
-                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+                <input type="text" x-model="search" placeholder="Search..."
+                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
             </div>
 
             <!-- Button Group -->
             <div class="flex gap-2">
-                <x-button emerald right-icon="plus" x-on:click="$openModal('Add')" />
-                @include('partials.supplier-modal.supplier-master-create')
-
-                <x-button right-icon="pencil" interaction="positive"
-                    x-bind:class="selected.length === 0 ?
+                <x-button right-icon="pencil" interaction="positive" x-bind:class="selected.length === 0 ?
                         'bg-gray-300 text-white cursor-not-allowed' :
-                        'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
-                    x-bind:disabled="selected.length === 0" x-on:click="$openModal('Edit')">
+                        'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selected.length === 0"
+                    x-on:click="$openModal('Edit')">
                 </x-button>
-                @include('partials.supplier-modal.supplier-edit')
+                {{-- @include('partials.supplier-modal.supplier-edit') --}}
 
-                <x-button right-icon="trash" interaction="negative"
-                    x-bind:class="selected.length === 0 ?
+                <x-button right-icon="trash" interaction="negative" x-bind:class="selected.length === 0 ?
                         'bg-red-300 text-white cursor-not-allowed' :
-                        'bg-red-600 hover:bg-red-700 text-white'"
-                    x-bind:disabled="selected.length === 0" x-on:click="$openModal('Delete')">
+                        'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selected.length === 0"
+                    x-on:click="$openModal('Delete')">
                 </x-button>
-                @include('partials.supplier-modal.supplier-delete')
+                {{-- @include('partials.supplier-modal.supplier-delete') --}}
             </div>
         </div>
 
@@ -59,10 +50,10 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                    <template x-for="poItem in po" :key="poItem.id">
+                    <template x-for="poItem in po" :key="poItem . id">
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-4">
-                                <input type="checkbox" :value="poItem.id" x-model="selected"
+                                <input type="checkbox" :value="poItem . id" x-model="selected"
                                     class="h-4 w-4 text-blue-600" />
                             </td>
                             <td class="px-6 py-4" x-text="poItem.PO"></td>
@@ -76,8 +67,6 @@
             </table>
         </div>
     </div>
-
-
     <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
     <div class="col-span-1 w-full md:w-[450px] bg-white rounded-lg border shadow-md p-5 space-y-4">
         <h3 class="text-lg font-bold text-gray-800">
@@ -138,7 +127,6 @@
                         <td class="border px-2 py-2">
             </table>
         </div>
-
         <!-- Add Product Button -->
         <div class="pt-2">
             <x-button green label="Add Product" />
@@ -151,54 +139,7 @@
                 <x-button blue label="Submit" />
             </div>
         </div>
-
-
         </tr>
         </tfoot>
-
-
-
-
-        <script>
-            function POTable() {
-                return {
-                    search: '',
-                    selected: [],
-                    po: [{
-                            id: 1,
-                            PO: 'PO-1001',
-                            Customer: 'ABC Corp.',
-                            Date: '2025-05-01',
-                            Status: 'Pending',
-                            Total: '$1,500',
-                        },
-                        {
-                            id: 2,
-                            PO: 'PO-1002',
-                            Customer: 'XYZ Ltd.',
-                            Date: '2025-05-03',
-                            Status: 'Completed',
-                            Total: '$2,200',
-                        },
-                        {
-                            id: 3,
-                            PO: 'PO-1003',
-                            Customer: 'Acme Inc.',
-                            Date: '2025-05-05',
-                            Status: 'In Progress',
-                            Total: '$800',
-                        },
-                    ],
-                    get isAllSelected() {
-                        return this.selected.length === this.po.length;
-                    },
-                    toggleAll() {
-                        if (this.isAllSelected) {
-                            this.selected = [];
-                        } else {
-                            this.selected = this.po.map((c) => c.id);
-                        }
-                    },
-                };
-            }
-        </script>
+    </div>
+</div>

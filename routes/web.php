@@ -15,7 +15,7 @@ use App\Livewire\CustomerPoList;
 use App\Livewire\PoToSupplierList;
 use App\Livewire\CustomerPo;
 use App\Livewire\Recieving;
-use App\Livewire\ReturnByCustomer;  
+use App\Livewire\ReturnByCustomer;
 use App\Livewire\ReturnToSupplier;
 use App\Livewire\Stockcard;
 use App\Livewire\SalesReleasing;
@@ -33,24 +33,27 @@ use App\Livewire\CashFlow;
 use App\Livewire\Testform;
 // customer add edit 
 use App\Livewire\Addcustomer;
+use App\Livewire\Addproduct;
+use App\Livewire\Addsupplier;
 use App\Livewire\Editcustomer;
 
-Use App\Livewire\LoginForm;
+use App\Livewire\LoginForm;
 
 Route::get('/', CustomerMaster::class)->name('login-form');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::prefix('admin')->group(function () {
-       // Route::get('dashboard', AdminDashboard::class)->name('admin.dashboard');
+        // Route::get('dashboard', AdminDashboard::class)->name('admin.dashboard');
         Route::get('/contact-developer', ContactDeveloper::class)->name('contact-developer');
         Route::get('/CustomerMaster', CustomerMaster::class)->name('customer-master');
         Route::get('/add-customer-files', Addcustomer::class)->name('addcustomer');
-        Route::get('/edit-customer-files', Editcustomer::class)->name('editcustomer');
-
+        Route::get('/customeredit/{id}', Editcustomer::class)->name('customeredit');
+        Route::get('/add-product', Addproduct::class)->name('addproduct');
+        Route::get('/add-supplier', Addsupplier::class)->name('addsupplier');
         Route::get('/ProductMaster', ProductMaster::class)->name('product-master');
         Route::get('/SupplierMaster', SupplierMaster::class)->name('supplier-master');
         Route::get('/UserList', UserList::class)->name('user-list');
-    
+
         Route::get('/po-to-supplier', PoToSupplier::class)->name('po-to-supplier');
         Route::get('/customer-po-list', CustomerPoList::class)->name('customer-po-list');
         Route::get('/po-to-supplier-list', PoToSupplierList::class)->name('po-to-supplier-list');
@@ -75,7 +78,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::prefix('user')->group(function () {
-       
+
     });
 });
 
@@ -99,4 +102,4 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
