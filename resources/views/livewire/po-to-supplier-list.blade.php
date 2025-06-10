@@ -5,6 +5,7 @@
             <!-- Title -->
             <h2 class="text-2xl font-semibold text-gray-900 mb-2">PO to Supplier list</h2>
 
+
             <!-- Search and Buttons -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <!-- Search Bar -->
@@ -14,6 +15,8 @@
                     </span>
                     <input type="text" x-model="search" placeholder="Search..."
                         class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                    <input type="text" x-model="search" placeholder="Search..."
+                        class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
                 <!-- Button Group -->
                 <div class="flex gap-2">
@@ -21,15 +24,23 @@
                     @include('partials.supplier-modal.supplier-master-create')
 
                     <x-button right-icon="pencil" interaction="positive" x-bind:class="selected.length === 0 ?
+
+                    <x-button right-icon=" pencil" interaction="positive" x-bind:class="selected.length === 0 ?
                             'bg-gray-300 text-white cursor-not-allowed' :
                             'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selected.length === 0"
+                        x-on:click="$openModal('Edit')">
+                        'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selected.length === 0"
                         x-on:click="$openModal('Edit')">
                     </x-button>
                     @include('partials.supplier-modal.supplier-edit')
 
                     <x-button right-icon="trash" interaction="negative" x-bind:class="selected.length === 0 ?
+
+                    <x-button right-icon=" trash" interaction="negative" x-bind:class="selected.length === 0 ?
                             'bg-red-300 text-white cursor-not-allowed' :
                             'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selected.length === 0"
+                        x-on:click="$openModal('Delete')">
+                        'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selected.length === 0"
                         x-on:click="$openModal('Delete')">
                     </x-button>
                     @include('partials.supplier-modal.supplier-delete')
@@ -53,18 +64,20 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 border-t border-gray-100">
                         <template x-for="poItem in po" :key="poItem . id">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-4">
-                                    <input type="checkbox" :value="poItem . id" x-model="selected"
-                                        class="h-4 w-4 text-blue-600" />
-                                </td>
-                                <td class="px-6 py-4" x-text="poItem.PO"></td>
-                                <td class="px-6 py-4" x-text="poItem.Customer"></td>
-                                <td class="px-6 py-4" x-text="poItem.Date"></td>
-                                <td class="px-6 py-4" x-text="poItem.Status"></td>
-                                <td class="px-6 py-4" x-text="poItem.Total"></td>
-                            </tr>
-                        </template>
+                            <template x-for="poItem in po" :key="poItem . id">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-4">
+                                        <input type="checkbox" :value="poItem . id" x-model="selected" <input
+                                            type="checkbox" :value="poItem . id" x-model="selected"
+                                            class="h-4 w-4 text-blue-600" />
+                                    </td>
+                                    <td class="px-6 py-4" x-text="poItem.PO"></td>
+                                    <td class="px-6 py-4" x-text="poItem.Customer"></td>
+                                    <td class="px-6 py-4" x-text="poItem.Date"></td>
+                                    <td class="px-6 py-4" x-text="poItem.Status"></td>
+                                    <td class="px-6 py-4" x-text="poItem.Total"></td>
+                                </tr>
+                            </template>
                     </tbody>
                 </table>
             </div>
@@ -143,4 +156,7 @@
 
         </div>
     </div>
+
+</div>
+</div>
 </div>

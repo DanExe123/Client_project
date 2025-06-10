@@ -2,26 +2,35 @@
     {{-- Success Alert --}}
 
 
+
     <div>
         <div class="flex justify-start">
             <h2 class="text-lg font-bold text-gray-800">Add Customer Files</h2>
         </div>
+
 
         @if (session()->has('message'))
             <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
                 class="mt-2">
                 <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
                     class="!bg-green-300 !w-full" />
-            </div>
+                <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+                    class="mt-2">
+                    <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+                        class="!bg-green-300 !w-full" />
+                </div>
         @endif
-    </div>
+        </div>
 
 
 
-    <div class="text-gray-500 flex text-start gap-3">
-        <a class="text-gray-500 font-medium" wire:navigate href="{{ route('customer-master') }}">Customer Files</a>
-        <x-phosphor.icons::regular.caret-right class="w-4 h-4 text-gray-500 flex shrink-0 mt-1" />
-        <span class="text-gray-500 font-medium "> Add Customer Files</span>
+
+
+        <div class="text-gray-500 flex text-start gap-3">
+            <a class="text-gray-500 font-medium" wire:navigate href="{{ route('customer-master') }}">Customer Files</a>
+            <x-phosphor.icons::regular.caret-right class="w-4 h-4 text-gray-500 flex shrink-0 mt-1" />
+            <span class="text-gray-500 font-medium "> Add Customer Files</span>
+        </div>
     </div>
     <hr>
     {{-- Form --}}
@@ -29,17 +38,25 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <x-input label="Name" wire:model="name" id="name" placeholder="Enter your name"
                 :error="$errors->first('name')" />
+            <x-input label="Name" wire:model="name" id="name" placeholder="Enter your name"
+                :error="$errors->first('name')" />
 
             <x-input label="Email" wire:model="email" id="email" type="email" placeholder="Enter your email"
                 :error="$errors->first('email')" />
+            <x-input label="Email" wire:model="email" id="email" type="email" placeholder="Enter your email"
+                :error="$errors->first('email')" />
 
+            <x-input label="Address" wire:model="address" id="address" placeholder="Enter your address" />
             <x-input label="Address" wire:model="address" id="address" placeholder="Enter your address" />
 
             <x-input label="Contact Number" wire:model="contact" id="contact" type="number" placeholder="Enter contact number" />
 
             <x-input label="Contact Person" wire:model="contact_person" id="contact_person"
                 placeholder="Enter contact person" />
+            <x-input label="Contact Person" wire:model="contact_person" id="contact_person"
+                placeholder="Enter contact person" />
 
+            <x-input label="Term" wire:model="term" id="term" placeholder="Enter term" />
             <x-input label="Term" wire:model="term" id="term" placeholder="Enter term" />
         </div>
         <hr>

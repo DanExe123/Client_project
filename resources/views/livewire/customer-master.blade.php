@@ -34,6 +34,7 @@
       />
 
       <!-- Add Button -->
+      <!-- Add Button -->
       <a wire:navigate href="{{ route('addcustomer') }}">
           <x-button emerald right-icon="plus" />
       </a>
