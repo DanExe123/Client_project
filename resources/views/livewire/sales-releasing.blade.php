@@ -1,4 +1,4 @@
-<div x-cloak class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-5 w-full overflow-x-auto min-w-[1024px]" x-data="POTable()">
+<div x-cloak class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto"  x-data="SalesTable()">
     <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->
@@ -30,28 +30,6 @@
                     placeholder="Search..."
                     class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
-            </div>
-
-            <!-- Button Group -->
-            <div class="flex gap-2">
-                <x-button emerald right-icon="plus" x-on:click="$openModal('Add')" />
-                @include('partials.supplier-modal.supplier-master-create')
-
-                <x-button right-icon="pencil" interaction="positive"
-                    x-bind:class="selected.length === 0 ?
-                        'bg-gray-300 text-white cursor-not-allowed' :
-                        'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
-                    x-bind:disabled="selected.length === 0" x-on:click="$openModal('Edit')">
-                </x-button>
-                @include('partials.supplier-modal.supplier-edit')
-
-                <x-button right-icon="trash" interaction="negative"
-                    x-bind:class="selected.length === 0 ?
-                        'bg-red-300 text-white cursor-not-allowed' :
-                        'bg-red-600 hover:bg-red-700 text-white'"
-                    x-bind:disabled="selected.length === 0" x-on:click="$openModal('Delete')">
-                </x-button>
-                @include('partials.supplier-modal.supplier-delete')
             </div>
         </div>
 
@@ -133,85 +111,12 @@
 
     </div>
 
-    <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
-    <div class="col-span-1 w-full lg:w-full xl:w-[490px] md:w-[250px] bg-white rounded-lg border shadow-md p-5 space-y-4">
-        <h3 class="text-lg font-bold text-gray-800">
-            Csutomer PO <span class="text-blue-500"></span>
-        </h3>
-
-        <!-- User and Address Inputs -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <x-select label="Select Transaction type" placeholder="Select some user" option-label="name" option-value="id" />
-            <x-select label="Select Customer" placeholder="Select some customer" option-label="name" option-value="id" />
-        </div>
-
-        <!-- Product Table -->
-        <h4 class="text-md font-semibold text-gray-700">Products</h4>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="border px-2 py-1 font-medium">Product Description</th>
-                        <th class="border px-2 py-1 font-medium">Qty</th>
-                        <th class="border px-2 py-1 font-medium">Unit Price</th>
-                        <th class="border px-2 py-1 font-medium">Discount%</th>
-                        <th class="border px-2 py-1 font-medium">Subtotal</th>
-                        <th class="border px-2 py-1 font-medium">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="hover:bg-gray-50">
-                        <td class="border px-2 py-2">
-                            <select class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-200 focus:ring-opacity-50">
-                                <option>Select</option>
-                                <option>Dog Food</option>
-                                <option>Cat Shampoo</option>
-                                <option>Vaccine A</option>
-                            </select>
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="number" value="1" min="1" class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="number" value="0.00" step="0.01" class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="text" value="0.00" readonly class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2 text-center">0.00</td>
-                        <td class="border px-2 py-2 text-center">
-                            <x-button red label="Remove" class="px-2 py-1 text-xs h-8" />
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot class="bg-gray-50">
-                    <tr>
-                        <td colspan="5" class="border px-2 py-2 text-right font-semibold">Total:</td>
-                        <td class="border px-2 py-2 text-center">0.00</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <!-- Add Product Button -->
-        <div class="pt-2">
-            <x-button green label="Add Product" />
-        </div>
-        <hr>
-        <!-- Remarks Section -->
-        <div class="pt-4">
-            <x-textarea name="remarks" label="remarks" placeholder="Write your remarks" />
-            <div class="flex justify-end pt-2">
-                <x-button blue label="Submit" />
-            </div>
-        </div>
-    </div>
-</div>
+    
 
 
 
 <script>
-    function POTable() {
+    function SalesTable() {
         return {
             search: '',
             selected: [],
