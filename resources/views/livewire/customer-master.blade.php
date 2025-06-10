@@ -1,50 +1,29 @@
-<div x-cloak class="m-5" x-data="customerTable">
+<div x-cloak class="m-5">
   <!-- Header with title and button group --> 
   <h2 class="text-2xl font-semibold text-gray-900">Customer Master</h2>
   <div class="flex items-center justify-end">
     <!-- Button Group -->
     <div class="flex items-center gap-2 mt-5">
       <x-select class="mb-1"
-      placeholder="Select year"
-      :options="[
-          ['name' => '2025', 'id' => '2025'],
-          ['name' => '2024', 'id' => '2024'],
-          ['name' => '2023', 'id' => '2023'],
-      ]" 
-      option-label="name" 
-      option-value="id"
-  />
+          placeholder="Select year"
+          :options="[
+              ['name' => '2025', 'id' => '2025'],
+              ['name' => '2024', 'id' => '2024'],
+              ['name' => '2023', 'id' => '2023'],
+          ]" 
+          option-label="name" 
+          option-value="id"
+      />
 
+      <!-- Add Button -->
+      <a wire:navigate href="{{ route('addcustomer') }}">
+          <x-button emerald right-icon="plus" />
+      </a>
 
-    <!-- Add Button -->
-
-    <a wire:navigate href="{{ route('addcustomer') }}">
-      <x-button emerald right-icon="plus" />
-  </a>
-  
- 
-  
-
-      <!-- Edit Button -->
-      <x-button right-icon="pencil" interaction="positive" 
-        x-bind:class="selected.length === 0 
-          ? 'bg-gray-300 text-white cursor-not-allowed' 
-          : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
-        x-bind:disabled="selected.length === 0"
-        x-on:click="$openModal('Edit')">
-    </x-button>
-          @include('partials.customer-edit')
-
-      <!-- Delete Button -->
-    <x-button  right-icon="trash" interaction="negative" 
-        x-bind:class="selected.length === 0 
-          ? 'bg-red-300 text-white cursor-not-allowed' 
-          : 'bg-red-600 hover:bg-red-700 text-white'"
-        x-bind:disabled="selected.length === 0"
-        x-on:click="$openModal('Delete')">
-      </x-button>
-            @include('partials.customer-delete')
-
+      <x-button right-icon="pencil" wire:click="editSelected" :disabled="count($selectedCustomerId) !== 1"/>
+       
+      <x-button right-icon="trash" wire:click="deleteSelected" :disabled="count($selectedCustomerId) === 0"/>
+            
     </div>
   </div>
 
@@ -53,7 +32,10 @@
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-4 py-4">
-                    <input type="checkbox" wire:click="toggleAll" />
+                  <input type="checkbox"
+                      wire:click="toggleSelectAll"
+                      @if($customers->pluck('id')->diff($selectedCustomerId)->isEmpty()) checked @endif
+                  />
                 </th>
                 <th class="px-6 py-4 font-medium text-gray-900">Name</th>
                 <th class="px-6 py-4 font-medium text-gray-900">Status</th>
@@ -67,7 +49,10 @@
           @forelse ($customers as $customer)
               <tr class="hover:bg-gray-50">
                   <td class="px-4 py-4">
-                      <input type="checkbox" wire:model="selected" value="{{ $customer->id }}" class="h-4 w-4 text-blue-600" />
+                    <input type="checkbox"
+                        wire:click="selectCustomer({{ $customer->id }})"
+                        @if(in_array($customer->id, $selectedCustomerId)) checked @endif
+                    />
                   </td>
                   <td class="flex gap-3 px-6 py-4 font-normal text-gray-900">
                       <div class="text-sm">
@@ -98,35 +83,24 @@
       <hr class="mb-2">
         {{ $customers->links() }}
       </div>
+
+      @if (session()->has('message'))
+          <div 
+              x-data="{ show: true }" 
+              x-init="setTimeout(() => show = false, 3000)" 
+              x-show="show" 
+              x-transition 
+              class="fixed top-8 right-4 z-50"
+          >
+              <x-alert 
+                  :title="session('message')" 
+                  icon="check-circle" 
+                  color="success" 
+                  positive 
+                  flat 
+                  class="!bg-green-300 !w-72 shadow-lg"
+              />
+          </div>
+      @endif
+
 </div>
-
-
-<script>
-  document.addEventListener("alpine:init", () => {
-    Alpine.data("customerTable", () => ({
-      selected: [],
-      rows: [
-        {
-          id: 1,
-          name: "Steven Jobs",
-          email: "jobs@sailboatui.com",
-          address: "Villamontes",
-          contact: "091243124",
-          contact_person: "091243124",
-          term: "Termination",
-        },
-        // Add more rows if needed
-      ],
-      get isAllSelected() {
-        return this.selected.length === this.rows.length;
-      },
-      toggleAll() {
-        if (this.isAllSelected) {
-          this.selected = [];
-        } else {
-          this.selected = this.rows.map(row => row.id);
-        }
-      },
-    }));
-  });
-</script>

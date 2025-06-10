@@ -47,7 +47,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/contact-developer', ContactDeveloper::class)->name('contact-developer');
         Route::get('/CustomerMaster', CustomerMaster::class)->name('customer-master');
         Route::get('/add-customer-files', Addcustomer::class)->name('addcustomer');
-        Route::get('/edit-customer-files', Editcustomer::class)->name('editcustomer');
+        Route::get('/customeredit/{id}', Editcustomer::class)->name('customeredit');
         Route::get('/add-product', Addproduct::class)->name('addproduct');
         Route::get('/add-supplier', Addsupplier::class)->name('addsupplier');
         Route::get('/ProductMaster', ProductMaster::class)->name('product-master');
