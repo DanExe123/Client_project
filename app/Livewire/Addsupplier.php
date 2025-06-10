@@ -12,7 +12,6 @@ class AddSupplier extends Component
     public $term;
     public $contact;
     public $contact_person;
-
     protected $rules = [
         'name' => 'required|string|min:3',
         'address' => 'nullable|string',
@@ -20,7 +19,6 @@ class AddSupplier extends Component
         'contact' => 'nullable|string',
         'contact_person' => 'nullable|string',
     ];
-
     public function submit()
     {
         $this->validate();

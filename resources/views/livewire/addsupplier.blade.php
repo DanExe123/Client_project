@@ -19,7 +19,6 @@
         <span class="text-gray-500 font-medium">Add Supplier</span>
     </div>
     <hr>
-
     <form wire:submit.prevent="submit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <x-input label="Supplier Name" wire:model="name" id="name" placeholder="Enter supplier name"

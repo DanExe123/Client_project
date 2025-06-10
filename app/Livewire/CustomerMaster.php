@@ -26,6 +26,7 @@ class CustomerMaster extends Component
         }
     }
 
+
     public function toggleSelectAll()
     {
         $paginatedIds = Customer::paginate(5)->pluck('id')->toArray();

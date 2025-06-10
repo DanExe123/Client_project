@@ -22,7 +22,6 @@
         <span class="text-gray-500 font-medium">Add Product</span>
     </div>
     <hr>
-
     {{-- Form --}}
     <form wire:submit.prevent="submit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
