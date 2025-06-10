@@ -1,4 +1,5 @@
 <div class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
+<div class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
     <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->
@@ -73,6 +74,7 @@
     </div>
     <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
     <div class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
+    <div class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
         <h3 class="text-lg font-bold text-gray-800">
             Add <span class="text-blue-500">PO</span> to <span class="text-blue-500">Supplier</span>
         </h3>
@@ -121,6 +123,7 @@
 
 
         </div>
+
 
         <!-- Product Table -->
         <h4 class="text-md font-semibold text-gray-700">Products</h4>

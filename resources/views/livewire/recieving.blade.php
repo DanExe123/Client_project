@@ -37,7 +37,7 @@
                 
 
                 <x-button emerald right-icon="plus" x-on:click="$openModal('Add')" />
-                @include('partials.inventory-modal.recieving-create')
+               
     
                 <x-button right-icon="pencil" interaction="positive"
                     x-bind:class="selected.length === 0 ?
@@ -45,7 +45,7 @@
                         'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
                     x-bind:disabled="selected.length === 0" x-on:click="$openModal('Edit')">
                 </x-button>
-                @include('partials.inventory-modal.recieving-edit')
+                
     
                 <x-button right-icon="trash" interaction="negative"
                     x-bind:class="selected.length === 0 ?
@@ -53,7 +53,7 @@
                         'bg-red-600 hover:bg-red-700 text-white'"
                     x-bind:disabled="selected.length === 0" x-on:click="$openModal('Delete')">
                 </x-button>
-                @include('partials.inventory-modal.recieving-delete')
+           
             </div>
     
             <!-- Supplier Table -->

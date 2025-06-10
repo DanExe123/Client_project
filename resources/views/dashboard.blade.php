@@ -1,5 +1,5 @@
 <x-layouts.app :title="__('Dashboard')">
-    <div 
+    <div x-cloak
     x-data="{
         date: new Date(),
         init() {

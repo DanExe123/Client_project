@@ -87,11 +87,36 @@
             <h3 class="text-lg font-bold text-gray-800">
                 Add <span class="text-blue-500">PO</span> to <span class="text-blue-500">Supplier</span>
             </h3>
+
             <!-- User and Address Inputs -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <x-select label="Search a User" placeholder="Select some user" option-label="name" option-value="id" />
                 <x-input label="Customer Address" placeholder="Enter Address" />
             </div>
+
+            <div 
+            x-data="{
+                date: new Date(),
+                init() {
+                    this.setDefaultDateTime();
+                },
+                setDefaultDateTime() {
+                    const pad = num => String(num).padStart(2, '0');
+                    const yyyy = this.date.getFullYear();
+                    const mm = pad(this.date.getMonth() + 1);
+                    const dd = pad(this.date.getDate());
+                    const hh = pad(this.date.getHours());
+                    const min = pad(this.date.getMinutes());
+                    this.datetime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+                },
+                datetime: ''
+            }"
+            >
+            <label for="datetime">Select Date & Time:</label>
+            <input type="datetime-local" x-model="datetime" id="datetime" class="border p-2 rounded" />
+            </div>
+
+
             <!-- Product Table -->
             <h4 class="text-md font-semibold text-gray-700">Products</h4>
             <div class="overflow-x-auto">

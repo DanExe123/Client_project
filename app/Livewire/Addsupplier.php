@@ -16,7 +16,7 @@ class AddSupplier extends Component
         'name' => 'required|string|min:3',
         'address' => 'nullable|string',
         'term' => 'nullable|string',
-        'conatct' => 'required|numeric|min:0',
+        'contact' => 'required|numeric|min:0',
         'contact_person' => 'nullable|string',
     ];
     public function submit()

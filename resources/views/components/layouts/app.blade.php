@@ -19,6 +19,9 @@
     @livewireStyles
 </head>
 <body class="">
+    <p class="alert alert-warning text-black" wire:offline>
+        Whoops, your device has lost connection. The web page you are viewing is offline.
+    </p>
 
     <x-layouts.app.header :title="$title ?? null" />
 

@@ -47,7 +47,7 @@
   </div>
 
   <div class="overflow-hidden rounded-lg border border-gray-200 shadow-md">
-    <table wire:poll.1s class="w-full border-collapse bg-white text-left text-sm text-gray-500">
+    <table class="w-full border-collapse bg-white text-left text-sm text-gray-500">
       <thead class="bg-gray-50">
         <tr>
           <th class="px-4 py-4">
@@ -62,7 +62,6 @@
           <th class="px-6 py-4 font-medium text-gray-900">Highest Unit of Measurement</th>
           <th class="px-6 py-4 font-medium text-gray-900">Lowest Unit of Measurement</th>
           <th class="px-6 py-4 font-medium text-gray-900">Price</th>
-          <th class="px-6 py-4 font-medium text-gray-900">Selling Price</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100 border-t border-gray-100">
@@ -80,7 +79,6 @@
         <td class="px-6 py-4">{{ $product->highest_uom }}</td>
         <td class="px-6 py-4">{{ $product->lowest_uom }}</td>
         <td class="px-6 py-4">{{ number_format($product->price, 2) }}</td>
-        <td class="px-6 py-4">{{ number_format($product->selling_price, 2) }}</td>
       </tr>
     @empty
       <tr>
