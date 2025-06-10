@@ -16,7 +16,7 @@ class AddSupplier extends Component
         'name' => 'required|string|min:3',
         'address' => 'nullable|string',
         'term' => 'nullable|string',
-        'contact' => 'nullable|string',
+        'conatct' => 'required|numeric|min:0',
         'contact_person' => 'nullable|string',
     ];
     public function submit()
@@ -35,6 +35,7 @@ class AddSupplier extends Component
         session()->flash('message', 'Successfully Added New Supplier');
 
         $this->reset();
+        return redirect()->route('supplier-master');
     }
 
     public function render()

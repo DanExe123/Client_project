@@ -1,28 +1,47 @@
-<div class="m-5" x-data>
+<div x-cloak class="m-5">
   <h2 class="text-2xl font-semibold text-gray-900">Product Master</h2>
+  {{-- Success Alert --}}
+  @if (session()->has('message'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+        class="mt-2">
+        <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+            class="!bg-green-300 !w-full" />
+    </div>
+  @endif
+  
   <div class="flex items-center justify-between mb-1 mt-5">
+    <!-- 🔍 Search Bar -->
     <div class="w-full sm:max-w-xs flex justify-start relative">
       <span class="absolute inset-y-0 left-0 flex items-center pl-3">
         <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
       </span>
-      <input type="text" placeholder="Search..."
+      <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..."
         class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
     </div>
+
     <div class="flex items-center gap-2">
       <a wire:navigate href="{{ route('addproduct') }}">
         <x-button emerald right-icon="plus" />
       </a>
-      <x-button right-icon="pencil" interaction="positive" x-bind:class="selected.length === 0 
+
+      <x-button 
+          right-icon="pencil" 
+          wire:click="editSelected" 
+          :class="count($selectedProductId) !== 1 
               ? 'bg-gray-300 text-white cursor-not-allowed' 
-              : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selected.length === 0"
-        x-on:click="$openModal('Edit')">
-      </x-button>
-      {{-- @include('partials.product-modal.product-edit') --}}
-      <x-button right-icon="trash" interaction="negative" x-bind:class="selected.length === 0 
+              : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'" 
+          :disabled="count($selectedProductId) !== 1" 
+      />
+
+      <x-button 
+          right-icon="trash" 
+          wire:click="deleteSelected" 
+          :class="count($selectedProductId) === 0 
               ? 'bg-red-300 text-white cursor-not-allowed' 
-              : 'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selected.length === 0"
-        x-on:click="$openModal('Delete')">
-      </x-button>
+              : 'bg-red-600 hover:bg-red-700 text-white'" 
+          :disabled="count($selectedProductId) === 0" 
+      />
+
       {{-- @include('partials.product-modal.product-delete') --}}
     </div>
   </div>
@@ -32,7 +51,10 @@
       <thead class="bg-gray-50">
         <tr>
           <th class="px-4 py-4">
-            <input type="checkbox" wire:click="toggleAll" />
+            <input type="checkbox"
+              wire:click="toggleSelectAll"
+              @if($products->pluck('id')->diff($selectedProductId)->isEmpty()) checked @endif
+            />
           </th>
           <th class="px-6 py-4 font-medium text-gray-900">Barcode</th>
           <th class="px-6 py-4 font-medium text-gray-900">Supplier</th>
@@ -46,7 +68,10 @@
         @forelse ($products as $product)
       <tr class="hover:bg-gray-50">
         <td class="px-4 py-4">
-        <input type="checkbox" wire:model="selected" value="{{ $product->id }}" class="h-4 w-4 text-blue-600" />
+          <input type="checkbox"
+              wire:click="selectProduct({{ $product->id }})"
+              @if(in_array($product->id, $selectedProductId)) checked @endif
+          />
         </td>
         <td class="px-6 py-4">{{ $product->barcode }}</td>
         <td class="px-6 py-4">{{ $product->supplier }}</td>

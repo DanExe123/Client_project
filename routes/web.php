@@ -36,6 +36,8 @@ use App\Livewire\Addcustomer;
 use App\Livewire\Addproduct;
 use App\Livewire\Addsupplier;
 use App\Livewire\Editcustomer;
+use App\Livewire\Editproduct;
+use App\Livewire\Editsupplier;
 
 use App\Livewire\LoginForm;
 
@@ -48,6 +50,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/CustomerMaster', CustomerMaster::class)->name('customer-master');
         Route::get('/add-customer-files', Addcustomer::class)->name('addcustomer');
         Route::get('/customeredit/{id}', Editcustomer::class)->name('customeredit');
+        Route::get('/edit-product/{id}', Editproduct::class)->name('productedit');
+        Route::get('/edit-supplier/{id}', Editsupplier::class)->name('supplieredit');
+
         Route::get('/add-product', Addproduct::class)->name('addproduct');
         Route::get('/add-supplier', Addsupplier::class)->name('addsupplier');
         Route::get('/ProductMaster', ProductMaster::class)->name('product-master');

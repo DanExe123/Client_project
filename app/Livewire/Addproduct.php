@@ -39,6 +39,7 @@ class AddProduct extends Component
         session()->flash('message', 'Successfully added new product.');
 
         $this->reset();
+        return redirect()->route('product-master');
     }
     public function render()
     {

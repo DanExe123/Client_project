@@ -2,19 +2,29 @@
     {{-- Header --}}
     <div>
         <div class="flex justify-start">
-            <h2 class="text-lg font-bold text-gray-800">Add Product</h2>
+            <h2 class="text-lg font-bold text-gray-800">Edit Product</h2>
         </div>
+
+        {{-- Success Alert --}}
+        @if (session()->has('message'))
+            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+                class="mt-2">
+                <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+                    class="!bg-green-300 !w-full" />
+            </div>
+        @endif
     </div>
 
     {{-- Breadcrumb --}}
     <div class="text-gray-500 flex text-start gap-3">
         <span class="text-gray-500 font-medium">Product Master</span>
         <x-phosphor.icons::regular.caret-right class="w-4 h-4 text-gray-500 flex shrink-0 mt-1" />
-        <span class="text-gray-500 font-medium">Add Product</span>
+        <span class="text-gray-500 font-medium">Edit Product</span>
     </div>
     <hr>
+
     {{-- Form --}}
-    <form wire:submit.prevent="submit" class="space-y-4">
+    <form wire:submit.prevent="updateProduct" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <x-input label="Barcode" wire:model="barcode" id="barcode" placeholder="Enter barcode"
                 :error="$errors->first('barcode')" />
@@ -29,7 +39,7 @@
         </div>
         <hr>
         <div class="pt-2 flex justify-center">
-            <x-button spinner type="submit" primary label="Submit" class="flex justify-center !w-48" />
+            <x-button spinner type="submit" primary label="Update" class="flex justify-center !w-48" />
         </div>
     </form>
 </div>

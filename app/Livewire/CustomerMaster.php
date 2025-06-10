@@ -10,6 +10,7 @@ class CustomerMaster extends Component
 {
     use WithPagination;
 
+    public $search = '';
     public $selectedCustomerId = [];
 
     public function selectCustomer($id)
@@ -60,7 +61,16 @@ class CustomerMaster extends Component
 
     public function render()
     {
-        $customers = Customer::paginate(5);
+        $search = $this->search;
+
+        $customers = Customer::when($search, function ($query) use ($search) {
+            $query->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('address', 'like', '%' . $search . '%')
+                  ->orWhere('contact', 'like', '%' . $search . '%')
+                  ->orWhere('contact_person', 'like', '%' . $search . '%')
+                  ->orWhere('term', 'like', '%' . $search . '%');
+        })->paginate(5);
         return view('livewire.customer-master', compact('customers'));
     }
 }

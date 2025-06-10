@@ -38,10 +38,10 @@ class Addcustomer extends Component
             'status' => true,
         ]);
 
-       
+        session()->flash('message', 'Successfully Added New Customer');
         $this->reset();
         
-        return redirect()->route('customer-master')->with('message', 'Successfully Added New Customer file');
+        return redirect()->route('customer-master');
     }
 
     public function render()
