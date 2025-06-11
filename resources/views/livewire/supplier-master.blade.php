@@ -3,13 +3,12 @@
   <h2 class="text-2xl font-semibold text-gray-900">Supplier Master</h2>
   {{-- Success Alert --}}
   @if (session()->has('message'))
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
-        class="mt-2">
-        <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
-            class="!bg-green-300 !w-full" />
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
+    <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+      class="!bg-green-300 !w-full" />
     </div>
   @endif
-  
+
   <div class="flex items-center justify-between mb-1 mt-5">
     <!-- 🔍 Search Bar -->
     <div class="w-full sm:max-w-xs flex justify-start relative">
@@ -27,23 +26,15 @@
         <x-button emerald right-icon="plus" />
       </a>
 
-      <x-button 
-          right-icon="pencil" 
-          wire:click="editSelected" 
-          :class="count($selectedSupplierId) !== 1 
-              ? 'bg-gray-300 text-white cursor-not-allowed' 
-              : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'" 
-          :disabled="count($selectedSupplierId) !== 1" 
-      />
+      <x-button right-icon="pencil" wire:click="editSelected" :class="count($selectedSupplierId) !== 1
+    ? 'bg-gray-300 text-white cursor-not-allowed'
+    : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
+        :disabled="count($selectedSupplierId) !== 1" />
 
-      <x-button 
-          right-icon="trash" 
-          wire:click="deleteSelected" 
-          :class="count($selectedSupplierId) === 0 
-              ? 'bg-red-300 text-white cursor-not-allowed' 
-              : 'bg-red-600 hover:bg-red-700 text-white'" 
-          :disabled="count($selectedSupplierId) === 0" 
-      />
+      <x-button right-icon="trash" wire:click="deleteSelected" :class="count($selectedSupplierId) === 0
+    ? 'bg-red-300 text-white cursor-not-allowed'
+    : 'bg-red-600 hover:bg-red-700 text-white'"
+        :disabled="count($selectedSupplierId) === 0" />
     </div>
   </div>
 
@@ -54,14 +45,13 @@
       <thead class="bg-gray-50">
         <tr>
           <th class="px-4 py-4">
-            <input type="checkbox"
-              wire:click="toggleSelectAll"
-              @if($suppliers->pluck('id')->diff($selectedSupplierId)->isEmpty()) checked @endif
-            />
+            <input type="checkbox" wire:click="toggleSelectAll"
+              @if($suppliers->pluck('id')->diff($selectedSupplierId)->isEmpty()) checked @endif />
           </th>
           <th class="px-6 py-4 font-medium text-gray-900">Supplier Name</th>
           <th class="px-6 py-4 font-medium text-gray-900">Address</th>
           <th class="px-6 py-4 font-medium text-gray-900">Term</th>
+          <th class="px-6 py-4 font-medium text-gray-900">Tin Number</th>
           <th class="px-6 py-4 font-medium text-gray-900">Contact</th>
           <th class="px-6 py-4 font-medium text-gray-900">Contact Person</th>
           <th class="px-6 py-4 font-medium text-gray-900">Status</th>
@@ -71,14 +61,12 @@
         @forelse ($suppliers as $supplier)
       <tr class="hover:bg-gray-50">
         <td class="px-4 py-4">
-          <input type="checkbox"
-              wire:click="selectSupplier({{ $supplier->id }})"
-              @if(in_array($supplier->id, $selectedSupplierId)) checked @endif
-          />
+        <input type="checkbox" wire:click="selectSupplier({{ $supplier->id }})" @if(in_array($supplier->id, $selectedSupplierId)) checked @endif />
         </td>
         <td class="px-6 py-4">{{ $supplier->name }}</td>
         <td class="px-6 py-4">{{ $supplier->address }}</td>
         <td class="px-6 py-4">{{ $supplier->term }}</td>
+        <td class="px-6 py-4">{{ $supplier->tin_number }}</td>
         <td class="px-6 py-4">{{ $supplier->contact }}</td>
         <td class="px-6 py-4">{{ $supplier->contact_person }}</td>
         <td class="px-6 py-4">{{ $supplier->status }}</td>

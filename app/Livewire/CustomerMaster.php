@@ -65,11 +65,12 @@ class CustomerMaster extends Component
 
         $customers = Customer::when($search, function ($query) use ($search) {
             $query->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('address', 'like', '%' . $search . '%')
-                  ->orWhere('contact', 'like', '%' . $search . '%')
-                  ->orWhere('contact_person', 'like', '%' . $search . '%')
-                  ->orWhere('term', 'like', '%' . $search . '%');
+                ->orWhere('email', 'like', '%' . $search . '%')
+                ->orWhere('address', 'like', '%' . $search . '%')
+                ->orWhere('contact', 'like', '%' . $search . '%')
+                ->orWhere('contact_person', 'like', '%' . $search . '%')
+                ->orWhere('term', 'like', '%' . $search . '%')
+                ->orWhere('cust_tin_number', 'like', '%' . $search . '%');
         })->paginate(5);
         return view('livewire.customer-master', compact('customers'));
     }

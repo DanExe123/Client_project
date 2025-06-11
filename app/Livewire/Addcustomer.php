@@ -13,6 +13,7 @@ class Addcustomer extends Component
     public $contact;
     public $contact_person;
     public $term;
+    public $cust_tin_number; // Assuming TIN is a field in the Customer model
 
     protected $rules = [
         'name' => 'required|string|min:3',
@@ -20,10 +21,11 @@ class Addcustomer extends Component
         'address' => 'nullable|string',
         'contact' => 'required|numeric|min:0',
         'contact_person' => 'nullable|string',
-        'term' => 'nullable|string',
+        'term' => 'nullable|numeric|min:0',
+        'cust_tin_number' => 'nullable|string', // Assuming TIN is optional
     ];
 
-    
+
     public function submit()
     {
         $this->validate();
@@ -35,12 +37,13 @@ class Addcustomer extends Component
             'contact' => $this->contact,
             'contact_person' => $this->contact_person,
             'term' => $this->term,
+            'cust_tin_number' => $this->cust_tin_number, // Assuming TIN is a field in the Customer model
             'status' => true,
         ]);
 
         session()->flash('message', 'Successfully Added New Customer');
         $this->reset();
-        
+
         return redirect()->route('customer-master');
     }
 

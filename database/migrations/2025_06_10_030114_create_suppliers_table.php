@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('name'); // Supplier Name
             $table->string('address')->nullable();
             $table->string('term')->nullable(); // Terms (No. of Days)
+            $table->string('tin_number')->nullable(); // Tax Identification Number
             $table->unsignedInteger('contact')->nullable();
             $table->string('contact_person')->nullable();
             $table->boolean('status')->default(true);

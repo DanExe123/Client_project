@@ -29,9 +29,11 @@
 
             <x-input label="Terms (No. of Days)" wire:model="term" id="term" placeholder="Enter term"
                 :error="$errors->first('term')" />
+            <x-input label="Tin Number" wire:model="tin_number" id="term" placeholder="Enter Tin number"
+                :error="$errors->first('tin_number')" />
 
-            <x-input label="Contact Number" wire:model="contact" id="contact" type="number" placeholder="Enter contact number"
-                :error="$errors->first('contact')" />
+            <x-input label="Contact Number" wire:model="contact" id="contact" type="number"
+                placeholder="Enter contact number" :error="$errors->first('contact')" />
 
             <x-input label="Contact Person" wire:model="contact_person" id="contact_person"
                 placeholder="Enter contact person" :error="$errors->first('contact_person')" />

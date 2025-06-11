@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Product;
+use App\Models\Supplier;
 
 class AddProduct extends Component
 {
@@ -14,6 +15,7 @@ class AddProduct extends Component
     public $lowest_uom;
     public $price;
     public $selling_price;
+
 
     protected $rules = [
         'barcode' => 'required|numeric|min:0|unique:products,barcode',
@@ -46,6 +48,13 @@ class AddProduct extends Component
     }
     public function render()
     {
-        return view('livewire.addproduct');
+        $suppliers = Supplier::select('id', 'name')->get();
+
+        return view(
+            'livewire.addproduct',
+            [
+                'suppliers' => $suppliers,
+            ]
+        );
     }
 }

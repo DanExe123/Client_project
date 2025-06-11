@@ -27,7 +27,7 @@ class SupplierMaster extends Component
             $this->selectedSupplierId[] = $id;
         }
     }
-    
+
     public function toggleSelectAll()
     {
         $paginatedIds = Supplier::paginate(5)->pluck('id')->toArray();
@@ -63,11 +63,13 @@ class SupplierMaster extends Component
         $search = $this->search;
 
         $suppliers = Supplier::when($search, function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('address', 'like', '%' . $search . '%')
-                      ->orWhere('contact', 'like', '%' . $search . '%')
-                      ->orWhere('contact_person', 'like', '%' . $search . '%');
-            })
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('address', 'like', '%' . $search . '%')
+                ->orWhere('contact', 'like', '%' . $search . '%')
+                ->orWhere('contact_person', 'like', '%' . $search . '%')
+                ->orWhere('term', 'like', '%' . $search . '%')
+                ->orWhere('tin_number', 'like', '%' . $search . '%');
+        })
             ->paginate(5);
         return view('livewire.supplier-master', compact('suppliers'));
     }

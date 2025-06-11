@@ -68,8 +68,10 @@
                             <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Date</th>
+                            <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Status</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Total</th>
+                            <th class="px-6 py-4 font-medium text-gray-900">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 border-t border-gray-100">
@@ -82,8 +84,10 @@
                                 <td class="px-6 py-4" x-text="poItem.PO"></td>
                                 <td class="px-6 py-4" x-text="poItem.Customer"></td>
                                 <td class="px-6 py-4" x-text="poItem.Date"></td>
+                                <td class="px-6 py-4" x-text="poItem.Transaction"></td>
                                 <td class="px-6 py-4" x-text="poItem.Status"></td>
                                 <td class="px-6 py-4" x-text="poItem.Total"></td>
+                                <td class="px-6 py-4" x-text="poItem.Action"></td>
                             </tr>
                         </template>
                     </tbody>
@@ -102,6 +106,7 @@
                             PO: 'PO001',
                             Customer: 'Customer A',
                             Date: '2025-06-01',
+                            Transaction: 'DR',
                             Status: 'For Approval',
                             Total: '$1,000'
                         },
@@ -110,6 +115,7 @@
                             PO: 'PO002',
                             Customer: 'Customer B',
                             Date: '2025-06-02',
+                            Transaction: 'Invoice',
                             Status: 'Approved',
                             Total: '$2,500'
                         },
@@ -118,6 +124,7 @@
                             PO: 'PO003',
                             Customer: 'Customer C',
                             Date: '2025-06-03',
+                            Transaction: 'Invoice',
                             Status: 'Cancelled',
                             Total: '$500'
                         },
@@ -126,6 +133,7 @@
                             PO: 'PO004',
                             Customer: 'Customer D',
                             Date: '2025-06-04',
+                            Transaction: 'Invoice',
                             Status: 'For Approval',
                             Total: '$1,750'
                         },
