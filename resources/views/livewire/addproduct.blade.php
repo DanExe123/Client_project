@@ -11,7 +11,7 @@
         <span class="text-gray-500 font-medium">Product Master</span>
         <x-phosphor.icons::regular.caret-right class="w-4 h-4 text-gray-500 flex shrink-0 mt-1" />
         <span class="text-gray-500 font-medium">Add Product</span>
-    </div>
+    </div> 
     <hr>
     {{-- Form --}}
     <form wire:submit.prevent="submit" class="space-y-4">

@@ -100,6 +100,11 @@
                     Payable Ledger
                 </flux:navmenu.item>
 
+                <flux:navmenu.item wire:navigate href="{{ route('expenses') }}" icon="wallet">
+                    Expenses
+                </flux:navmenu.item>
+                
+
             </flux:navmenu>
         </flux:dropdown>
 

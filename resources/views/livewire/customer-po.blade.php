@@ -1,4 +1,4 @@
-<div class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
+<div x-cloak class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
     <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->

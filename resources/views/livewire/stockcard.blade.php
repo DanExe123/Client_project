@@ -79,6 +79,7 @@
                         <td class="px-4 py-4">{{ $product->highest_uom }}</td>
                         <td class="px-4 py-4">{{ $product->lowest_uom }}</td>
                         <td class="px-4 py-4">{{ $product->damages }}</td>
+                        <td class="px-4 py-4">{{ $product->quantity }}</td>
                     </tr>
                     @endforeach
                     @if ($products->isEmpty())
