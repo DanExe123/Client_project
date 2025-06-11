@@ -67,7 +67,7 @@
 
         <flux:dropdown position="bottom" align="end">
             <flux:profile name="Recievables" />
-            <flux:navmenu>
+            <flux:navmenu> 
                 <flux:navmenu.item wire:navigate href="{{ route('sales-releasing') }}" icon="truck">Sales Releasing
                 </flux:navmenu.item>
                 <flux:navmenu.item wire:navigate href="{{ route('unservered-lacking') }}" icon="exclamation-circle">
@@ -88,7 +88,7 @@
             </flux:navmenu>
         </flux:dropdown>
 
-
+ 
         <flux:dropdown position="bottom" align="end">
             <flux:profile name="Payable" />
             <flux:navmenu>

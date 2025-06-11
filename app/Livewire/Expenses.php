@@ -11,3 +11,4 @@ class Expenses extends Component
         return view('livewire.expenses');
     }
 }
+ 

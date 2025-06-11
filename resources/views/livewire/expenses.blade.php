@@ -51,7 +51,7 @@
               <x-button info label="Add Entry" type="submit" class="!w-94" />
             </div>
           </form>
-          
+           
           <hr>
       
         <table class="min-w-full border-collapse bg-white text-left text-sm text-gray-500">

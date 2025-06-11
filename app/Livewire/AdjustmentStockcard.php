@@ -51,7 +51,7 @@ class AdjustmentStockcard extends Component
         session()->flash('success', 'Quantity updated!');
         return redirect()->route('stockcard');
     }
-    
+     
 
     public function render()
     {
