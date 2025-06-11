@@ -30,7 +30,7 @@
             </div>
         <hr>
         {{-- Form --}}
-            
+              
         <form wire:submit.prevent="submitQuantity" class="space-y-6">
     
             {{-- Since we only have one product, we can reference it directly --}}

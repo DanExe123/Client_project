@@ -56,7 +56,7 @@
                             wire:click="toggleSelectAll"
                             @if($product->pluck('id')->diff($selectedProductId)->isEmpty()) checked @endif
                         />
-                        </th>
+                        </th> 
                         <th class="px-4 py-4 font-medium text-gray-900">Barcode</th>
                         <th class="px-4 py-4 font-medium text-gray-900">Product Name</th>
                         <th class="px-4 py-4 font-medium text-gray-900">Bag (Highest UoM)</th>

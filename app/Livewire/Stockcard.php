@@ -18,7 +18,7 @@ class Stockcard extends Component
     public $quantity;
     public $productsData = [];
     public bool $showAdjustmentsModal = false;
-
+  
     public function selectedProduct($id)
     {
         if (in_array($id, $this->selectedProductId)) {

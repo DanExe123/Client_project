@@ -29,7 +29,7 @@ class AdjustmentStockcard extends Component
             'barcode'     => $product->barcode,
             'productName' => $product->description,
             'highestUom'  => $product->highest_uom,
-            'lowest_uom'          => $product->lowest_uom,
+            'lowest_uom'          => $product->lowest_uom, 
             'damages'     => $product->damages,
             'quantity'    => 0, // default
         ];
