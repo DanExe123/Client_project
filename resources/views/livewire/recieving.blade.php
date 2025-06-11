@@ -4,7 +4,7 @@
             <h2 class="text-2xl font-semibold text-gray-900 mb-2">Recieving</h2>
             <!-- Tab Buttons -->
             <div class="flex flex-wrap gap-2 pt-2 mb-2">
-                <x-button rounded="lg" light teal  icon="user" label="For Approval"  @click="filterByStatus('For Approval')" 
+                <x-button rounded="lg" light teal  icon="check-circle"  label="For Approval"  @click="filterByStatus('For Approval')" 
                     :class="currentTab === 'For Approval' ? 'bg-blue-600' : 'bg-gray-300'" 
                     class=""/>
             
@@ -34,29 +34,20 @@
                     />
                 </div>
                 
+                <a href="{{ route('recievingapproval') }}">
+                    <x-button emerald right-icon="check-circle" label="Approve" />
+                </a>
                 
-
-                <x-button emerald right-icon="plus" x-on:click="$openModal('Add')" />
-               
-    
                 <x-button right-icon="pencil" interaction="positive"
                     x-bind:class="selected.length === 0 ?
                         'bg-gray-300 text-white cursor-not-allowed' :
                         'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
                     x-bind:disabled="selected.length === 0" x-on:click="$openModal('Edit')">
                 </x-button>
-                
-    
-                <x-button right-icon="trash" interaction="negative"
-                    x-bind:class="selected.length === 0 ?
-                        'bg-red-300 text-white cursor-not-allowed' :
-                        'bg-red-600 hover:bg-red-700 text-white'"
-                    x-bind:disabled="selected.length === 0" x-on:click="$openModal('Delete')">
-                </x-button>
            
             </div>
     
-            <!-- Supplier Table -->
+      
             <div class="overflow-auto rounded-lg border border-gray-200 shadow-md">
                 <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
                     <thead class="bg-gray-50 sticky top-0 z-10">
@@ -88,6 +79,15 @@
                                 <td class="px-6 py-4" x-text="poItem.Status"></td>
                                 <td class="px-6 py-4" x-text="poItem.Total"></td>
                                 <td class="px-6 py-4" x-text="poItem.Action"></td>
+                                <td class="px-6 py-4">
+                                    <x-button 
+                                        outline 
+                                        primary 
+                                        label="View" 
+                                        @click="viewPO(poItem.id)" 
+                                    />
+                                </td>
+                                
                             </tr>
                         </template>
                     </tbody>

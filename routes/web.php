@@ -40,6 +40,9 @@ use App\Livewire\Editproduct;
 use App\Livewire\Editsupplier;
 use App\Livewire\AdjustmentStockcard;
 use App\Livewire\Expenses;
+use App\Livewire\EditExpenses;
+use App\Livewire\Recievingapproval;
+
 
 use App\Livewire\LoginForm;
 
@@ -65,13 +68,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/customer-po-list', CustomerPoList::class)->name('customer-po-list');
         Route::get('/po-to-supplier-list', PoToSupplierList::class)->name('po-to-supplier-list');
         Route::get('/customer-po', CustomerPo::class)->name('customer-po');
+
         Route::get('/recieving', Recieving::class)->name('recieving');
+        Route::get('/recieving-approval', Recievingapproval::class)->name('recievingapproval');
+
         Route::get('/return-by-customer', ReturnByCustomer::class)->name('return-by-customer');
         Route::get('/return-by-supplier', ReturnToSupplier::class)->name('return-by-supplier');
         Route::get('/stockcard', Stockcard::class)->name('stockcard');
         Route::get('/adjustments/{product}',AdjustmentStockcard::class)->name('adjustment-stockcard');
 
         Route::get('/expenses',Expenses::class)->name('expenses');
+        Route::get('/expenses/{id}/edit', Editexpenses::class)->name('editexpenses');
 
 
         Route::get('/sales-releasing', SalesReleasing::class)->name('sales-releasing');
