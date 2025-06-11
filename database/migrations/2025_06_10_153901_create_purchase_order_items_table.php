@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('product_barcode')->nullable(); // Store barcode for historical accuracy
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2); // Price at the time of purchase
+            $table->decimal('product_discount', 10, 2)->default(0); // Add product discount here
             $table->decimal('subtotal', 10, 2); // quantity * unit_price
             $table->timestamps();
         });

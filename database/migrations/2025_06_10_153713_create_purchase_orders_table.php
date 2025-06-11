@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->date('order_date'); // Date of the purchase order
             $table->string('po_number')->unique()->nullable(); // Optional: A unique PO number
             $table->decimal('total_amount', 12, 2)->default(0); // Calculated total of all items
+            $table->decimal('purchase_discount', 10, 2)->default(0); // Add purchase discount here
             $table->text('remarks')->nullable(); // Remarks for the PO
             $table->string('status')->default('Pending'); // e.g., Pending, Completed, Cancelled
             $table->timestamps();

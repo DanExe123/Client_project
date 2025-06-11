@@ -16,6 +16,7 @@ class PurchaseOrder extends Model
         'po_number',
         'total_amount',
         'remarks',
+        'purchase_discount',
         'status',
     ];
 

@@ -16,6 +16,7 @@ class PurchaseOrderItem extends Model
         'product_barcode',     // Stored for historical data
         'quantity',
         'unit_price',
+        'product_discount',
         'subtotal',
     ];
 

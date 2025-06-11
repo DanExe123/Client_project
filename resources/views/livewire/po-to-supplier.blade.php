@@ -1,10 +1,16 @@
-<div class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
-<div class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
+<div x-cloak class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto ">
     <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->
         <h2 class="text-2xl font-semibold text-gray-900 mb-2">PO TO SUPPLIER</h2>
-
+        {{-- Success Alert --}}
+        @if (session()->has('message'))
+            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+                class="mt-2">
+                <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+                    class="!bg-green-300 !w-full" />
+            </div>
+        @endif
 
         <!-- Search and Buttons -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -74,186 +80,141 @@
     </div>
     <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
     <div class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
-    <div class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
         <h3 class="text-lg font-bold text-gray-800">
             Add <span class="text-blue-500">PO</span> to <span class="text-blue-500">Supplier</span>
         </h3>
-
-        <!-- User and Address Inputs -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <label for="supplier" class="block text-sm font-medium text-gray-700 mb-1">Select Supplier</label>
-                <select id="supplier" name="supplier"
-                    class="block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
-                    <option value="" disabled selected>Select a supplier</option>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Select Supplier</label>
+                <select wire:model="selectedSupplierId" class="block w-full rounded-md border border-gray-300 py-2 px-3">
+                    <option value="">Select a supplier</option>
                     @foreach($suppliers as $supplier)
                         <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                     @endforeach
                 </select>
             </div>
+    
             <div>
-                <label for="document-type" class="block text-sm font-medium text-gray-700 mb-1">Select Type</label>
-                <select id="document-type" name="document-type"
-                    class="block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
-                    <option value="" disabled selected>Select type</option>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Select Type</label>
+                <select wire:model="receiptType" class="block w-full rounded-md border border-gray-300 py-2 px-3">
+                    <option value="">Select type</option>
                     <option value="DR">DR</option>
                     <option value="INVOICE">INVOICE</option>
                 </select>
             </div>
-
-            <div x-data="{
-    currentDate: '', // Property to hold the date string in YYYY-MM-DD format
-    init() {
-        // Get today's date
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-        const day = String(today.getDate()).padStart(2, '0');
-
-        // Format it as YYYY-MM-DD
-        this.currentDate = `${year}-${month}-${day}`;
-    }
-}">
-                <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input type="date" id="date" name="date"
-                    class="block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                    x-model="currentDate">
-
+    
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input type="date" wire:model="poDate"
+                    class="block w-full rounded-md border border-gray-300 py-2 px-3" />
             </div>
-
-
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Discount</label>
+                <input type="number" min="0" step="0.01" wire:model.lazy="purchase_discount" class="border border-gray-300 rounded-md px-3 py-2 w-full" />
+            </div>            
         </div>
-
-
-        <!-- Product Table -->
+    
         <h4 class="text-md font-semibold text-gray-700">Products</h4>
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
+            <table wire:poll class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="border px-2 py-1 font-medium">Barcode</th>
                         <th class="border px-2 py-1 font-medium">Product Description</th>
                         <th class="border px-2 py-1 font-medium">Qty</th>
                         <th class="border px-2 py-1 font-medium">Unit Price</th>
+                        <th class="border px-2 py-1 font-medium">Product Discount</th>
                         <th class="border px-2 py-1 font-medium">Subtotal</th>
                         <th class="border px-2 py-1 font-medium">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <template x-for="(item, index) in products" :key="index">
+                    @foreach($products as $index => $p)
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-2 py-2">
-                                <input type="text" x-model="item.barcode"
+                            <td wire:poll.prevent class="border px-2 py-2">
+                                <input type="text"
+                                    wire:model.lazy="products.{{ $index }}.barcode"
+                                    list="barcodes"
+                                    placeholder="enter and select barcode"
                                     class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
-                                    placeholder="Scan or enter barcode" />
-                            </td>
-                            <td class="border px-2 py-2">
-                                <select x-model="item.product_id" @change="updatePrice(index)"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm">
-                                    <option value="">Select</option>
-                                    @foreach($products as $product)
-                                        <option value="{{ $product->id }}">{{ $product->description }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td class="border px-2 py-2">
-                                <input type="number" x-model="item.quantity" @input="updateTotal(index)" min="1"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
+                                    wire:change="fillProductByBarcode({{ $index }})"
+                                />
 
+                                <datalist id="barcodes">
+                                    @foreach($allProducts as $product)
+                                        <option value="{{ $product['barcode'] }}">{{ $product['description'] }}</option>
+                                    @endforeach
+                                </datalist>
+                            </td>
+                            {{-- //HOYY!! DRI KA NAG UNTAT --}}
+                            <td wire:ignore.self class="border px-2 py-2">
+                                <input type="text"
+                                    wire:model.lazy="products.{{ $index }}.product_description"
+                                    list="product_descriptions"
+                                    placeholder="enter and select description"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
+                                    wire:change="fillProductByDescription({{ $index }})"
+                                />
+                                <datalist id="product_descriptions">
+                                    @foreach($allProducts as $product)
+                                        <option value="{{ $product['description'] }}">{{ $product['barcode'] }}</option>
+                                    @endforeach
+                                </datalist>
+                            </td>                            
+                            <td class="border px-2 py-2">
+                                <input type="number"
+                                    wire:model.lazy="products.{{ $index }}.quantity"
+                                    wire:input="updateTotal({{ $index }})"
+                                    min="1"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" 
+                                />
                             </td>
                             <td class="border px-2 py-2">
-                                <input type="number" x-model="item.price" step="0.01" readonly
+                                <input type="number"
+                                    step="0.01"
+                                    readonly
+                                    value="{{ $products[$index]['price'] ?? 0 }}"
                                     class="w-full border-gray-300 rounded-md px-2 py-1 text-sm bg-gray-100" />
                             </td>
-
-
                             <td class="border px-2 py-2">
-                                <input type="text" :value="item . total . toFixed(2)" readonly
+                                <input type="number" min="0" step="0.01"
+                                       wire:model.lazy="products.{{ $index }}.product_discount"
+                                       wire:input="updateTotal({{ $index }})"
+                                       class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
+                            </td>
+                            <td class="border px-2 py-2">
+                                <input type="text" value="{{ number_format($p['total'] ?? 0, 2) }}" readonly
                                     class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
                             </td>
                             <td class="border px-2 py-2 text-center">
                                 <x-button red label="Remove" class="px-2 py-1 text-xs h-8"
-                                    x-on:click="removeProduct(index)" />
+                                    wire:click="removeProduct({{ $index }})" />
                             </td>
                         </tr>
-                    </template>
+                    @endforeach
                 </tbody>
                 <tfoot class="bg-gray-50">
                     <tr>
-                        <td colspan="4" class="border px-2 py-2 text-right font-semibold">Total:</td>
-                        <td class="border px-2 py-2 font-semibold text-right" x-text="grandTotal"></td>
+                        <td colspan="5" class="border px-2 py-2 text-right font-semibold">Total:</td>
+                        <td class="border px-2 py-2 font-semibold text-right">{{ number_format($grandTotal, 2) }}</td>
                         <td class="border px-2 py-2"></td>
                     </tr>
+                </tfoot>
             </table>
-
-            <!-- Add Product Button -->
+    
             <div class="pt-2 ml-2">
-                <x-button green label="Add Product" x-on:click="addProduct()" />
+                <x-button green label="Add Product" wire:click="addProduct" />
             </div>
-
-            <!-- Remarks Section -->
+    
             <div class="pt-4">
-                <x-textarea name="remarks" label="Remarks" placeholder="Write your remarks" />
+                <x-textarea wire:model="remarks" name="remarks" label="Remarks" placeholder="Write your remarks" />
                 <div class="flex justify-end pt-2">
-                    <x-button blue label="Submit" @click="submitPO()" />
+                    <x-button blue label="Submit" wire:click="submitPO" />
                 </div>
             </div>
         </div>
     </div>
-
-    </tr>
-    </tfoot>
+    
 </div>
 
-<script>
-    function POTable() {
-        return {
-            products: [],
-
-            // This is the product list with id + price + description from PHP
-            allProducts: @json($products), // includes id, price, description
-
-            grandTotal: 0,
-
-            addProduct() {
-                this.products.push({
-                    barcode: '',
-                    product_id: '',
-                    quantity: 1,
-                    price: 0,
-                    total: 0
-                });
-            },
-
-            removeProduct(index) {
-                this.products.splice(index, 1);
-                this.updateGrandTotal();
-            },
-
-            updatePrice(index) {
-                const productId = this.products[index].product_id;
-                const product = this.allProducts.find(p => p.id == productId);
-
-                if (product) {
-                    this.products[index].price = parseFloat(product.price);
-                    this.updateTotal(index);
-                }
-            },
-
-            updateTotal(index) {
-                const item = this.products[index];
-                item.total = (item.quantity || 0) * (item.price || 0);
-                this.updateGrandTotal();
-            },
-
-            updateGrandTotal() {
-                this.grandTotal = this.products.reduce((sum, item) => sum + item.total, 0).toFixed(2);
-            },
-
-            submitPO() {
-                // Handle form submission here
-                console.log(this.products);
-            }
-        };
-    }
-</script>
