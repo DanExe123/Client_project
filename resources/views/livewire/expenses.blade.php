@@ -1,8 +1,29 @@
 <div>
+
+    <div 
+        x-data="{ loading: true }" 
+        x-init="setTimeout(() => loading = false, 2000)" 
+        x-show="loading" 
+        x-transition 
+        class="fixed inset-0 flex items-center justify-center bg-white z-50"
+    >
+        <div class="flex flex-col items-center space-y-4">
+            <!-- Inventory Animation -->
+            <div class="relative w-24 h-24">
+                <div class="absolute inset-0 border-4 border-dashed border-blue-400 rounded-full animate-spin"></div>
+                <div class="absolute top-2 left-2 w-4 h-4 bg-blue-500 rounded animate-bounce"></div>
+                <div class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded animate-bounce delay-150"></div>
+            </div>
+
+            <p class="text-gray-700 text-lg font-semibold animate-pulse">Loading Inventory...</p>
+        </div>
+    </div>
+
+
     <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full mx-auto p-4" x-cloak>
         <h2 class="text-xl font-semibold mb-4">Expenses</h2>
 
-        @if (session()->has('message'))
+       @if (session()->has('message'))
         <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
             <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
                 class="!bg-green-300 !w-full" />
@@ -120,5 +141,10 @@
           
       </div>
       
-      
+      <script>
+        window.addEventListener('expenses-added', () => {
+            location.reload();
+        });
+    </script>
+    
 </div>

@@ -51,6 +51,7 @@ class Expenses extends Component
     
         // Reset all input fields
         $this->reset('expenses');
+        $this->dispatch('expenses-added');
     
         // Reassign today's date
         $this->expenses['date'] = Carbon::now()->toDateString();
