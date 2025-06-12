@@ -18,7 +18,7 @@ class Stockcard extends Component
     public $quantity;
     public $productsData = [];
     public bool $showAdjustmentsModal = false;
-  
+
     public function selectedProduct($id)
     {
         if (in_array($id, $this->selectedProductId)) {
@@ -32,7 +32,7 @@ class Stockcard extends Component
             $this->selectedProductId[] = $id;
         }
     }
-    
+
     public function goToAdjustment()
     {
         // ensure exactly one is selected
@@ -43,7 +43,7 @@ class Stockcard extends Component
             ]);
         }
     }
-    
+
 
 
 
@@ -75,7 +75,7 @@ class Stockcard extends Component
         $this->products = Product::all();
     }
 
-  
+
 
     public function render()
     {

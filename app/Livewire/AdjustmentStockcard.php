@@ -26,12 +26,12 @@ class AdjustmentStockcard extends Component
 
         // Initialize the editable data for this product
         $this->productsData[$product->id] = [
-            'barcode'     => $product->barcode,
+            'barcode' => $product->barcode,
             'productName' => $product->description,
-            'highestUom'  => $product->highest_uom,
-            'lowest_uom'          => $product->lowest_uom, 
-            'damages'     => $product->damages,
-            'quantity'    => 0, // default
+            'highestUom' => $product->highest_uom,
+            'lowest_uom' => $product->lowest_uom,
+            'damages' => $product->damages,
+            'quantity' => $product->quantity, // default
         ];
     }
 
@@ -39,19 +39,19 @@ class AdjustmentStockcard extends Component
     {
         // Validate quantity only
         $this->validateOnly("productsData.{$this->product->id}.quantity");
-    
+
         // Grab the new quantity
         $quantity = $this->productsData[$this->product->id]['quantity'];
-    
+
         // Persist: you could update the product or create an adjustment record
         $this->product->update([
             'quantity' => $quantity,
         ]);
-    
+
         session()->flash('success', 'Quantity updated!');
         return redirect()->route('stockcard');
     }
-     
+
 
     public function render()
     {

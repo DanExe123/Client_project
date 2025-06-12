@@ -19,6 +19,8 @@
         <div class="text-gray-500 flex text-start gap-3">
             <a class="text-gray-500 font-medium" wire:navigate href="{{ route('customer-master') }}">Customer
                 Files</a>
+            <a class="text-gray-500 font-medium" wire:navigate href="{{ route('customer-master') }}">Customer
+                Files</a>
             <x-phosphor.icons::regular.caret-right class="w-4 h-4 text-gray-500 flex shrink-0 mt-1" />
             <span class="text-gray-500 font-medium "> Add Customer Files</span>
         </div>
@@ -36,6 +38,8 @@
 
                 <x-input label="Address" wire:model="address" id="address" placeholder="Enter your address" />
 
+                <x-input label="Contact Number" wire:model="contact" id="contact" type="number"
+                    placeholder="Enter contact number" />
                 <x-input label="Contact Number" wire:model="contact" id="contact" type="number"
                     placeholder="Enter contact number" />
 
