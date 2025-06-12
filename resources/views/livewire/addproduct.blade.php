@@ -11,7 +11,7 @@
         <span class="text-gray-500 font-medium">Product Master</span>
         <x-phosphor.icons::regular.caret-right class="w-4 h-4 text-gray-500 flex shrink-0 mt-1" />
         <span class="text-gray-500 font-medium">Add Product</span>
-    </div> 
+    </div>
     <hr>
     {{-- Form --}}
     <form wire:submit.prevent="submit" class="space-y-4">
@@ -35,11 +35,13 @@
             <x-input label="Product Description" wire:model="description" id="description"
                 placeholder="Enter product description" :error="$errors->first('description')" />
             <x-input label="Highest UOM" wire:model="highest_uom" id="highest_uom" placeholder="Enter highest unit" />
-            <x-input label="Lowest UOM" wire:model="lowest_uom" id="lowest_uom" placeholder="Enter lowest unit" />
             <x-input label="Price" wire:model="price" id="price" placeholder="Enter price" type="number" step="0.01"
                 :error="$errors->first('price')" />
             <x-input label="Selling Price" wire:model="selling_price" id="selling_price"
                 placeholder="Enter selling price" type="number" step="0.01" :error="$errors->first('selling_price')" />
+            <x-input label="Lowest UOM" wire:model="lowest_uom" id="lowest_uom" placeholder="Enter lowest unit" />
+            <x-input label="Lowest UOM Quantity" wire:model="lowest_uom_quantity" id="lowest_uom_quanttiy"
+                placeholder="Enter Lowest Unit Quantity" />
         </div>
         <hr>
         <div class=" flex justify-center gap-6">

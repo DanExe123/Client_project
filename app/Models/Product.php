@@ -13,6 +13,7 @@ class Product extends Model
         'quantity',
         'highest_uom',
         'lowest_uom',
+        'lowest_uom_quantity',
         'price',
         'status',
         'selling_price',

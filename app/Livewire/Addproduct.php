@@ -23,6 +23,7 @@ class AddProduct extends Component
         'description' => 'required|string',
         'highest_uom' => 'nullable|string',
         'lowest_uom' => 'nullable|string',
+        'lowest_uom_quantity' => 'nullable|numeric|min:0',
         'price' => 'required|numeric|min:0',
         'selling_price' => 'required|numeric|min:0',
     ];
@@ -37,6 +38,7 @@ class AddProduct extends Component
             'description' => $this->description,
             'highest_uom' => $this->highest_uom,
             'lowest_uom' => $this->lowest_uom,
+            'lowest_uom_quantity' => $this->lowest_uom_quantity ?? 0,
             'price' => $this->price,
             'selling_price' => $this->selling_price,
         ]);
