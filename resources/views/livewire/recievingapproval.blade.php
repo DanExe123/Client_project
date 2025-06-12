@@ -68,7 +68,6 @@
                             </td>
                             <td class="border px-2 py-2 space-y-1 text-center">
                                 <x-button red label="Remove" class="px-2 py-1 text-xs h-8 w-full" x-on:click="removeProduct(index)" />
-                                <x-button emerald label="Approve" class="px-2 py-1 text-xs h-8 w-full" />
                             </td>
                         </tr>
                     </template>
@@ -85,7 +84,7 @@
             <div class="pt-4">
                 <x-textarea name="remarks" label="Remarks" placeholder="Write your remarks" />
                 <div class="flex justify-end pt-2">
-                    <x-button blue label="Submit" />
+                    <x-button blue label="Approved" />
                 </div>
             </div>
         </div>
