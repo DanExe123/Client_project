@@ -1,4 +1,4 @@
-<div x-cloak class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto " x-data="POTable()">
+<div x-cloak class="grid grid-cols-1 lg:grid-cols-1 gap-4 w-full md:w-full mx-auto ">
     <!-- LEFT SIDE: Supplier Master Table (2/3 width) -->
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->
@@ -87,184 +87,162 @@
     <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
     <div class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
         <h3 class="text-lg font-bold text-gray-800">
-            Csutomer PO <span class="text-blue-500"></span>
+            Add <span class="text-blue-500">PO</span> to <span class="text-blue-500">Customer</span>
         </h3>
-
-        <!-- User and Address Inputs -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <x-select label="Select Transaction type" placeholder="Select some user" option-label="name"
-                option-value="id" />
-            <x-select label="Select Customer" placeholder="Select some customer" option-label="name"
-                option-value="id" />
-
-            <div x-data="{
-                currentDate: '', // Property to hold the date string in YYYY-MM-DD format
-                init() {
-                    // Get today's date
-                    const today = new Date();
-                    const year = today.getFullYear();
-                    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-                    const day = String(today.getDate()).padStart(2, '0');
-            
-                    // Format it as YYYY-MM-DD
-                    this.currentDate = `${year}-${month}-${day}`;
-                }
-            }">
-                <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input type="date" id="date" name="date"
-                    class="block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                    x-model="currentDate">
-
+    
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Select Customer</label>
+                <select wire:model="selectedCustomerId" class="block w-full rounded-md border border-gray-300 py-2 px-3">
+                    <option value="">Select a customer</option>
+                    @foreach($customers as $customer)
+                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                    @endforeach
+                </select>
             </div>
+    
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Select Type</label>
+                <select wire:model="receiptType" class="block w-full rounded-md border border-gray-300 py-2 px-3">
+                    <option value="">Select type</option>
+                    <option value="DR">DR</option>
+                    <option value="INVOICE">INVOICE</option>
+                </select>
+            </div>
+    
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input type="date" wire:model="poDate"
+                    class="block w-full rounded-md border border-gray-300 py-2 px-3" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Discount</label>
+                <input type="number" min="0" step="0.01" wire:model.lazy="purchase_discount" class="border border-gray-300 rounded-md px-3 py-2 w-full" />
+            </div>            
         </div>
-
-        <!-- Product Table -->
+    
         <h4 class="text-md font-semibold text-gray-700">Products</h4>
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
+            <table wire:poll class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
                 <thead class="bg-gray-100">
                     <tr>
+                        <th class="border px-2 py-1 font-medium">Barcode</th>
                         <th class="border px-2 py-1 font-medium">Product Description</th>
                         <th class="border px-2 py-1 font-medium">Qty</th>
                         <th class="border px-2 py-1 font-medium">Unit Price</th>
-                        <th class="border px-2 py-1 font-medium">Discount%</th>
+                        <th class="border px-2 py-1 font-medium">Product Discount</th>
                         <th class="border px-2 py-1 font-medium">Subtotal</th>
                         <th class="border px-2 py-1 font-medium">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="hover:bg-gray-50">
-                        <td class="border px-2 py-2">
-                            <select
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-200 focus:ring-opacity-50">
-                                <option>Select</option>
-                                <option>Dog Food</option>
-                                <option>Cat Shampoo</option>
-                                <option>Vaccine A</option>
-                            </select>
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="number" value="1" min="1"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="number" value="0.00" step="0.01"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="text" value="0.00" readonly
-                                class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2 text-center">0.00</td>
-                        <td class="border px-2 py-2 text-center">
-                            <x-button red label="Remove" class="px-2 py-1 text-xs h-8" />
-                        </td>
-                    </tr>
+                    @foreach($products as $index => $p)
+                        <tr class="hover:bg-gray-50">
+                            <td wire:poll.prevent class="border px-2 py-2">
+                                <input type="text"
+                                    wire:model.lazy="products.{{ $index }}.barcode"
+                                    list="barcodes"
+                                    placeholder="enter and select barcode"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
+                                    wire:change="fillProductByBarcode({{ $index }})"
+                                />
+
+                                <datalist id="barcodes">
+                                    @foreach($allProducts as $product)
+                                        <option value="{{ $product['barcode'] }}">{{ $product['description'] }}</option>
+                                    @endforeach
+                                </datalist>
+                            </td>
+                            {{-- //HOYY!! DRI KA NAG UNTAT --}}
+                            <td wire:ignore.self class="border px-2 py-2">
+                                <input type="text"
+                                    wire:model.lazy="products.{{ $index }}.product_description"
+                                    list="product_descriptions"
+                                    placeholder="enter and select description"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
+                                    wire:change="fillProductByDescription({{ $index }})"
+                                />
+                                <datalist id="product_descriptions">
+                                    @foreach($allProducts as $product)
+                                        <option value="{{ $product['description'] }}">{{ $product['barcode'] }}</option>
+                                    @endforeach
+                                </datalist>
+                            </td>                            
+                            <td class="border px-2 py-2">
+                                <input type="number"
+                                    wire:model.lazy="products.{{ $index }}.quantity"
+                                    wire:input="updateTotal({{ $index }})"
+                                    min="1"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" 
+                                />
+                            </td>
+                            <td class="border px-2 py-2">
+                                <input type="number"
+                                    step="0.01"
+                                    readonly
+                                    value="{{ $products[$index]['price'] ?? 0 }}"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm bg-gray-100" />
+                            </td>
+                            <td class="border px-2 py-2">
+                                <input type="number" min="0" step="0.01"
+                                       wire:model.lazy="products.{{ $index }}.product_discount"
+                                       wire:input="updateTotal({{ $index }})"
+                                       class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
+                            </td>
+                            <td class="border px-2 py-2">
+                                <div wire:loading wire:target="updateTotal"
+                                    class="w-[200px] flex items-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1 text-sm">  
+                                    <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                    </svg>
+                                    <span class="text-sm text-gray-400 italic">calculating...</span>
+                                </div>
+
+                                <div wire:loading.remove wire:target="updateTotal">
+                                    <input type="text" value="{{ number_format($p['total'] ?? 0, 2) }}" readonly
+                                        class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
+                                </div>
+                            </td>                            
+                            <td class="border px-2 py-2 text-center">
+                                <x-button red label="Remove" class="px-2 py-1 text-xs h-8"
+                                    wire:click="removeProduct({{ $index }})" />
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
-                <template x-for="(item, index) in products" :key="index">
-                    <tr class="hover:bg-gray-50">
-                        <td class="border px-2 py-2">
-                            <input type="text" x-model="item.barcode"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
-                                placeholder="Scan or enter barcode" />
+                <tfoot class="bg-gray-50">
+                    <tr>
+                        <td colspan="5" class="border px-2 py-2 text-right font-semibold">Total:</td>
+                        <td class="border px-2 py-2 font-semibold text-right">
+                            <div wire:loading wire:target="updateTotal, fillProductByBarcode, fillProductByDescription" class="flex justify-end items-center space-x-2">
+                                <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                </svg>
+                                <span class="text-gray-500 text-sm italic">Calculating...</span>
+                            </div>
+                            <div wire:loading.remove wire:target="updateTotal, fillProductByBarcode, fillProductByDescription">
+                                {{ number_format($grandTotal, 2) }}
+                            </div>
                         </td>
-                        <td class="border px-2 py-2">
-                            <select
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-200 focus:ring-opacity-50">
-                                <option>Select</option>
-                                <option>Dog Food</option>
-                                <option>Cat Shampoo</option>
-                                <option>Vaccine A</option>
-                            </select>
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="number" x-model="item.quantity" @input="updateTotal(index)" min="1"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="number" x-model="item.price" @input="updateTotal(index)" step="0.01"
-                                class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2">
-                            <input type="text" :value="item . total . toFixed(2)" readonly
-                                class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
-                        </td>
-                        <td class="border px-2 py-2 text-center">
-                            <x-button red label="Remove" class="px-2 py-1 text-xs h-8"
-                                x-on:click="removeProduct(index)" />
-                        </td>
+                        <td class="border px-2 py-2"></td>
                     </tr>
-                </template>
-                </tbody>
+                </tfoot>                
             </table>
-
-            <!-- Add Product Button -->
+    
             <div class="pt-2 ml-2">
-                <x-button green label="Add Product" x-on:click="addProduct()" />
+                <x-button green label="Add Product" wire:click="addProduct" />
             </div>
-
-            <!-- Remarks Section -->
+    
             <div class="pt-4">
-                <x-textarea name="remarks" label="Remarks" placeholder="Write your remarks" />
+                <x-textarea wire:model="remarks" name="remarks" label="Remarks" placeholder="Write your remarks" />
                 <div class="flex justify-end pt-2">
-                    <x-button blue label="Submit" />
+                    <x-button blue label="Submit" wire:click="submitPO" />
                 </div>
             </div>
         </div>
     </div>
-
-    </tr>
-    </tfoot>
-</div>
+    
 </div>
 
-
-<script>
-    function POTable() {
-        return {
-            search: '',
-            selected: [],
-            currentTab: 'DR',
-            allPOs: [  // Unfiltered full list
-                { id: 1, PO: 'PO-1001', Customer: 'ABC Corp.', Date: '2025-05-01', Status: 'DR', Total: '$1,500' },
-                { id: 2, PO: 'PO-1002', Customer: 'XYZ Ltd.', Date: '2025-05-03', Status: 'Invoice', Total: '$2,200' },
-                { id: 3, PO: 'PO-1003', Customer: 'Acme Inc.', Date: '2025-05-05', Status: 'Costumerpo', Total: '$800' },
-                { id: 4, PO: 'PO-1004', Customer: 'Another Client', Date: '2025-05-06', Status: 'DR', Total: '$1,000' },
-                { id: 5, PO: 'PO-1005', Customer: 'Client Five', Date: '2025-05-07', Status: 'Invoice', Total: '$3,000' }
-            ],
-            products: [],
-            addProduct() {
-                this.products.push({ barcode: '', product_id: '', quantity: 1, price: 0.00, total: 0.00 });
-            },
-            removeProduct(index) {
-                this.products.splice(index, 1);
-            },
-            updateTotal(index) {
-                const item = this.products[index];
-                item.total = (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0);
-            },
-            get po() {
-                // Filter by current tab (status) and search term
-                return this.allPOs.filter(poItem =>
-                    poItem.Status === this.currentTab &&
-                    (poItem.PO.toLowerCase().includes(this.search.toLowerCase()) ||
-                        poItem.Customer.toLowerCase().includes(this.search.toLowerCase()))
-                );
-            },
-            toggleAll(event) {
-                if (event.target.checked) {
-                    this.selected = this.po.map(po => po.id);
-                } else {
-                    this.selected = [];
-                }
-            },
-            get isAllSelected() {
-                return this.po.length > 0 && this.selected.length === this.po.length;
-            },
-            filterByStatus(status) {
-                this.currentTab = status;
-                this.selected = []; // Optional: clear selection on tab switch
-            },
-        }
-    }
-</script>

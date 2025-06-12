@@ -184,9 +184,20 @@
                                        class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
                             </td>
                             <td class="border px-2 py-2">
-                                <input type="text" value="{{ number_format($p['total'] ?? 0, 2) }}" readonly
-                                    class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
-                            </td>
+                                <div wire:loading wire:target="updateTotal"
+                                    class="w-[200px] flex items-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1 text-sm">  
+                                    <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                    </svg>
+                                    <span class="text-sm text-gray-400 italic">calculating...</span>
+                                </div>
+
+                                <div wire:loading.remove wire:target="updateTotal">
+                                    <input type="text" value="{{ number_format($p['total'] ?? 0, 2) }}" readonly
+                                        class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
+                                </div>
+                            </td>                            
                             <td class="border px-2 py-2 text-center">
                                 <x-button red label="Remove" class="px-2 py-1 text-xs h-8"
                                     wire:click="removeProduct({{ $index }})" />
@@ -197,10 +208,21 @@
                 <tfoot class="bg-gray-50">
                     <tr>
                         <td colspan="5" class="border px-2 py-2 text-right font-semibold">Total:</td>
-                        <td class="border px-2 py-2 font-semibold text-right">{{ number_format($grandTotal, 2) }}</td>
+                        <td class="border px-2 py-2 font-semibold text-right">
+                            <div wire:loading wire:target="updateTotal, fillProductByBarcode, fillProductByDescription" class="flex justify-end items-center space-x-2">
+                                <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                </svg>
+                                <span class="text-gray-500 text-sm italic">Calculating...</span>
+                            </div>
+                            <div wire:loading.remove wire:target="updateTotal, fillProductByBarcode, fillProductByDescription">
+                                {{ number_format($grandTotal, 2) }}
+                            </div>
+                        </td>
                         <td class="border px-2 py-2"></td>
                     </tr>
-                </tfoot>
+                </tfoot>                
             </table>
     
             <div class="pt-2 ml-2">
