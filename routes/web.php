@@ -44,6 +44,9 @@ use App\Livewire\EditExpenses;
 use App\Livewire\Recievingapproval;
 use App\Livewire\ViewDetailRecieving;
 use App\Livewire\Editrecieving;
+use App\Livewire\ReprintInvoice;
+use App\Livewire\ServeSaleReleasing;
+use App\Livewire\ServePrintPreview;
 
 
 use App\Livewire\LoginForm;
@@ -72,9 +75,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/customer-po', CustomerPo::class)->name('customer-po');
 
         Route::get('/recieving', Recieving::class)->name('recieving');
-        Route::get('/recievingapproval/{purchaseOrderId}', Recievingapproval::class)  ->name('recievingapproval');
+        Route::get('/recievingapproval/{purchaseOrderId}', Recievingapproval::class) ->name('recievingapproval');
         Route::get('/view-detail-recieving/{id}', ViewDetailRecieving::class)->name('view-detail-recieving');
         Route::get('/edit-recieving/{id}', Editrecieving::class)->name('editrecieving');
+        Route::get('/reprint-invoice/{id}', ReprintInvoice::class)->name('reprint-invoice');
+        Route::get('/serve-sales-releasing/{id}', ServeSaleReleasing::class)->name('serve-sale-releasing');
+        Route::get('/serve-print-preview', ServePrintPreview::class)->name('serve-print-preview');
 
         Route::get('/return-by-customer', ReturnByCustomer::class)->name('return-by-customer');
         Route::get('/return-by-supplier', ReturnToSupplier::class)->name('return-by-supplier');

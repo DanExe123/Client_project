@@ -33,7 +33,8 @@
             </div>
         </div>
 
-        <template x-if="currentTab === 'Invoice'">
+
+            <div x-show="currentTab === 'Invoice'" x-cloak>
           <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full">
               <table class="min-w-xl w-full border-collapse bg-white text-left text-sm text-gray-500">
                   <thead class="bg-gray-50 sticky top-0 z-10">
@@ -61,18 +62,23 @@
                               <td class="px-6 py-4">{{ $poItem->status }}</td>
                               <td class="px-6 py-4">₱{{ number_format($poItem->total_amount, 2) }}</td>
                               <td class="px-6 py-4 space-x-2 flex flex-wrap">
-                                  <x-button rounded="lg" light blue label="Serve" wire:click="serve({{ $poItem->id }})" />
-                                  <x-button rounded="lg" light yellow label="Reprint Invoice" wire:click="reprintInvoice({{ $poItem->id }})" />
+                                <a href="{{ route('serve-sale-releasing', ['id' => $poItem->id]) }}">
+                                    <x-button rounded="lg" light blue label="Serve" />
+                                </a>                                
+                                    <a href="{{ route('reprint-invoice', ['id' => $poItem->id]) }}">
+                                        <x-button rounded="lg" light yellow label="Reprint Invoice" />
+                                    </a>    
                               </td>
                           </tr>
                       @endforeach
                   </tbody>
               </table>
           </div>
-      </template>
+            </div>
       
         
-      <template x-if="currentTab === 'DR'">
+
+        <div x-show="currentTab === 'DR'" x-cloak>
         <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full">
             <table class="min-w-xl w-full border-collapse bg-white text-left text-sm text-gray-500">
                 <thead class="bg-gray-50 sticky top-0 z-10">
@@ -100,15 +106,19 @@
                             <td class="px-6 py-4">{{ $poItem->status }}</td>
                             <td class="px-6 py-4">₱{{ number_format($poItem->total_amount, 2) }}</td>
                             <td class="px-6 py-4 space-x-2 flex flex-wrap">
-                                <x-button rounded="lg" light blue label="Serve" wire:click="serve({{ $poItem->id }})" />
-                                <x-button rounded="lg" light yellow label="Reprint Invoice" wire:click="reprintInvoice({{ $poItem->id }})" />
+                                <a href="{{ route('serve-sale-releasing', ['id' => $poItem->id]) }}">
+                                    <x-button rounded="lg" light blue label="Serve" />
+                                </a>                                
+                                    <a href="{{ route('reprint-invoice', ['id' => $poItem->id]) }}">
+                                        <x-button rounded="lg" light yellow label="Reprint Invoice" />
+                                    </a>                                    
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-    </template>
+        </div>
     
     </div>
 

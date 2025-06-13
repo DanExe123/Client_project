@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ asset('logo/logoweb1-removebg-preview.png') }}" type="image/png">
-    <title>Inventory Management System</title>
+    <title class="">Inventory Management System</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
@@ -18,6 +18,30 @@
     @wireUiStyles
     @livewireStyles
 </head>
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        .print-area, .print-area * {
+            visibility: visible;
+        }
+
+        .print-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        /* Optional: Avoid page break inside table */
+        table, tr, td, th {
+            page-break-inside: avoid;
+        }
+    }
+</style>
+
 <body class="">
     
     <div 

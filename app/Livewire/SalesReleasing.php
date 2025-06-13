@@ -10,6 +10,7 @@ class SalesReleasing extends Component
     public $invoiceOrders = [];
     public $drOrders = [];
 
+    
     public function mount()
     {
         $this->invoiceOrders = PurchaseOrder::with('supplier')
