@@ -34,12 +34,14 @@
             </div>
             <x-input label="Product Description" wire:model="description" id="description"
                 placeholder="Enter product description" :error="$errors->first('description')" />
-            <x-input label="Highest UOM" wire:model="highest_uom" id="highest_uom" placeholder="Enter highest unit" />
+            <x-input label="Highest UOM" wire:model="highest_uom" id="highest_uom" placeholder="Enter highest unit"
+                x-on:input="$el.value = $el.value.replace(/[^a-zA-Z\s]/g, '')" :error="$errors->first('highest_uom')" />
             <x-input label="Price" wire:model="price" id="price" placeholder="Enter price" type="number" step="0.01"
                 :error="$errors->first('price')" />
             <x-input label="Selling Price" wire:model="selling_price" id="selling_price"
                 placeholder="Enter selling price" type="number" step="0.01" :error="$errors->first('selling_price')" />
-            <x-input label="Lowest UOM" wire:model="lowest_uom" id="lowest_uom" placeholder="Enter lowest unit" />
+            <x-input label="Lowest UOM" wire:model="lowest_uom" id="lowest_uom" placeholder="Enter lowest unit"
+                x-on:input="$el.value = $el.value.replace(/[^a-zA-Z\s]/g, '')" :error="$errors->first('lowest_uom')" />
             <x-input label="Lowest UOM Quantity" wire:model="lowest_uom_quantity" id="lowest_uom_quanttiy"
                 placeholder="Enter Lowest Unit Quantity" />
         </div>

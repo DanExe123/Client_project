@@ -13,18 +13,18 @@ class Addcustomer extends Component
     public $contact;
     public $contact_person;
     public $term;
-    public $cust_tin_number; // Assuming TIN is a field in the Customer model
+    public $cust_tin_number;
+
 
     protected $rules = [
-        'name' => 'required|string|min:3',
+        'name' => 'required|string|regex:/^[a-zA-Z\s]+$/|min:3',
         'email' => 'required|email',
-        'address' => 'nullable|string',
-        'contact' => 'required|numeric|min:0',
-        'contact_person' => 'nullable|string',
-        'term' => 'nullable|numeric|min:0',
-        'cust_tin_number' => 'nullable|string', // Assuming TIN is optional
+        'address' => 'nullable|string|regex:/^[a-zA-Z0-9\s,.#-]+$/',
+        'contact' => 'required|regex:/^[0-9]+$/',
+        'contact_person' => 'nullable|string|regex:/^[a-zA-Z\s]+$/',
+        'term' => 'nullable|regex:/^[0-9]+$/',
+        'cust_tin_number' => 'nullable|regex:/^[0-9-]+$/',
     ];
-
 
     public function submit()
     {

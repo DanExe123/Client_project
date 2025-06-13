@@ -17,8 +17,8 @@ return new class extends Migration {
             $table->string('address')->nullable();
             $table->string('contact', 15)->nullable();
             $table->string('contact_person')->nullable();
-            $table->string('term')->nullable();
-            $table->unsignedInteger('cust_tin_number')->nullable();
+            $table->integer('term')->nullable();
+            $table->string('cust_tin_number')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

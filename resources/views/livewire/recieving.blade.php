@@ -80,8 +80,10 @@
                             <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Date</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
+                            <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Status</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Total</th>
+                            <th class="px-6 py-4 font-medium text-gray-900">Action</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Action</th>
                         </tr>
                     </thead>
@@ -125,6 +127,7 @@
                             Customer: 'Customer A',
                             Date: '2025-06-01',
                             Transaction: 'DR',
+                            Transaction: 'DR',
                             Status: 'For Approval',
                             Total: '$1,000'
                         },
@@ -133,6 +136,7 @@
                             PO: 'PO002',
                             Customer: 'Customer B',
                             Date: '2025-06-02',
+                            Transaction: 'Invoice',
                             Transaction: 'Invoice',
                             Status: 'Approved',
                             Total: '$2,500'
@@ -143,6 +147,7 @@
                             Customer: 'Customer C',
                             Date: '2025-06-03',
                             Transaction: 'Invoice',
+                            Transaction: 'Invoice',
                             Status: 'Cancelled',
                             Total: '$500'
                         },
@@ -151,6 +156,7 @@
                             PO: 'PO004',
                             Customer: 'Customer D',
                             Date: '2025-06-04',
+                            Transaction: 'Invoice',
                             Transaction: 'Invoice',
                             Status: 'For Approval',
                             Total: '$1,750'

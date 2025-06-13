@@ -21,6 +21,8 @@ return new class extends Migration {
             $table->string('lowest_uom_quantity')->default(0);
             $table->decimal('price', 15, 2)->default(0);
             $table->decimal('selling_price', 15, 2)->default(0);
+            $table->string('Good')->nullable();
+            $table->string('Damage')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });
