@@ -19,8 +19,8 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
                 </span>
-                <input type="text" x-model="search" placeholder="Search..."
-                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..."
+                  class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
             </div>
 
             <!-- Button Group -->
@@ -61,19 +61,23 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                    <template x-for="poItem in po" :key="poItem . id">
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-4">
-                                <input type="checkbox" :value="poItem . id" x-model="selected"
-                                    class="h-4 w-4 text-blue-600" />
+                    @forelse ($purchaseOrders as $purchaseOrder)
+                        <tr>
+                            <td class="px-6 py-4">
+                                <input type="checkbox" 
+                                   class="h-4 w-4 text-blue-600" />
                             </td>
-                            <td class="px-6 py-4" x-text="poItem.PO"></td>
-                            <td class="px-6 py-4" x-text="poItem.Customer"></td>
-                            <td class="px-6 py-4" x-text="poItem.Date"></td>
-                            <td class="px-6 py-4" x-text="poItem.Status"></td>
-                            <td class="px-6 py-4" x-text="poItem.Total"></td>
+                            <td class="px-6 py-4">{{ $purchaseOrder->po_number }}</td>
+                            <td class="px-6 py-4">{{ $purchaseOrder->supplier->name ?? 'N/A' }}</td>
+                            <td class="px-6 py-4">{{ $purchaseOrder->receipt_type }}</td>
+                            <td class="px-6 py-4">{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('Y-m-d') }}</td>
+                            <td class="px-6 py-4">₱{{ number_format($purchaseOrder->total_amount, 2) }}</td>
                         </tr>
-                    </template>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center py-6 text-gray-500">No purchase orders found.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

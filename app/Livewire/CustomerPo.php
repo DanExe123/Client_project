@@ -7,9 +7,14 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\CustomerPurchaseOrder;
 use App\Models\CustomerPurchaseOrderItem;
+use Livewire\WithPagination;
 
 class CustomerPo extends Component
 {
+    use WithPagination;
+
+    public $search = '';
+
     public $selectedCustomerId;
     public $receiptType;
     public $poDate;
@@ -110,7 +115,6 @@ class CustomerPo extends Component
         }
     }
 
-
     public function fillProductByDescription($index)
     {
         $description = $this->products[$index]['product_description'] ?? null;
@@ -136,11 +140,21 @@ class CustomerPo extends Component
 
     public function render()
     {
+        $search = $this->search;
+        
         $customers = Customer::all();
         $products = Product::select('id', 'description', 'price', 'barcode')->get();
+        $purchaseOrders = CustomerPurchaseOrder::with('customer') // Eager load relationship
+        ->when($search, function ($query) use ($search) {
+            return $query->where('po_number', 'like', '%' . $search . '%')
+                ->orWhere('receipt_type', 'like', '%' . $search . '%')
+                ->orWhere('remarks', 'like', '%' . $search . '%');
+        })
+        ->paginate(5);
         return view('livewire.customer-po',[
             'customers' => $customers,
             'products' => $products,
+            'purchaseOrders' => $purchaseOrders,
         ]);
     }
 
@@ -176,7 +190,7 @@ class CustomerPo extends Component
             'remarks' => $this->remarks,
             'total_amount' => $this->grandTotal,
             'purchase_discount' => $this->purchase_discount,
-            'status' => true,
+            'status' => 'pending',
         ]);
 
         // Loop and insert each product item
@@ -192,6 +206,9 @@ class CustomerPo extends Component
                 'subtotal' => $item['total'],
             ]);
         }
+        $purchaseOrder->update([
+            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT),
+        ]);
 
         // Optional: reset form after saving
         $this->resetForm();

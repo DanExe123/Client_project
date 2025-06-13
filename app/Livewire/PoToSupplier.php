@@ -7,9 +7,14 @@ use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use Livewire\WithPagination;
 
 class PoToSupplier extends Component
 {
+    use WithPagination;
+
+    public $search = '';
+
     public $selectedSupplierId;
     public $receiptType;
     public $poDate;
@@ -135,13 +140,27 @@ class PoToSupplier extends Component
     }
 
     
-    public function render()
-    {
+    public function updatedSearch() {
+        $this->resetPage();
+    }
+
+    public function render() {
+        $search = $this->search;
+        
         $suppliers = Supplier::all();
         $products = Product::select('id', 'description', 'price', 'barcode')->get();
+        $purchaseOrders = PurchaseOrder::with('supplier') // Eager load relationship
+            ->when($search, function ($query) use ($search) {
+                return $query->where('po_number', 'like', '%' . $search . '%')
+                    ->orWhere('receipt_type', 'like', '%' . $search . '%')
+                    ->orWhere('remarks', 'like', '%' . $search . '%');
+            })
+            ->paginate(5);
+    
         return view('livewire.po-to-supplier', [
             'suppliers' => $suppliers,
             'products' => $products,
+            'purchaseOrders' => $purchaseOrders,
         ]);
     }
 
@@ -177,7 +196,8 @@ class PoToSupplier extends Component
             'remarks' => $this->remarks,
             'total_amount' => $this->grandTotal,
             'purchase_discount' => $this->purchase_discount,
-            'status' => true,
+            'status' => 'pending',
+           //tobe change 'status' => 'pending',
         ]);
 
         // Loop and insert each product item
@@ -193,7 +213,10 @@ class PoToSupplier extends Component
                 'subtotal' => $item['total'],
             ]);
         }
-
+        $purchaseOrder->update([
+            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT),
+        ]);
+        
         // Optional: reset form after saving
         $this->resetForm();
 
