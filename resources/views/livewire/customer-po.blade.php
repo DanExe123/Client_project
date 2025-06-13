@@ -24,22 +24,16 @@
 
 
                 <x-button right-icon="pencil" interaction="positive" x-bind:class="selected.length === 0 ?
-                <x-button right-icon=" pencil" interaction="positive" x-bind:class="selected.length === 0 ?
                         'bg-gray-300 text-white cursor-not-allowed' :
                         'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selected.length === 0"
-                    x-on:click="$openModal('Edit')">
-                    'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selected.length === 0"
                     x-on:click="$openModal('Edit')">
                 </x-button>
 
 
 
                 <x-button right-icon="trash" interaction="negative" x-bind:class="selected.length === 0 ?
-                <x-button right-icon=" trash" interaction="negative" x-bind:class="selected.length === 0 ?
                         'bg-red-300 text-white cursor-not-allowed' :
                         'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selected.length === 0"
-                    x-on:click="$openModal('Delete')">
-                    'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selected.length === 0"
                     x-on:click="$openModal('Delete')">
                 </x-button>
 
