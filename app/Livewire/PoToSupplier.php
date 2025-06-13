@@ -25,11 +25,13 @@ class PoToSupplier extends Component
     public $allProducts = [];
     public $grandTotal = 0;
     public $purchase_discount = 0;
-
+    public $formKey;
+    
     public function mount()
     {
         $this->poDate = now()->toDateString();
         $this->allProducts = Product::select('id', 'description', 'price', 'barcode')->get()->toArray();
+        $this->formKey = uniqid();
     }
 
     // Called when the supplier dropdown is updated
@@ -256,16 +258,9 @@ class PoToSupplier extends Component
         $purchaseOrder->update([
             'po_number' => 'PO-' . str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT),
         ]);
-
         
-        $this->reset(
-            'selectedSupplierId',
-            'receiptType',
-            'remarks',
-            'products',
-            'purchase_discount',
-            'grandTotal'
-        );
+        $this->resetForm(); // or $this->reset(...)
+        $this->formKey = uniqid(); // triggers rerender of only that block
 
         $this->poDate = now()->toDateString(); // resaet date
         session()->flash('message', 'Purchase order saved successfully.');
