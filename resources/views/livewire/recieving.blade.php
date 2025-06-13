@@ -64,10 +64,6 @@
         </x-button>
         
             </div>
-
-            
-    
-      
             <div class="overflow-auto rounded-lg border border-gray-200 shadow-md">
                 <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
                     <thead class="bg-gray-50 sticky top-0 z-10">
@@ -80,10 +76,8 @@
                             <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Date</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Status</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Total</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Action</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Action</th>
                         </tr>
                     </thead>
@@ -111,8 +105,6 @@
                     </tbody>
                 </table>
             </div>
-
-
         </div>
     
         <!-- Alpine.js Script -->
@@ -182,6 +174,5 @@
                 };
             }
         </script>
-    
     </div>
 </div>
