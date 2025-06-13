@@ -103,7 +103,8 @@ class CustomerPo extends Component
     {
         $barcode = $this->products[$index]['barcode'] ?? null;
 
-        if (!$barcode) return;
+        if (!$barcode)
+            return;
 
         $product = collect($this->allProducts)->firstWhere('barcode', $barcode);
 
@@ -126,7 +127,8 @@ class CustomerPo extends Component
     {
         $description = $this->products[$index]['product_description'] ?? null;
 
-        if (!$description) return;
+        if (!$description)
+            return;
 
         $product = collect($this->allProducts)->firstWhere('description', $description);
 
@@ -148,17 +150,17 @@ class CustomerPo extends Component
     public function render()
     {
         $search = $this->search;
-        
+
         $customers = Customer::all();
         $products = Product::select('id', 'description', 'price', 'barcode')->get();
         $purchaseOrders = CustomerPurchaseOrder::with('customer') // Eager load relationship
-        ->when($search, function ($query) use ($search) {
-            return $query->where('po_number', 'like', '%' . $search . '%')
-                ->orWhere('receipt_type', 'like', '%' . $search . '%')
-                ->orWhere('remarks', 'like', '%' . $search . '%');
-        })
-        ->paginate(5);
-        return view('livewire.customer-po',[
+            ->when($search, function ($query) use ($search) {
+                return $query->where('po_number', 'like', '%' . $search . '%')
+                    ->orWhere('receipt_type', 'like', '%' . $search . '%')
+                    ->orWhere('remarks', 'like', '%' . $search . '%');
+            })
+            ->paginate(5);
+        return view('livewire.customer-po', [
             'customers' => $customers,
             'products' => $products,
             'purchaseOrders' => $purchaseOrders,
@@ -214,7 +216,7 @@ class CustomerPo extends Component
             ]);
         }
         $purchaseOrder->update([
-            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT),
+            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 6, '0', STR_PAD_LEFT),
         ]);
 
         $this->resetForm(); // or $this->reset(...)

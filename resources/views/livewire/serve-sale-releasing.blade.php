@@ -1,42 +1,36 @@
-<div x-data="POTable()" class="p-4">
-    <div class="col-span-1 w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
+<div x-data="POTable({{ json_encode($po) }})" class="p-4">
+    <div class="bg-white border rounded-lg shadow-md p-5 space-y-4 mt-5 mx-auto">
 
         <!-- Breadcrumb -->
-        <div class="text-gray-500 flex text-start gap-3">
-            <a class="text-gray-500 font-medium" href="#">Sales Releasing</a>
+        <div class="text-gray-500 flex gap-3">
+            <a class="font-medium" href="#">Sales Releasing</a>
             <span>&gt;</span>
-            <span class="text-gray-500 font-medium">Serve</span>
-        </div> 
+            <span class="font-medium">Serve</span>
+        </div>
         <hr>
 
-        <!-- Inputs -->
+        <!-- PO Info -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <select class="rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                <option>Select Transaction type</option>
-                <option>Sale</option>
-                <option>Return</option>
-            </select>
+            <input type="text" :value="po.receipt_type" disabled class="rounded-md border py-2 px-3 bg-gray-100 text-sm"
+                placeholder="Transaction Type" />
 
-            <select class="rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                <option>Select Customer</option>
-                <option>Juan Dela Cruz</option>
-                <option>Jane Smith</option>
-            </select>
+            <input type="text" :value="po.customer_name" disabled
+                class="rounded-md border py-2 px-3 bg-gray-100 text-sm" placeholder="Customer" />
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input type="date"
-                    class="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    x-bind:value="new Date().toISOString().split('T')[0]" />
+                <label class="block text-sm text-gray-700 mb-1">Date</label>
+                <input type="date" :value="po.order_date" disabled
+                    class="rounded-md border py-2 px-3 bg-gray-100 text-sm" />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Discount</label>
-                <input type="number"
-                    class="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                <label class="block text-sm text-gray-700 mb-1">Discount</label>
+                <input type="number" :value="po.discount" disabled
+                    class="rounded-md border py-2 px-3 bg-gray-100 text-sm" />
             </div>
         </div>
 
+        <!-- Products Table -->
         <h4 class="text-md font-semibold text-gray-700 pt-4">Products</h4>
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
@@ -53,16 +47,20 @@
                     <template x-for="(item, index) in products" :key="index">
                         <tr class="hover:bg-gray-50">
                             <td class="border px-2 py-2">
-                                <input x-model="item.description" type="text" class="w-full border-none outline-none" placeholder="Product..." />
+                                <input x-model="item.product_description" type="text" disabled
+                                    class="w-full border-none bg-gray-100 outline-none" />
                             </td>
                             <td class="border px-2 py-2">
-                                <input x-model.number="item.quantity" @input="updateTotal(index)" type="number" class="w-full border-none outline-none text-right" />
+                                <input x-model.number="item.quantity" @input="updateTotal(index)" type="number"
+                                    class="w-full border-none outline-none text-right" />
                             </td>
                             <td class="border px-2 py-2">
-                                <input x-model.number="item.price" @input="updateTotal(index)" type="number" class="w-full border-none outline-none text-right" />
+                                <input x-model.number="item.price" type="number" disabled
+                                    class="w-full border-none bg-gray-100 outline-none text-right" />
                             </td>
                             <td class="border px-2 py-2">
-                                <input x-model.number="item.discount" @input="updateTotal(index)" type="number" class="w-full border-none outline-none text-right" />
+                                <input x-model.number="item.discount" type="number" disabled
+                                    class="w-full border-none bg-gray-100 outline-none text-right" />
                             </td>
                             <td class="border px-2 py-2 text-right" x-text="item.total.toFixed(2)"></td>
                         </tr>
@@ -71,60 +69,49 @@
             </table>
         </div>
 
-        <!-- Add Product Button -->
-        <div class="pt-2 ml-2">
-            <button type="button" x-on:click="addProduct()"
-                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">
-                Add Product
-            </button>
-        </div>
-
-        <!-- Remarks and Submit -->
+        <!-- Remarks and Serve Button -->
         <div class="pt-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
-            <textarea rows="3"
-                class="w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                placeholder="Write your remarks..."></textarea>
+            <textarea rows="3" disabled x-text="po.remarks"
+                class="w-full rounded-md border py-2 px-3 bg-gray-100 shadow-sm sm:text-sm"></textarea>
 
             <div class="flex justify-end pt-4">
-                <a href="{{ route('serve-print-preview')}}">
-                <x-button type="submit" blue label="Serve" />
-                </a>
+                <form method="POST" action="{{ route('sales-releasing.serve', ['id' => $po->id]) }}">
+                    @csrf
+                    <x-button type="submit" blue label="Serve" />
+                </form>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    function POTable() {
+    function POTable(poData) {
+        const products = poData.items.map(item => ({
+            product_description: item.product_description || 'N/A',
+            quantity: item.quantity,
+            price: parseFloat(item.unit_price),
+            discount: parseFloat(item.product_discount),
+            total: parseFloat(item.subtotal) || 0
+        }));
+
         return {
-            products: [
-                {
-                    description: 'Sample Product',
-                    quantity: 1,
-                    price: 100.00,
-                    discount: 0,
-                    total: 100.00,
-                }
-            ],
-            addProduct() {
-                this.products.push({
-                    description: '',
-                    quantity: 1,
-                    price: 0.00,
-                    discount: 0,
-                    total: 0.00
-                });
+            po: {
+                receipt_type: poData.receipt_type || 'N/A',
+                customer_name: poData.customer?.name || 'N/A',
+                order_date: poData.order_date?.substring(0, 10) || '',
+                discount: poData.discount,
+                remarks: poData.remarks
             },
+            products,
+
             updateTotal(index) {
                 const item = this.products[index];
-                const qty = parseFloat(item.quantity) || 0;
-                const price = parseFloat(item.price) || 0;
-                const discount = parseFloat(item.discount) || 0;
-                const subtotal = qty * price;
-                const discountAmount = subtotal * (discount / 100);
+                const subtotal = item.quantity * item.price;
+                const discountAmount = subtotal * (item.discount / 100);
                 item.total = subtotal - discountAmount;
             }
         };
+
     }
 </script>

@@ -37,6 +37,6 @@ class CustomerPurchaseOrder extends Model
      */
     public function items()
     {
-        return $this->hasMany(CustomerPurchaseOrderItem::class);
+        return $this->hasMany(\App\Models\CustomerPurchaseOrderItem::class, 'purchase_order_id');
     }
 }
