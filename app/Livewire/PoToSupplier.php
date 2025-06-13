@@ -198,6 +198,7 @@ class PoToSupplier extends Component
             'purchase_discount' => $this->purchase_discount,
             'status' => 'pending',
            //tobe change 'status' => 'pending',
+            'status' => 'Pending',
         ]);
 
         // Loop and insert each product item

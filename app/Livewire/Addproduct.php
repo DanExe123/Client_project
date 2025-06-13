@@ -15,6 +15,7 @@ class AddProduct extends Component
     public $lowest_uom;
     public $price;
     public $selling_price;
+    public $lowest_uom_quantity;
 
 
     protected $rules = [

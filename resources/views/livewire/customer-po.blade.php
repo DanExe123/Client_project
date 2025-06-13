@@ -4,18 +4,7 @@
         <!-- Title -->
         <h2 class="text-2xl font-semibold text-gray-900">Customer PO</h2>
 
-        <!-- Tabs -->
-        <div class="flex flex-wrap gap-2 mb-2 pt-2">
-            <x-button rounded="lg" light teal icon="user" label="DR" @click="filterByStatus('DR')"
-                :class="currentTab === 'DR' ? 'bg-blue-600' : 'bg-gray-300'" class="" />
-
-            <x-button rounded="lg" light teal icon="user" label="Invoice" @click="filterByStatus('Invoice')"
-                :class="currentTab === 'Invoice' ? 'bg-green-600' : 'bg-gray-300'" class="" />
-
-            <x-button rounded="lg" light teal icon="user" label="Costumerpo" @click="filterByStatus('Costumerpo')"
-                :class="currentTab === 'Costumerpo' ? 'bg-green-600' : 'bg-gray-300'" class="" />
-        </div>
-        <!-- end tabs -->
+    
 
         <!-- Search and Buttons -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

@@ -75,30 +75,30 @@
                     <tr>
                         <td colspan="5" class="text-center p-4 text-gray-500">No stock records found.</td>
                     </tr>
-                @endif
-            </tbody>
-        </table>
-    </div>
-
-
+                    @endif
+                </tbody>
+            </table>
+        </div>
+        
+    
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('stockCardUI', () => ({
-                search: '',
-                products: [
-                    { barcode: '1234567890', name: 'Dog Food Premium', bag: 20, pc: 10, damages: 0 },
-                    { barcode: '0987654321', name: 'Cat Litter', bag: 15, pc: 5, damages: 1 },
-                    // Add more sample data as needed
-                ],
-                get filteredProducts() {
-                    const term = this.search.toLowerCase();
-                    return this.products.filter(p =>
-                        p.barcode.includes(term) ||
-                        p.name.toLowerCase().includes(term)
-                    );
-                }
-            }));
-        });
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('stockCardUI', () => ({
+            search: '',
+            products: [
+                { barcode: '1234567890', name: 'Dog Food Premium', bag: 20, pc: 10, damages: 0 },
+                { barcode: '0987654321', name: 'Cat Litter', bag: 15, pc: 5, damages: 1 },
+                // Add more sample data as needed
+            ],
+            get filteredProducts() {
+                const term = this.search.toLowerCase();
+                return this.products.filter(p =>
+                    p.barcode.includes(term) ||
+                    p.name.toLowerCase().includes(term)
+                );
+            }
+        }));
+    });
     </script>
-
+    
 </div>

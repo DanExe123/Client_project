@@ -2,6 +2,13 @@
     <div class="col-span-1 w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
         <h3 class="text-lg font-bold text-gray-800">Recieving Approval</h3>
 
+        @if (session()->has('message'))
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
+            <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+                class="!bg-green-300 !w-full" />
+        </div>
+    @endif
+
         <div class="text-gray-500 flex text-start gap-3">
             <a class="text-gray-500 font-medium" wire:navigate href="{{ route('recieving') }}">Recieving</a>
             <x-phosphor.icons::regular.caret-right class="w-4 h-4 text-gray-500 flex shrink-0 mt-1" />
@@ -28,52 +35,31 @@
             </div>
         </div>
 
-        <!-- Product Table -->
         <h4 class="text-md font-semibold text-gray-700">Products</h4>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="border px-2 py-1 font-medium">Product Description</th>
-                        <th class="border px-2 py-1 font-medium">Qty</th>
-                        <th class="border px-2 py-1 font-medium">Unit Price</th>
-                        <th class="border px-2 py-1 font-medium">Discount%</th> <!-- Added -->
-                        <th class="border px-2 py-1 font-medium">Subtotal</th>
-                        <th class="border px-2 py-1 font-medium">Action</th> <!-- Modified -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <template x-for="(item, index) in products" :key="index">
-                        <tr class="hover:bg-gray-50">
-                            <td class="border px-2 py-2">
-                                <input type="text" x-model="item.barcode"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
-                                    placeholder="Scan or enter barcode" />
-                            </td>
-                            <td class="border px-2 py-2">
-                                <input type="number" x-model="item.quantity" @input="updateTotal(index)" min="1"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                            </td>
-                            <td class="border px-2 py-2">
-                                <input type="number" x-model="item.price" @input="updateTotal(index)" step="0.01"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                            </td>
-                            <td class="border px-2 py-2">
-                                <input type="number" x-model="item.discount" @input="updateTotal(index)" step="0.01" min="0" max="100"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                            </td>
-                            <td class="border px-2 py-2">
-                                <input type="text" :value="item.total.toFixed(2)" readonly
-                                    class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
-                            </td>
-                            <td class="border px-2 py-2 space-y-1 text-center">
-                                <x-button red label="Remove" class="px-2 py-1 text-xs h-8 w-full" x-on:click="removeProduct(index)" />
-                            </td>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border px-2 py-1 font-medium">Product Description</th>
+                            <th class="border px-2 py-1 font-medium">Qty</th>
+                            <th class="border px-2 py-1 font-medium">Unit Price</th>
+                            <th class="border px-2 py-1 font-medium">Discount%</th>
+                            <th class="border px-2 py-1 font-medium">Subtotal</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
-            
+                    </thead>
+                    <tbody>
+                        @foreach ($items as $item)
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-2 py-2">{{ $item['description'] }}</td>
+                                <td class="border px-2 py-2">{{ $item['quantity'] }}</td>
+                                <td class="border px-2 py-2">{{ number_format($item['unit_price'], 2) }}</td>
+                                <td class="border px-2 py-2">{{ $item['discount'] }}%</td>
+                                <td class="border px-2 py-2">{{ number_format($item['subtotal'], 2) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Add Product Button -->
             <div class="pt-2 ml-2">
@@ -83,9 +69,12 @@
             <!-- Remarks and Submit -->
             <div class="pt-4">
                 <x-textarea name="remarks" label="Remarks" placeholder="Write your remarks" />
-                <div class="flex justify-end pt-2">
-                    <x-button blue label="Approved" />
-                </div>
+                <form wire:submit.prevent="approve">
+                    <div class="flex justify-end pt-4">
+                        <x-button type="submit" blue label="Approve" />
+                    </div>
+                </form>
+                
             </div>
         </div>
     </div>

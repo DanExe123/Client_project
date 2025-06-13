@@ -72,7 +72,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/customer-po', CustomerPo::class)->name('customer-po');
 
         Route::get('/recieving', Recieving::class)->name('recieving');
-        Route::get('/recieving-approval', Recievingapproval::class)->name('recievingapproval');
+        Route::get('/recievingapproval/{purchaseOrderId}', Recievingapproval::class)  ->name('recievingapproval');
         Route::get('/view-detail-recieving/{id}', ViewDetailRecieving::class)->name('view-detail-recieving');
         Route::get('/edit-recieving/{id}', Editrecieving::class)->name('editrecieving');
 

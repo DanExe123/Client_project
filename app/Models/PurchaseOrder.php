@@ -39,4 +39,12 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(PurchaseOrderItem::class);
     }
+
+    public function receivings()
+{
+    return $this->hasMany(Receiving::class);
+}
+
+
+    
 }

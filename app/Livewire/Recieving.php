@@ -7,6 +7,7 @@ use App\Models\PurchaseOrder;
 
 class Recieving extends Component
 {
+    public $search = '';
     public $purchaseOrders;
     public $selectedpoId = [];
     
@@ -40,14 +41,12 @@ class Recieving extends Component
 
         public function approveSelected()
         {
-            // ensure exactly one is selected
             if (count($this->selectedpoId) === 1) {
-                // redirect to the route, passing the single selected ID
-                return redirect()->route('recievingapproval', [
-                    'purchaseOrders' => $this->selectedpoId[0],
-                ]);
+                $selectedId = $this->selectedpoId[0];
+                return redirect()->route('recievingapproval', ['purchaseOrderId' => $selectedId]);
             }
         }
+        
 
         public function editSelected()
         {
