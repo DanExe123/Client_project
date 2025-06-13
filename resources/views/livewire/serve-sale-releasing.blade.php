@@ -84,7 +84,6 @@
         </div>
     </div>
 </div>
-
 <script>
     function POTable(poData) {
         const products = poData.items.map(item => ({

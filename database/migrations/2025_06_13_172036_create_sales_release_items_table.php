@@ -22,7 +22,6 @@ return new class extends Migration {
             $table->foreign('sales_release_id')->references('id')->on('sales_releases')->onDelete('cascade');
         });
     }
-
     public function down(): void
     {
         Schema::dropIfExists('sales_release_items');

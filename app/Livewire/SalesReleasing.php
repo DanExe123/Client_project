@@ -72,7 +72,6 @@ class SalesReleasing extends Component
                 'subtotal' => $item->subtotal,
             ]);
         }
-
         // Optional: mark the PO as served
         $po->status = 'served';
         $po->save();

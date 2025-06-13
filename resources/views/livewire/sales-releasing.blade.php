@@ -27,7 +27,6 @@
             </div>
         </div>
 
-
         <div x-show="currentTab === 'Invoice'" x-cloak>
             <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full">
                 <table class="min-w-xl w-full border-collapse bg-white text-left text-sm text-gray-500">

@@ -3,11 +3,23 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Models\PurchaseOrder;
 
 class ViewDetailRecieving extends Component
 {
+    public $purchaseOrderId;
+
+    public function mount($id)
+    {
+        $this->purchaseOrderId = $id;
+    }
+
     public function render()
     {
-        return view('livewire.view-detail-recieving');
+        $purchaseOrder = PurchaseOrder::with('items')->findOrFail($this->purchaseOrderId);
+
+        return view('livewire.view-detail-recieving', [
+            'purchaseOrder' => $purchaseOrder,
+        ]);
     }
 }

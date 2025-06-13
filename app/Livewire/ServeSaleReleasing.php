@@ -13,7 +13,6 @@ class ServeSaleReleasing extends Component
     {
         $this->po = CustomerPurchaseOrder::with(['customer', 'items.product'])->findOrFail($id);
     }
-
     public function render()
     {
         return view('livewire.serve-sale-releasing'); // ← path to Blade view

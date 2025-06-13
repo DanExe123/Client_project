@@ -84,8 +84,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/sales-releasing/print-preview/{id}', [SalesReleasing::class, 'printPreview'])->name('serve-print-preview');
 
 
-
-
         Route::get('/return-by-customer', ReturnByCustomer::class)->name('return-by-customer');
         Route::get('/return-by-supplier', ReturnToSupplier::class)->name('return-by-supplier');
         Route::get('/stockcard', Stockcard::class)->name('stockcard');

@@ -22,7 +22,6 @@ return new class extends Migration {
             $table->foreign('created_by')->references('id')->on('users');
         });
     }
-
     public function down(): void
     {
         Schema::dropIfExists('sales_releases');

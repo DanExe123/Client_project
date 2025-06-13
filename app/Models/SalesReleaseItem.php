@@ -19,7 +19,6 @@ class SalesReleaseItem extends Model
         'discount',
         'subtotal',
     ];
-
     public function release()
     {
         return $this->belongsTo(SalesRelease::class, 'sales_release_id');

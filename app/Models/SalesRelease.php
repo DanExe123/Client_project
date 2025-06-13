@@ -18,7 +18,6 @@ class SalesRelease extends Model
         'remarks',
         'created_by',
     ];
-
     public function items()
     {
         return $this->hasMany(SalesReleaseItem::class);

@@ -24,7 +24,6 @@
                 <p><strong>Release ID:</strong> #{{ $release->id }}</p>
             </div>
         </div>
-
         <div class="mb-6">
             <h2 class="font-semibold text-lg">Customer Information</h2>
             <p><strong>Name:</strong> {{ $release->customer->name }}</p>
