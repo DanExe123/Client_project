@@ -4,7 +4,7 @@
         <!-- Title -->
         <h2 class="text-2xl font-semibold text-gray-900">Customer PO</h2>
 
-    
+     
 
         <!-- Search and Buttons -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
