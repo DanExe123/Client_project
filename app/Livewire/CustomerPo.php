@@ -37,6 +37,11 @@ class CustomerPo extends Component
         $this->updateGrandTotal();
     }
 
+    public function updatedPurchaseDiscount()
+    {
+        $this->updateGrandTotal(); // Recalculate live
+    }
+
     public function addProduct()
     {
         $this->products[] = [

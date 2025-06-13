@@ -3,8 +3,14 @@
     <div class="lg:col-span-2 space-y-1">
         <!-- Title -->
         <h2 class="text-2xl font-semibold text-gray-900">Customer PO</h2>
-
-     
+        {{-- Success Alert --}}
+        @if (session()->has('message'))
+            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+                class="mt-2">
+                <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+                    class="!bg-green-300 !w-full" />
+            </div>
+        @endif
 
         <!-- Search and Buttons -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -15,29 +21,6 @@
                 </span>
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..."
                   class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-            </div>
-
-            <!-- Button Group -->
-            <div class="flex gap-2">
-                <x-button emerald right-icon="plus" x-on:click="$openModal('Add')" />
-
-
-
-                <x-button right-icon="pencil" interaction="positive" x-bind:class="selected.length === 0 ?
-                        'bg-gray-300 text-white cursor-not-allowed' :
-                        'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selected.length === 0"
-                    x-on:click="$openModal('Edit')">
-                </x-button>
-
-
-
-                <x-button right-icon="trash" interaction="negative" x-bind:class="selected.length === 0 ?
-                        'bg-red-300 text-white cursor-not-allowed' :
-                        'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selected.length === 0"
-                    x-on:click="$openModal('Delete')">
-                </x-button>
-
-
             </div>
         </div>
 
@@ -85,19 +68,21 @@
         <h3 class="text-lg font-bold text-gray-800">
             Add <span class="text-blue-500">PO</span> to <span class="text-blue-500">Customer</span>
         </h3>
-
+    
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Select Customer</label>
-                <select wire:model="selectedCustomerId"
-                    class="block w-full rounded-md border border-gray-300 py-2 px-3">
+                <select wire:model="selectedCustomerId" class="block w-full rounded-md border border-gray-300 py-2 px-3">
                     <option value="">Select a customer</option>
                     @foreach($customers as $customer)
                         <option value="{{ $customer->id }}">{{ $customer->name }}</option>
                     @endforeach
                 </select>
+                @error('selectedCustomerId')
+                    <span class="text-sm text-red-500">{{ $message }}</span>
+                @enderror
             </div>
-
+    
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Select Type</label>
                 <select wire:model="receiptType" class="block w-full rounded-md border border-gray-300 py-2 px-3">
@@ -105,8 +90,11 @@
                     <option value="DR">DR</option>
                     <option value="INVOICE">INVOICE</option>
                 </select>
+                @error('receiptType')
+                    <span class="text-sm text-red-500">{{ $message }}</span>
+                @enderror
             </div>
-
+    
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
                 <input type="date" wire:model="poDate"
@@ -114,11 +102,10 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Discount</label>
-                <input type="number" min="0" step="0.01" wire:model.lazy="purchase_discount"
-                    class="border border-gray-300 rounded-md px-3 py-2 w-full" />
-            </div>
+                <input type="number" min="0" step="0.01" wire:model.debounce.200ms="purchase_discount" class="border border-gray-300 rounded-md px-3 py-2 w-full" />
+            </div>            
         </div>
-
+    
         <h4 class="text-md font-semibold text-gray-700">Products</h4>
         <div class="overflow-x-auto">
             <table wire:poll class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
@@ -137,53 +124,71 @@
                     @foreach($products as $index => $p)
                         <tr class="hover:bg-gray-50">
                             <td wire:poll.prevent class="border px-2 py-2">
-                                <input type="text" wire:model.lazy="products.{{ $index }}.barcode" list="barcodes"
+                                <input type="text"
+                                    wire:model.lazy="products.{{ $index }}.barcode"
+                                    list="barcodes"
                                     placeholder="enter and select barcode"
                                     class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
-                                    wire:change="fillProductByBarcode({{ $index }})" />
+                                    wire:change="fillProductByBarcode({{ $index }})"
+                                />
 
                                 <datalist id="barcodes">
                                     @foreach($allProducts as $product)
                                         <option value="{{ $product['barcode'] }}">{{ $product['description'] }}</option>
                                     @endforeach
                                 </datalist>
+                                @error('products')
+                                    <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
+                                @enderror
                             </td>
                             {{-- //HOYY!! DRI KA NAG UNTAT --}}
                             <td wire:ignore.self class="border px-2 py-2">
-                                <input type="text" wire:model.lazy="products.{{ $index }}.product_description"
-                                    list="product_descriptions" placeholder="enter and select description"
+                                <input type="text"
+                                    wire:model.lazy="products.{{ $index }}.product_description"
+                                    list="product_descriptions"
+                                    placeholder="enter and select description"
                                     class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
-                                    wire:change="fillProductByDescription({{ $index }})" />
+                                    wire:change="fillProductByDescription({{ $index }})"
+                                />
                                 <datalist id="product_descriptions">
                                     @foreach($allProducts as $product)
                                         <option value="{{ $product['description'] }}">{{ $product['barcode'] }}</option>
                                     @endforeach
                                 </datalist>
+                                @error('products')
+                                    <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
+                                @enderror
+                            </td>                            
+                            <td class="border px-2 py-2">
+                                <input type="number"
+                                    wire:model.lazy="products.{{ $index }}.quantity"
+                                    wire:input="updateTotal({{ $index }})"
+                                    min="1"
+                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" 
+                                />
+                                @error("products.{$index}.quantity")
+                                    <span class="text-sm text-red-500">{{ $message }}</span>
+                                @enderror
                             </td>
                             <td class="border px-2 py-2">
-                                <input type="number" wire:model.lazy="products.{{ $index }}.quantity"
-                                    wire:input="updateTotal({{ $index }})" min="1"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
-                            </td>
-                            <td class="border px-2 py-2">
-                                <input type="number" step="0.01" readonly value="{{ $products[$index]['price'] ?? 0 }}"
+                                <input type="number"
+                                    step="0.01"
+                                    readonly
+                                    value="{{ $products[$index]['price'] ?? 0 }}"
                                     class="w-full border-gray-300 rounded-md px-2 py-1 text-sm bg-gray-100" />
                             </td>
                             <td class="border px-2 py-2">
                                 <input type="number" min="0" step="0.01"
-                                    wire:model.lazy="products.{{ $index }}.product_discount"
-                                    wire:input="updateTotal({{ $index }})"
-                                    class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
+                                       wire:model.lazy="products.{{ $index }}.product_discount"
+                                       wire:input="updateTotal({{ $index }})"
+                                       class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" />
                             </td>
                             <td class="border px-2 py-2">
                                 <div wire:loading wire:target="updateTotal"
-                                    class="w-[200px] flex items-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1 text-sm">
-                                    <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                            stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                    class="w-[200px] flex items-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1 text-sm">  
+                                    <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                                     </svg>
                                     <span class="text-sm text-gray-400 italic">calculating...</span>
                                 </div>
@@ -192,7 +197,7 @@
                                     <input type="text" value="{{ number_format($p['total'] ?? 0, 2) }}" readonly
                                         class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
                                 </div>
-                            </td>
+                            </td>                            
                             <td class="border px-2 py-2 text-center">
                                 <x-button red label="Remove" class="px-2 py-1 text-xs h-8"
                                     wire:click="removeProduct({{ $index }})" />
@@ -204,31 +209,26 @@
                     <tr>
                         <td colspan="5" class="border px-2 py-2 text-right font-semibold">Total:</td>
                         <td class="border px-2 py-2 font-semibold text-right">
-                            <div wire:loading wire:target="updateTotal, fillProductByBarcode, fillProductByDescription"
-                                class="flex justify-end items-center space-x-2">
-                                <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            <div wire:loading wire:target="purchase_discount, updateTotal, fillProductByBarcode, fillProductByDescription" class="flex justify-end items-center space-x-2">
+                                <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                                 </svg>
                                 <span class="text-gray-500 text-sm italic">Calculating...</span>
                             </div>
-                            <div wire:loading.remove
-                                wire:target="updateTotal, fillProductByBarcode, fillProductByDescription">
+                            <div wire:loading.remove wire:target="purchase_discount, updateTotal, fillProductByBarcode, fillProductByDescription">
                                 {{ number_format($grandTotal, 2) }}
                             </div>
                         </td>
                         <td class="border px-2 py-2"></td>
                     </tr>
-                </tfoot>
+                </tfoot>                
             </table>
-
+    
             <div class="pt-2 ml-2">
                 <x-button green label="Add Product" wire:click="addProduct" />
             </div>
-
+    
             <div class="pt-4">
                 <x-textarea wire:model="remarks" name="remarks" label="Remarks" placeholder="Write your remarks" />
                 <div class="flex justify-end pt-2">
@@ -237,5 +237,6 @@
             </div>
         </div>
     </div>
-
+    
 </div>
+

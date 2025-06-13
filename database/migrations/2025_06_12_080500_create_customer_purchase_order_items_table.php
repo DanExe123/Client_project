@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('customer_purchase_order_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_order_id')->constrained('purchase_orders')->onDelete('cascade'); // Links to the purchase_orders table
+            $table->foreignId('purchase_order_id')->constrained('customer_purchase_orders')->onDelete('cascade'); // Links to the purchase_orders table
             $table->foreignId('product_id')->constrained('products')->onDelete('restrict'); // Links to the products table
             $table->string('product_description'); // Store description at time of PO creation (for historical accuracy)
             $table->string('product_barcode')->nullable(); // Store barcode for historical accuracy
