@@ -14,21 +14,23 @@ class SalesReleasing extends Component
 {
     public $invoiceOrders = [];
     public $drOrders = [];
-    public $allOrders = [];
+    public $releasedOrders = [];
     public $po;
 
     public function mount()
     {
         $this->invoiceOrders = CustomerPurchaseOrder::with('customer')
             ->where('receipt_type', 'INVOICE')
+            ->where('status', 'pending') // only pending
             ->get();
 
         $this->drOrders = CustomerPurchaseOrder::with('customer')
             ->where('receipt_type', 'DR')
+            ->where('status', 'pending') // only pending
             ->get();
-
-        $this->allOrders = CustomerPurchaseOrder::with('customer')
-            ->whereIn('receipt_type', ['INVOICE', 'DR'])
+        // NEW: fetch all served sales releases
+        $this->releasedOrders = SalesRelease::with(['customer', 'items'])
+            ->orderByDesc('release_date')
             ->get();
     }
 
@@ -37,7 +39,7 @@ class SalesReleasing extends Component
         return view('livewire.sales-releasing', [
             'invoiceOrders' => $this->invoiceOrders,
             'drOrders' => $this->drOrders,
-            'allOrders' => $this->allOrders,
+            'releasedOrders' => $this->releasedOrders,
         ]);
     }
 
@@ -69,10 +71,10 @@ class SalesReleasing extends Component
             'remarks' => $po->remarks,
             'created_by' => Auth::id(),
             'vat_percent' => $vatPercent,
+            'total_amount' => $subtotal,
             'vat_amount' => $vatAmount,
             'total_with_vat' => $totalWithVat,
         ]);
-
         // Decode product data from the request
         $products = json_decode($request->input('products'), true);
 
@@ -98,7 +100,13 @@ class SalesReleasing extends Component
     public function printPreview($id)
     {
         $release = SalesRelease::with(['customer', 'items'])->findOrFail($id);
-        return view('livewire.print-preview', compact('release'));
 
+        // Mark as printed if not yet
+        if (!$release->printed_at) {
+            $release->printed_at = now();
+            $release->save();
+        }
+
+        return view('livewire.print-preview', compact('release'));
     }
 }

@@ -17,6 +17,10 @@ class SalesRelease extends Model
         'discount',
         'remarks',
         'created_by',
+        'vat_percent',
+        'total_amount',
+        'vat_amount',
+        'total_with_vat'
     ];
     public function items()
     {

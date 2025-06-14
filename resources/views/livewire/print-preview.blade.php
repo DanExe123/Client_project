@@ -19,7 +19,10 @@
     <div class="max-w-4xl mx-auto bg-white p-6 shadow-md border">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">Teepee</h1>
-            <h1 class="text-1xl font-bold">Sales Receipt</h1>
+            <h1 class="text-1xl font-bold">
+                {{ $release->receipt_type === 'DR' ? 'DR RECEIPT' : 'Invoice Receipt' }}
+
+            </h1>
             <div class="text-sm text-right">
                 <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($release->release_date)->format('F d, Y') }}</p>
                 <p><strong class="font-bold">Invoice No.</strong> <span
@@ -59,23 +62,49 @@
             $grossSales = $release->items->sum('subtotal');
             $discount = $release->discount ?? 0;
             $totalSales = $grossSales - $discount;
-
-            $netOfVat = $totalSales / 1.12;
-            $vat = $netOfVat * 0.12;
-            $totalAmountDue = $netOfVat + $vat;
         @endphp
 
-        <div class="text-right mb-4 space-y-1">
-            <p><strong>Total Discount:</strong> {{ number_format($discount, 2) }}</p>
-            <p class="text-lg font-bold">Total Sales: {{ number_format($totalSales, 2) }}</p>
-            <p><strong>Amount Net of VAT:</strong> {{ number_format($netOfVat, 2) }}</p>
-            <p><strong>Add: VAT (12%):</strong> {{ number_format($vat, 2) }}</p>
-            <p class="text-lg font-bold">TOTAL AMOUNT DUE: {{ number_format($totalAmountDue, 2) }}</p>
+        <div class="flex justify-end mb-4">
+            <div class="w-full max-w-sm space-y-1">
+                <div class="flex justify-between">
+                    <span class="font-medium">Total Discount:</span>
+                    <span>{{ number_format($discount, 2) }}</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                    <span>Total Sales:</span>
+                    <span>{{ number_format($totalSales, 2) }}</span>
+                </div>
+
+                @if ($release->receipt_type !== 'DR')
+                    @php
+                        $netOfVat = $totalSales / 1.12;
+                        $vat = $netOfVat * 0.12;
+                        $totalAmountDue = $netOfVat + $vat;
+                    @endphp
+                    <div class="flex justify-between">
+                        <span class="font-medium">Amount Net of VAT:</span>
+                        <span>{{ number_format($netOfVat, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium">Add: VAT (12%):</span>
+                        <span>{{ number_format($vat, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold">
+                        <span>TOTAL AMOUNT DUE:</span>
+                        <span>{{ number_format($totalAmountDue, 2) }}</span>
+                    </div>
+                @else
+                    <div class="flex justify-between text-lg font-bold">
+                        <span>TOTAL AMOUNT DUE:</span>
+                        <span>{{ number_format($totalSales, 2) }}</span>
+                    </div>
+                @endif
+            </div>
         </div>
 
         <div class="mb-4">
-            <h2 class="font-semibold">Remarks</h2>
-            <p>{{ $release->remarks ?? 'N/A' }}</p>
+            <h2 class="font-semibold">Remarks:</h2>
+            <p>{{ $release->remarks ?? '' }}</p>
         </div>
 
         <div class="flex justify-end space-x-3 no-print">
@@ -84,7 +113,13 @@
             <a href="{{ route('sales-releasing') }}"
                 class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Back</a>
         </div>
+        @if ($release->printed_at)
+            <div class="fixed left-0 right-0 text-center text-gray-400 text-sm ">
+                DUPLICATE COPY
+            </div>
+        @endif
     </div>
+
 </body>
 
 </html>
