@@ -57,7 +57,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="5" class="text-center py-6 text-gray-500">No purchase orders found.</td>
+              <td colspan="5" class="text-center py-6 text-gray-500">No return orders found.</td>
                 </tr>
           @endforelse
         </tbody>
@@ -233,12 +233,5 @@
           </div>
       </div>
     </div>
-
-
-
-
-
-
-    
   </div>
 </div>

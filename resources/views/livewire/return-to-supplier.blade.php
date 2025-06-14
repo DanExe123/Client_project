@@ -1,12 +1,20 @@
 <div>
-  <div x-cloak x-data="returnToSupplierUI" class="space-y-2">
+  <div x-cloak class="space-y-2">
     <h2 class="text-2xl font-semibold text-gray-900">Return To Supplier</h2>
+    {{-- Success Alert --}}
+    @if (session()->has('message'))
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+            class="mt-2">
+            <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+                class="!bg-green-300 !w-full" />
+        </div>
+    @endif
     <div class="flex gap-2 justify-end">
       <div class="w-full sm:max-w-xs flex justify-start relative">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
           <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
         </span>
-        <input type="text" x-model="search" placeholder="Search..."
+        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..."
           class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
       </div>
       <x-button right-icon="pencil" interaction="positive" x-bind:class="selectedReturns.length === 0
@@ -22,7 +30,7 @@
       </x-button>
     </div>
 
-    <div class="overflow-auto rounded-lg border border-gray-200">
+    <div wire:poll class="overflow-auto rounded-lg border border-gray-200">
       <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
         <thead class="bg-gray-50 sticky top-0 z-10">
           <tr>
@@ -36,277 +44,193 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-          <template x-for="(rs, index) in returnList" :key="index">
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-4">
-                <input type="checkbox" :value="index" x-model="selectedReturns" class="h-4 w-4 text-blue-600" />
+          @forelse ($returnOrders as $returnOrder)
+            <tr>
+              <td class="px-6 py-4">
+                <input type="checkbox" 
+                  class="h-4 w-4 text-blue-600" />
               </td>
-              <td class="px-6 py-4" x-text="rs.date"></td>
-              <td class="px-6 py-4" x-text="rs.supplier"></td>
-              <td class="px-6 py-4"
-                x-text="formatPrice(rs.products.reduce((total, p) => total + (p.quantity * p.unitPrice), 0))">
-              </td>
+              <td class="px-6 py-4">{{ \Carbon\Carbon::parse($returnOrder->order_date)->format('Y-m-d') }}</td>
+              <td class="px-6 py-4">{{ $returnOrder->supplier->name ?? 'N/A' }}</td>
+              <td class="px-6 py-4">₱{{ number_format($returnOrder->total_amount, 2) }}</td>
             </tr>
-          </template>
-          <tr x-show="returnList.length === 0">
-            <td colspan="4" class="text-center p-4 text-gray-500">No return records yet.</td>
-          </tr>
+          @empty
+            <tr>
+              <td colspan="5" class="text-center py-6 text-gray-500">No return order found.</td>
+                </tr>
+          @endforelse
         </tbody>
       </table>
     </div>
 
     <hr>
-    <div x-show="showForm" x-transition class="bg-white border border-gray-200 rounded-lg p-6 space-y-4 mt-5">
-      <div class="text-lg font-semibold" x-text="formTitle"></div>
+    <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
+    <div wire:key="po-form-{{ $formKey }}" class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
+      <h3 class="text-lg font-bold text-gray-800">
+          Add <span class="text-blue-500">Return</span> by <span class="text-blue-500">Customer</span>
+      </h3>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div x-data="{
-                    currentDate: '', // Property to hold the date string in YYYY-MM-DD format
-                    init() {
-                        // Get today's date
-                        const today = new Date();
-                        const year = today.getFullYear();
-                        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-                        const day = String(today.getDate()).padStart(2, '0');
-
-                        // Format it as YYYY-MM-DD
-                        this.currentDate = `${year}-${month}-${day}`;
-                        // Set the form date to today's date if it's new
-                        if (!this.form.date) {
-                            this.form.date = this.currentDate;
-                        }
-                    }
-                }">
-          <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
-          <input type="date" id="date" name="date" class="w-full mt-1 border rounded px-3 py-2" x-model="form.date">
-        </div>
-        <div>
-          <label for="supplier" class="block text-sm font-medium text-gray-700">Supplier</label>
-          <select id="supplier" name="supplier" x-model="form.supplier_id" class="w-full mt-1 border rounded px-3 py-2">
-            <option value="" disabled selected>Select a Supplier</option>
-            @foreach ($suppliers as $supplier)
-        <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-      @endforeach
-          </select>
-        </div>
+      <div wire:loading wire:target="submitPO">
+          <p class="text-blue-600 font-semibold">Submitting PO... please wait.</p>
       </div>
 
-      <h4 class="text-md font-semibold text-gray-700 mt-4">Products to Return</h4>
-      <div class="overflow-auto mt-4">
-        <table class="w-full text-sm border">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="p-2">Barcode</th>
-              <th class="p-2">Product Description</th>
-              <th class="p-2">Qty</th>
-              <th class="p-2">Unit Price</th>
-              <th class="p-2">SubTotal</th>
-              <th class="p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template x-for="(item, index) in form.products" :key="index">
-              <tr>
-                <td class="p-2">
-                  {{-- Barcode input (often readonly, populated when product_id is selected) --}}
-                  <input type="text" x-model="item.barcode" class="w-full border px-2 py-1 rounded bg-gray-100"
-                    placeholder="Scan or enter barcode" />
-                </td>
-                <td class="p-2">
-                  <select x-model="item.product_id" @change="updateProductDetails(index)"
-                    class="w-[250px] border px-2 py-1 rounded">
-                    <option value="">Select</option>
-                    {{-- Make sure $products is passed from your Livewire/PHP component --}}
-                    @foreach ($products as $product)
-            <option value="{{ $product->id }}">{{ $product->description }}</option>
-          @endforeach
+      <div wire:loading.remove wire:target="submitPO">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div> 
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Select Supplier</label>
+                  <select wire:model="selectedSupplierId" class="block w-full rounded-md border border-gray-300 py-2 px-3">
+                      <option value="">Select a supplier</option>
+                      @foreach($suppliers as $supplier)
+                          <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                      @endforeach
                   </select>
-                </td>
-                <td class="p-2">
-                  <input type="number" x-model="item.quantity" @input="updateTotal(index)" min="1"
-                    class="w-[250px] border px-2 py-1 rounded" />
-                </td>
-                <td class="p-2">
-                  {{-- Unit Price input (often readonly, fetched from product) --}}
-                  <input type="number" x-model="item.unitPrice" step="0.01" readonly
-                    class="w-full border px-2 py-1 rounded bg-gray-100" />
-                </td>
-                <td class="p-2 text-right" x-text="formatPrice(item.quantity * item.unitPrice)"></td>
-                <td class="p-2 text-center">
-                  <x-button red label="Remove" @click="removeProduct(index)" />
-                </td>
-              </tr>
-            </template>
-            <template x-if="form.products.length === 0">
-              <tr>
-                <td colspan="6" class="p-4 text-center text-gray-500">No products added. Click "Add Product" to start.
-                </td>
-              </tr>
-            </template>
-          </tbody>
-          <tfoot class="bg-gray-50">
-            <tr>
-              <td colspan="4" class="p-2 text-right font-semibold">Grand Total:</td>
-              <td class="p-2 font-semibold text-right" x-text="formatPrice(grandTotal)"></td>
-              <td class="p-2"></td> {{-- Empty for action column --}}
-            </tr>
-          </tfoot>
-        </table>
-        <x-button green label="Add Product" class="mt-2 ml-2 mb-1" @click="addProduct()" />
-      </div>
+                  @error('selectedSupplierId')
+                      <span class="text-sm text-red-500">{{ $message }}</span>
+                  @enderror
+              </div>
+      
+              <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                  <input type="date" wire:model="poDate"
+                      class="block w-full rounded-md border border-gray-300 py-2 px-3" />
+              </div>        
+          </div>
+      
+          <h4 class="text-md font-semibold text-gray-700">Products to Return</h4>
+          <div class="overflow-x-auto">
+              <table wire:poll class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
+                  <thead class="bg-gray-100">
+                      <tr>
+                          <th class="border px-2 py-1 font-medium">Barcode</th>
+                          <th class="border px-2 py-1 font-medium">Product Description</th>
+                          <th class="border px-2 py-1 font-medium">Qty</th>
+                          <th class="border px-2 py-1 font-medium">Unit Price</th>
+                          <th class="border px-2 py-1 font-medium">Subtotal</th>
+                          <th class="border px-2 py-1 font-medium">Action</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      @foreach($products as $index => $p)
+                          <tr class="hover:bg-gray-50">
+                              <td wire:poll.prevent class="border px-2 py-2">
+                                  <input type="text"
+                                      wire:model.lazy="products.{{ $index }}.barcode"
+                                      list="barcodes"
+                                      placeholder="enter and select barcode"
+                                      class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
+                                      wire:change="fillProductByBarcode({{ $index }})"
+                                  />
 
-      <div class="pt-4">
-        <x-textarea name="remarks" label="Remarks" placeholder="Write any remarks for this return"
-          x-model="form.remarks" />
-      </div>
+                                  <datalist id="barcodes">
+                                      @foreach($allProducts as $product)
+                                          <option value="{{ $product['barcode'] }}">{{ $product['description'] }}</option>
+                                      @endforeach
+                                  </datalist>
+                                  @error('products')
+                                      <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
+                                  @enderror
+                              </td>
+                              {{-- //HOYY!! DRI KA NAG UNTAT --}}
+                              <td wire:ignore.self class="border px-2 py-2">
+                                  <input type="text"
+                                      wire:model.lazy="products.{{ $index }}.product_description"
+                                      list="product_descriptions"
+                                      placeholder="enter and select description"
+                                      class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
+                                      wire:change="fillProductByDescription({{ $index }})"
+                                  />
+                                  <datalist id="product_descriptions">
+                                      @foreach($allProducts as $product)
+                                          <option value="{{ $product['description'] }}">{{ $product['barcode'] }}</option>
+                                      @endforeach
+                                  </datalist>
+                                  @error('products')
+                                      <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
+                                  @enderror
+                              </td>                            
+                              <td class="border px-2 py-2">
+                                  <input type="number"
+                                      wire:model.lazy="products.{{ $index }}.quantity"
+                                      wire:input="updateTotal({{ $index }})"
+                                      min="1"
+                                      class="w-full border-gray-300 rounded-md px-2 py-1 text-sm" 
+                                  />
+                                  @error("products.{$index}.quantity")
+                                      <span class="text-sm text-red-500">{{ $message }}</span>
+                                  @enderror
+                              </td>
+                              <td class="border px-2 py-2">
+                                  <input type="number"
+                                      step="0.01"
+                                      readonly
+                                      value="{{ $products[$index]['price'] ?? 0 }}"
+                                      class="w-full border-gray-300 rounded-md px-2 py-1 text-sm bg-gray-100" />
+                              </td>
+                              <td class="border px-2 py-2">
+                                  <div wire:loading wire:target="updateTotal"
+                                      class="w-[200px] flex items-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1 text-sm">  
+                                      <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                      </svg>
+                                      <span class="text-sm text-gray-400 italic">calculating...</span>
+                                  </div>
 
-      <div class="flex justify-end gap-2">
-        <x-button blue label="Save Return" @click="saveReturn()" />
-        <x-button secondary label="Cancel" @click="showForm = false; resetForm()" />
+                                  <div wire:loading.remove wire:target="updateTotal">
+                                      <input type="text" value="{{ number_format($p['total'] ?? 0, 2) }}" readonly
+                                          class="w-full bg-gray-100 border-gray-300 rounded-md px-2 py-1 text-sm" />
+                                  </div>
+                              </td>                            
+                              <td class="border px-2 py-2 text-center">
+                                  <x-button red label="Remove" class="px-2 py-1 text-xs h-8"
+                                      wire:click="removeProduct({{ $index }})" />
+                              </td>
+                          </tr>
+                      @endforeach
+                  </tbody>
+                  <tfoot class="bg-gray-50">
+                      <tr>
+                          <td colspan="4" class="border px-2 py-2 text-right font-semibold">Total:</td>
+                          <td class="border px-2 py-2 font-semibold text-right">
+                              <div wire:loading wire:target="updateTotal, fillProductByBarcode, fillProductByDescription" class="flex justify-end items-center space-x-2">
+                                  <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                  </svg>
+                                  <span class="text-gray-500 text-sm italic">Calculating...</span>
+                              </div>
+                              <div wire:loading.remove wire:target="updateTotal, fillProductByBarcode, fillProductByDescription">
+                                  {{ number_format($grandTotal, 2) }}
+                              </div>
+                          </td>
+                          <td class="border px-2 py-2"></td>
+                      </tr>
+                  </tfoot>                
+              </table>
+      
+              <div class="pt-2 ml-2">
+                <button 
+                    wire:click="addProduct"
+                    @disabled(!$selectedSupplierId)
+                    class="px-4 py-2 rounded-md text-white font-semibold
+                        transition duration-150 ease-in-out
+                        focus:outline-none focus:ring
+                        {{ $selectedSupplierId ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed' }}"
+                    {{ !$selectedSupplierId ? 'disabled' : '' }}
+                >
+                    Add Product
+                </button>
+              </div>
+      
+              <div class="pt-4">
+                  <x-textarea wire:model="remarks" name="remarks" label="Remarks" placeholder="Write your remarks" />
+                  <div class="flex justify-end pt-2">
+                      <x-button blue label="Submit" wire:click="submitReturn" />
+                  </div>
+              </div>
+          </div>
       </div>
     </div>
   </div>
-
-  <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('returnToSupplierUI', () => ({
-        // Properties to be passed from PHP via Livewire, or hardcoded for example
-        // In a Livewire component, you'd fetch these in `mount()` and pass them to the view.
-        allProducts: @json($products ?? []), // Ensure $products is passed to the view
-        suppliers: @json($suppliers ?? []),
-
-        search: '',
-        selectedReturns: [],
-        returnList: [], // This will hold your list of return records
-
-        showForm: true, // Set to true to show the form initially, false to hide
-        formTitle: 'Add New Supplier Return',
-        selectedIndex: null, // For editing functionality
-
-        form: {
-          date: '',
-          supplier_id: '',
-          products: [],
-          remarks: '', // Added remarks to the form data
-        },
-
-        init() {
-          // Initialize the form products with an empty row if creating a new return
-          if (this.form.products.length === 0) {
-            this.addProduct();
-          }
-          // Initialize current date on form
-          const today = new Date();
-          const year = today.getFullYear();
-          const month = String(today.getMonth() + 1).padStart(2, '0');
-          const day = String(today.getDate()).padStart(2, '0');
-          this.form.date = `${year}-${month}-${day}`;
-        },
-
-        // Product Table Functions
-        addProduct() {
-          this.form.products.push({
-            barcode: '',
-            product_id: '',
-            quantity: 1, // Changed from qty to quantity for consistency
-            unitPrice: 0.00, // Changed from price to unitPrice
-            subtotal: 0.00 // To store calculated subtotal for each item
-          });
-        },
-
-        removeProduct(index) {
-          this.form.products.splice(index, 1);
-          this.updateGrandTotal(); // Recalculate grand total after removal
-        },
-
-        // Called when product dropdown changes or quantity/unit price changes
-        updateProductDetails(index) {
-          const productId = this.form.products[index].product_id;
-          const product = this.allProducts.find(p => p.id == productId);
-
-          if (product) {
-            this.form.products[index].barcode = product.barcode;
-            this.form.products[index].unitPrice = parseFloat(product.price); // Set price from product data
-          } else {
-            // Reset if no product is selected or found
-            this.form.products[index].barcode = '';
-            this.form.products[index].unitPrice = 0.00;
-          }
-          this.updateTotal(index); // Recalculate subtotal for this row
-        },
-
-        updateTotal(index) {
-          const item = this.form.products[index];
-          const quantity = parseFloat(item.quantity) || 0;
-          const unitPrice = parseFloat(item.unitPrice) || 0;
-          item.subtotal = quantity * unitPrice; // Update subtotal for the item
-          this.updateGrandTotal(); // Recalculate grand total
-        },
-
-        get grandTotal() {
-          return this.form.products.reduce((sum, item) => sum + (item.subtotal || 0), 0).toFixed(2);
-        },
-
-        // Form Actions
-        saveReturn() {
-          // Add validation here before saving
-          if (!this.form.date || !this.form.supplier_id || this.form.products.length === 0) {
-            alert('Please fill in all required fields and add at least one product.');
-            return;
-          }
-
-          // For demonstration, pushing to local array.
-          // In a real application, you'd send this.form data to your backend (e.g., via Livewire or Fetch API).
-          // Example: Livewire.dispatch('saveReturnEvent', this.form);
-          if (this.selectedIndex === null) {
-            this.returnList.push(JSON.parse(JSON.stringify(this.form)));
-          } else {
-            this.returnList.splice(this.selectedIndex, 1, JSON.parse(JSON.stringify(this.form)));
-          }
-          this.showForm = false; // Hide form after saving
-          this.resetForm(); // Reset form for next entry/clear
-          alert('Return saved successfully!');
-        },
-
-        resetForm() {
-          this.form = {
-            date: new Date().toISOString().slice(0, 10), // Reset date to today
-            supplier_id: '',
-            products: [],
-            remarks: ''
-          };
-          this.selectedIndex = null;
-          this.formTitle = 'Add New Supplier Return';
-          this.addProduct(); // Add an initial empty product row
-        },
-
-        // Other UI functions
-        formatPrice(value) {
-          return '₱' + (value || 0).toFixed(2);
-        },
-
-        get areAllReturnsSelected() {
-          return this.returnList.length > 0 && this.selectedReturns.length === this.returnList.length;
-        },
-
-        toggleAllReturns() {
-          if (this.selectedReturns.length === this.returnList.length) {
-            this.selectedReturns = [];
-          } else {
-            this.selectedReturns = this.returnList.map((_, index) => index);
-          }
-        },
-
-        // You might have edit/delete functions that set `showForm = true` and populate `this.form`
-        // For example:
-        editReturn(index) {
-          this.selectedIndex = index;
-          this.formTitle = 'Edit Supplier Return';
-          this.form = JSON.parse(JSON.stringify(this.returnList[index])); // Deep copy
-          this.showForm = true;
-        }
-      }));
-    });
-  </script>
 
 </div>

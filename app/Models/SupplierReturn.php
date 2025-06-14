@@ -10,7 +10,7 @@ class SupplierReturn extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id',
+        'supplier_id',
         'order_date',
         'total_amount',
         'remarks',
@@ -24,7 +24,7 @@ class SupplierReturn extends Model
     /**
      * A purchase order belongs to a customer.
      */
-    public function customer()
+    public function supplier()
     {
         return $this->belongsTo(Supplier::class);
     }
