@@ -103,6 +103,10 @@
                 <flux:navmenu.item wire:navigate href="{{ route('expenses') }}" icon="wallet">
                     Expenses
                 </flux:navmenu.item>
+               
+                <flux:navmenu.item wire:navigate href="{{ route('payment-to-supplier') }}" icon="receipt-refund">
+                    Payment to Supplier
+                </flux:navmenu.item>                
                 
 
             </flux:navmenu>

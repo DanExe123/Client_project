@@ -28,7 +28,7 @@ use App\Livewire\PayableLedger;
 use App\Livewire\SalesSummary;
 use App\Livewire\SalesBook;
 use App\Livewire\CashFlow;
-
+use App\Livewire\PaymentToSupplier;
 
 use App\Livewire\Testform;
 // customer add edit 
@@ -93,6 +93,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/expenses/{id}/edit', Editexpenses::class)->name('editexpenses');
 
 
+        Route::get('/payment-to-supplier', PaymentToSupplier::class)->name('payment-to-supplier');
         Route::get('/sales-releasing', SalesReleasing::class)->name('sales-releasing');
         Route::get('/unservered-lacking', UnserveredLacking::class)->name('unservered-lacking');
         Route::get('/account-recievables', AccountRecievables::class)->name('account-recievables');
