@@ -80,6 +80,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/serve-sales-releasing/{id}', ServeSaleReleasing::class)->name('serve-sale-releasing');
         Route::post('/sales-releasing/serve/{id}', [SalesReleasing::class, 'serve'])->name('sales-releasing.serve');
         Route::get('/sales-releasing/print-preview/{id}', [SalesReleasing::class, 'printPreview'])->name('serve-print-preview');
+        Route::get('/recieving/cancel/{id}', Recieving::class)    ->name('recieving.cancel');
+
+
 
 
         Route::get('/return-by-customer', ReturnByCustomer::class)->name('return-by-customer');

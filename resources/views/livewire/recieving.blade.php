@@ -1,28 +1,76 @@
-<div>
+<div x-data="{
+    currentTab: 'For Approval',
+    filterByStatus(status) {
+        this.currentTab = status;
+    }
+}">
     <div>
-        <div class="space-y-1">
-            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Recieving</h2>
-            <!-- Tab Buttons -->
-            <div class="flex flex-wrap gap-2 pt-2 mb-2">
-                <x-button rounded="lg" light teal  icon="check-circle"  label="For Approval"  @click="filterByStatus('For Approval')" 
-                    :class="currentTab === 'For Approval' ? 'bg-blue-600' : 'bg-gray-300'" 
-                    class=""/>
-            
-                    <x-button rounded="lg" light green icon="user" label="Approved" @click="filterByStatus('Approved')" 
-                    :class="currentTab === 'Approved' ? 'bg-green-600' : 'bg-gray-300'" 
-                    class=""/>
-                    
-                    <x-button rounded="lg" light red icon="user" label="Cancelled" @click="filterByStatus('Cancelled')" 
-                    :class="currentTab === 'Cancelled' ? 'bg-green-600' : 'bg-gray-300'" 
-                    class=""/>
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-2">Recieving</h2>
+        
+                    <!-- Tab Buttons -->
+                    <div class="flex flex-wrap gap-2 pt-2 mb-2">
+                        <x-button 
+                            rounded="lg" 
+                            light 
+                            teal  
+                            icon="check-circle"  
+                            label="For Approval"  
+                            @click="filterByStatus('For Approval')" 
+                            x-bind:class="currentTab=== 'For Approval' ? 'bg-blue-600' : 'bg-gray-300'"
+                            
+                        />
+        
+                        <x-button 
+                            rounded="lg" 
+                            light 
+                            green 
+                            icon="user" 
+                            label="Approved" 
+                            @click="filterByStatus('Approved')" 
+                            x-bind:class="currentTab === 'Approved' ? 'bg-green-600' : 'bg-gray-300'"
+                        />
+        
+                       
+                    <x-button rounded="lg" light red icon="x-circle" label="Cancelled" @click="filterByStatus('Cancelled')" 
+                    x-bind:class="currentTab === 'Cancelled' ? 'bg-green-600' : 'bg-gray-300'" 
+                    class=""
+                    />
+                            
+
+
+
             </div>
            
-            @if (session()->has('message'))
+            
+            @php
+            $message = session('message');
+            $isCancelled = str_contains(strtolower($message), 'cancel');
+        @endphp
+        
+        @if ($message)
             <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
-                <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
-                    class="!bg-green-300 !w-full" />
+                @if ($isCancelled)
+                    <x-alert 
+                        :title="$message"
+                        :description="$message"
+                        negative 
+                        class="!bg-red-300 !w-full"
+                    />
+                @else
+                    <x-alert 
+                        :title="$message" 
+                        icon="check-circle" 
+                        color="success" 
+                        class="!bg-green-300 !w-full" 
+                        positive 
+                        flat 
+                    />
+                @endif
             </div>
-            @endif
+        @endif
+        
+        
         
 
             <!-- Action Buttons -->
@@ -64,115 +112,86 @@
         </x-button>
         
             </div>
-            <div class="overflow-auto rounded-lg border border-gray-200 shadow-md">
-                <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
-                    <thead class="bg-gray-50 sticky top-0 z-10">
-                        <tr>
-                            <th class="px-4 py-4 font-medium text-gray-900">
-                                <input type="checkbox" wire:click="toggleSelectAll"
-                                @if ($purchaseOrders->pluck('id')->diff($selectedpoId)->isEmpty()) checked @endif />                            
-                            </th>
-                            <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Date</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Status</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Total</th>
-                            <th class="px-6 py-4 font-medium text-gray-900">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                        @foreach ($purchaseOrders as $po)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-4">
-                                    <input type="checkbox" wire:click="selectedPo({{ $po->id }})"
-                                    @if (in_array($po->id, $selectedpoId)) checked @endif />                                
-                                </td>
-                                <td class="px-6 py-4">{{ $po->po_number }}</td>
-                                <td class="px-6 py-4">{{ $po->supplier->name ?? 'N/A' }}</td>
-                                <td class="px-6 py-4">{{ $po->order_date->format('Y-m-d') }}</td>
-                                <td class="px-6 py-4">{{ $po->receipt_type }}</td>
-                                <td class="px-6 py-4">{{ ucfirst($po->status) }}</td>
-                                <td class="px-6 py-4">₱{{ number_format($po->total_amount, 2) }}</td>
-                                <td class="px-6 py-4">
-                                    <a href="{{ route('view-detail-recieving', ['id' => $po->id]) }}">
-                                        <x-button outline primary label="View" />
-                                    </a>                                    
 
-                                </td>
+
+                    @php
+            $tabs = [
+                'For Approval' => $forApprovalOrders,
+                'Approved' => $approvedOrders,
+                'Cancelled' => $cancelledOrders,
+            ];
+        @endphp
+
+        @foreach ($tabs as $tab => $orders)
+            <div x-show="currentTab === '{{ $tab }}'" x-cloak>
+                <div class="overflow-auto rounded-lg border border-gray-200 shadow-md">
+                    <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
+                        <thead class="bg-gray-50 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-4 py-4 font-medium text-gray-900">
+                                    <input type="checkbox" wire:click="toggleSelectAll"
+                                        @if ($orders->pluck('id')->diff($selectedpoId)->isEmpty()) checked @endif />
+                                </th>
+                                <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
+                                <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
+                                <th class="px-6 py-4 font-medium text-gray-900">Date</th>
+                                <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
+                                <th class="px-6 py-4 font-medium text-gray-900">Status</th>
+                                <th class="px-6 py-4 font-medium text-gray-900">Total</th>
+                                <th class="px-6 py-4 font-medium text-gray-900">Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 border-t border-gray-100">
+                            @forelse ($orders as $po)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-4">
+                                        <input type="checkbox" wire:click="selectedPo({{ $po->id }})"
+                                            @if (in_array($po->id, $selectedpoId)) checked @endif />
+                                    </td>
+                                    <td class="px-6 py-4">{{ $po->po_number }}</td>
+                                    <td class="px-6 py-4">{{ $po->supplier->name ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4">{{ $po->order_date->format('Y-m-d') }}</td>
+                                    <td class="px-6 py-4">{{ $po->receipt_type }}</td>
+                                    <td class="px-6 py-4">{{ ucfirst($po->status) }}</td>
+                                    <td class="px-6 py-4">₱{{ number_format($po->total_amount, 2) }}</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex gap-2">
+                                        <a href="{{ route('view-detail-recieving', ['id' => $po->id]) }}">
+                                            <x-button outline primary label="View" />
+                                        </a>
+
+                                        @if ($tab === 'For Approval')
+                                        <a href="{{ route('recieving.cancel', ['id' => $po->id]) }}"
+                                            onclick="return confirm('Are you sure you want to cancel this purchase order?')">
+                                             <x-button 
+                                                 outline 
+                                                 negative 
+                                                 label="Cancel"
+                                             />
+                                         </a>
+                                         
+                                    @endif
+                                    
+                                    </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-gray-400">
+                                        No records found for {{ $tab }}.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    
-        <!-- Alpine.js Script -->
-        <script>
-            function supplierPOApp() {
-                return {
-                    currentTab: 'For Approval',
-                    selected: [],
-                    po: [{
-                            id: 1,
-                            PO: 'PO001',
-                            Customer: 'Customer A',
-                            Date: '2025-06-01',
-                            Transaction: 'DR',
-                            Transaction: 'DR',
-                            Status: 'For Approval',
-                            Total: '$1,000'
-                        },
-                        {
-                            id: 2,
-                            PO: 'PO002',
-                            Customer: 'Customer B',
-                            Date: '2025-06-02',
-                            Transaction: 'Invoice',
-                            Transaction: 'Invoice',
-                            Status: 'Approved',
-                            Total: '$2,500'
-                        },
-                        {
-                            id: 3,
-                            PO: 'PO003',
-                            Customer: 'Customer C',
-                            Date: '2025-06-03',
-                            Transaction: 'Invoice',
-                            Transaction: 'Invoice',
-                            Status: 'Cancelled',
-                            Total: '$500'
-                        },
-                        {
-                            id: 4,
-                            PO: 'PO004',
-                            Customer: 'Customer D',
-                            Date: '2025-06-04',
-                            Transaction: 'Invoice',
-                            Transaction: 'Invoice',
-                            Status: 'For Approval',
-                            Total: '$1,750'
-                        },
-                    ],
-                    get filteredPO() {
-                        return this.po.filter(poItem => poItem.Status === this.currentTab);
-                    },
-                    filterByStatus(status) {
-                        this.currentTab = status;
-                        this.selected = [];
-                    },
-                    get isAllSelected() {
-                        return this.filteredPO.length > 0 && this.filteredPO.every(po => this.selected.includes(po.id));
-                    },
-                    toggleAll(event) {
-                        if (event.target.checked) {
-                            this.selected = this.filteredPO.map(po => po.id);
-                        } else {
-                            this.selected = [];
-                        }
-                    }
-                };
-            }
-        </script>
+        @endforeach
+
+            
+
     </div>
 </div>
+
+
+

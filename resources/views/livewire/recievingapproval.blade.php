@@ -1,4 +1,4 @@
-<div x-data="POTable()">
+<div>
     <div class="col-span-1 w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
         <h3 class="text-lg font-bold text-gray-800">Recieving Approval</h3>
 
@@ -79,31 +79,3 @@
         </div>
     </div>
 </div>
-
-<script>
-  function POTable() {
-    return {
-        products: [],
-        addProduct() {
-    this.products.push({
-        barcode: '',
-        quantity: 1,
-        price: 0.00,
-        discount: 0,
-        total: 0.00
-    });
-},
-updateTotal(index) {
-    const item = this.products[index];
-    const qty = parseFloat(item.quantity) || 0;
-    const price = parseFloat(item.price) || 0;
-    const discount = parseFloat(item.discount) || 0;
-    const subtotal = qty * price;
-    const discountAmount = subtotal * (discount / 100);
-    item.total = subtotal - discountAmount;
-}
-
-    };
-}
-
-</script>
