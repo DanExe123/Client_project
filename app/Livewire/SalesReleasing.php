@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\CustomerPurchaseOrder;
 use App\Models\SalesRelease;
 use App\Models\SalesReleaseItem;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Illuminate\Http\Request;
@@ -61,6 +62,7 @@ class SalesReleasing extends Component
         $vatPercent = 12;
         $vatAmount = $subtotal * ($vatPercent / 100);
         $totalWithVat = $subtotal + $vatAmount;
+
         // Create the sales release
         $release = SalesRelease::create([
             'purchase_order_id' => $po->id,
@@ -75,9 +77,8 @@ class SalesReleasing extends Component
             'vat_amount' => $vatAmount,
             'total_with_vat' => $totalWithVat,
         ]);
-        // Decode product data from the request
-        $products = json_decode($request->input('products'), true);
 
+        // Loop through items
         foreach ($products as $item) {
             SalesReleaseItem::create([
                 'sales_release_id' => $release->id,
@@ -89,12 +90,19 @@ class SalesReleasing extends Component
                 'discount' => $item['discount'],
                 'subtotal' => $item['total'],
             ]);
+
+            // 🔽 Deduct quantity from product stock
+            $product = Product::find($item['product_id']);
+            if ($product) {
+                $product->quantity -= $item['quantity'];
+                $product->save();
+            }
         }
-        // Optional: mark the PO as served
+
+        // Mark PO as served
         $po->status = 'served';
         $po->save();
 
-        // Redirect to print preview (this is Livewire-specific)
         return redirect()->route('serve-print-preview', $release->id);
     }
     public function printPreview($id)
