@@ -46,11 +46,16 @@ class ReturnByCustomer extends Component
         ->with('product') // eager-load product
         ->get()
         ->map(function ($item) {
+            $product = $item->product;
+        
             return [
-                'id' => $item->product->id,
-                'description' => $item->product->description,
-                'price' => $item->product->price,
-                'barcode' => $item->product->barcode,
+                'id' => $product->id,
+                'description' => $product->description,
+                'price' => $product->lowest_uom_quantity > 0
+                    ? $product->price / $product->lowest_uom_quantity
+                    : 0,
+                'barcode' => $product->barcode,
+                'lowest_uom_quantity' => $product->lowest_uom_quantity,
             ];
         })
         ->unique('id') // only unique products
