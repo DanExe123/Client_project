@@ -34,6 +34,7 @@ class CustomerPo extends Component
         $this->formKey = uniqid();
     }
 
+    // Called when products array is modified
     public function updatedProducts()
     {
         $this->updateGrandTotal();
@@ -44,6 +45,7 @@ class CustomerPo extends Component
         $this->updateGrandTotal(); // Recalculate live
     }
 
+    // Add a new blank product entry to the form
     public function addProduct()
     {
         $this->products[] = [
@@ -57,6 +59,7 @@ class CustomerPo extends Component
         ];
     }
 
+    // Remove a product row based on index
     public function removeProduct($index)
     {
         unset($this->products[$index]);
@@ -64,41 +67,50 @@ class CustomerPo extends Component
         $this->updateGrandTotal();
     }
 
+     // Auto-fill price when a product is selected
     public function updatePrice($index)
     {
         $productId = $this->products[$index]['product_id'] ?? null;
+
+        // Find the product from the list of all products
         $product = collect($this->allProducts)->firstWhere('id', $productId);
 
         if ($product) {
-            $this->products[$index]['price'] = $product['price'];
-            $this->updateTotal($index);
+            $this->products[$index]['price'] = $product['price']; // Set price
+            $this->updateTotal($index); // Recalculate total for that item
         }
     }
 
+    // Recalculate total for a product row
     public function updateTotal($index)
     {
         $item = $this->products[$index];
 
+        // Safely convert values to float, fallback to 0 if not numeric
         $qty = isset($item['quantity']) && is_numeric($item['quantity']) ? (float) $item['quantity'] : 0;
         $price = isset($item['price']) && is_numeric($item['price']) ? (float) $item['price'] : 0;
         $discount = isset($item['product_discount']) && is_numeric($item['product_discount']) ? (float) $item['product_discount'] : 0;
 
+        // Calculate subtotal with discount applied
         $subtotal = ($price - $discount) * $qty;
-        $this->products[$index]['total'] = max($subtotal, 0); // prevent negative totals
 
-        $this->updateGrandTotal();
+        // Ensure total is not negative
+        $this->products[$index]['total'] = max($subtotal, 0);
+
+        $this->updateGrandTotal(); // Recalculate grand total
     }
 
-    public function updateGrandTotal()
-    {
-        $sum = collect($this->products)->sum('total');
-        $discount = is_numeric($this->purchase_discount) ? (float) $this->purchase_discount : 0;
+     // Sum all totals from the products and apply global discount
+     public function updateGrandTotal()
+     {
+         $sum = collect($this->products)->sum('total'); // Sum of all product totals
+         $discount = is_numeric($this->purchase_discount) ? (float) $this->purchase_discount : 0;
+ 
+         // Apply discount to the sum, never go below 0
+         $this->grandTotal = max($sum - $discount, 0);
+     }
 
-        $this->grandTotal = max($sum - $discount, 0);
-    }
-
-
-    //HOYY!! DRI KA NAG UNTAT
+    // Auto-fill product fields by barcode
     public function fillProductByBarcode($index)
     {
         $barcode = $this->products[$index]['barcode'] ?? null;
@@ -106,15 +118,18 @@ class CustomerPo extends Component
         if (!$barcode)
             return;
 
+        // Find matching product by barcode
         $product = collect($this->allProducts)->firstWhere('barcode', $barcode);
 
         if ($product) {
+            // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['product_description'] = $product['description'];
             $this->products[$index]['price'] = $product['price'];
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
-            $this->updateTotal($index);
+            $this->updateTotal($index); // Update row total
         } else {
+            // Reset if barcode not found
             $this->products[$index]['product_id'] = '';
             $this->products[$index]['product_description'] = '';
             $this->products[$index]['price'] = 0;
@@ -123,6 +138,7 @@ class CustomerPo extends Component
         }
     }
 
+    // Auto-fill product fields by description
     public function fillProductByDescription($index)
     {
         $description = $this->products[$index]['product_description'] ?? null;
@@ -130,15 +146,18 @@ class CustomerPo extends Component
         if (!$description)
             return;
 
+        // Find matching product by description
         $product = collect($this->allProducts)->firstWhere('description', $description);
 
         if ($product) {
+            // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['barcode'] = $product['barcode'];
             $this->products[$index]['price'] = $product['price'];
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
-            $this->updateTotal($index);
+            $this->updateTotal($index); // Update row total
         } else {
+            // Reset if description not found
             $this->products[$index]['product_id'] = '';
             $this->products[$index]['barcode'] = '';
             $this->products[$index]['price'] = 0;
