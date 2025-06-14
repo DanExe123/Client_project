@@ -11,12 +11,16 @@
 
         <!-- PO Info -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input type="text" :value="po.receipt_type" disabled class="rounded-md border py-2 px-3 bg-gray-100 text-sm"
-                placeholder="Transaction Type" />
-
-            <input type="text" :value="po.customer_name" disabled
-                class="rounded-md border py-2 px-3 bg-gray-100 text-sm" placeholder="Customer" />
-
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">Receipt Type</label>
+                <input type="text" :value="po.receipt_type" disabled
+                    class="rounded-md border py-2 px-3 bg-gray-100 text-sm" placeholder="Transaction Type" />
+            </div>
+            <div>
+                <label class="block text-sm text-gray-700 mb-1">Customer Name</label>
+                <input type="text" :value="po.customer_name" disabled
+                    class="rounded-md border py-2 px-3 bg-gray-100 text-sm" placeholder="Customer" />
+            </div>
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Date</label>
                 <input type="date" :value="po.order_date" disabled
@@ -25,7 +29,7 @@
 
             <div>
                 <label class="block text-sm text-gray-700 mb-1">Discount</label>
-                <input type="number" :value="po.discount" disabled
+                <input type="number" :value="po.purchase_discount" disabled
                     class="rounded-md border py-2 px-3 bg-gray-100 text-sm" />
             </div>
         </div>
@@ -76,8 +80,12 @@
                 class="w-full rounded-md border py-2 px-3 bg-gray-100 shadow-sm sm:text-sm"></textarea>
 
             <div class="flex justify-end pt-4">
-                <form method="POST" action="{{ route('sales-releasing.serve', ['id' => $po->id]) }}">
+                <form method="POST" action="{{ route('sales-releasing.serve', ['id' => $po->id]) }}" x-ref="serveForm">
                     @csrf
+
+                    <!-- Hidden field to submit products as JSON -->
+                    <input type="hidden" name="products" :value="JSON.stringify(products)" />
+
                     <x-button type="submit" blue label="Serve" />
                 </form>
             </div>
@@ -87,6 +95,8 @@
 <script>
     function POTable(poData) {
         const products = poData.items.map(item => ({
+            product_id: item.product_id,
+            product_barcode: item.product_barcode,
             product_description: item.product_description || 'N/A',
             quantity: item.quantity,
             price: parseFloat(item.unit_price),
@@ -99,7 +109,7 @@
                 receipt_type: poData.receipt_type || 'N/A',
                 customer_name: poData.customer?.name || 'N/A',
                 order_date: poData.order_date?.substring(0, 10) || '',
-                discount: poData.discount,
+                purchase_discount: poData.purchase_discount,
                 remarks: poData.remarks
             },
             products,

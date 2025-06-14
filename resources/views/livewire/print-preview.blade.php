@@ -18,14 +18,15 @@
 <body class="p-8 text-gray-800">
     <div class="max-w-4xl mx-auto bg-white p-6 shadow-md border">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Sales Release Receipt</h1>
+            <h1 class="text-2xl font-bold">Teepee</h1>
+            <h1 class="text-1xl font-bold">Sales Receipt</h1>
             <div class="text-sm text-right">
                 <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($release->release_date)->format('F d, Y') }}</p>
-                <p><strong>Release ID:</strong> #{{ $release->id }}</p>
+                <p><strong class="font-bold">Invoice No.</strong> <span
+                        class="text-red-600 font-bold">{{ $release->id }}</span></p>
             </div>
         </div>
         <div class="mb-6">
-            <h2 class="font-semibold text-lg">Customer Information</h2>
             <p><strong>Name:</strong> {{ $release->customer->name }}</p>
             <p><strong>Receipt Type:</strong> {{ $release->receipt_type }}</p>
         </div>
@@ -54,12 +55,22 @@
                 @endforeach
             </tbody>
         </table>
+        @php
+            $grossSales = $release->items->sum('subtotal');
+            $discount = $release->discount ?? 0;
+            $totalSales = $grossSales - $discount;
 
-        <div class="text-right mb-4">
-            <p><strong>Total Discount:</strong> {{ number_format($release->discount, 2) }}</p>
-            <p class="text-lg font-bold">Total Amount:
-                {{ number_format($release->items->sum('subtotal'), 2) }}
-            </p>
+            $netOfVat = $totalSales / 1.12;
+            $vat = $netOfVat * 0.12;
+            $totalAmountDue = $netOfVat + $vat;
+        @endphp
+
+        <div class="text-right mb-4 space-y-1">
+            <p><strong>Total Discount:</strong> {{ number_format($discount, 2) }}</p>
+            <p class="text-lg font-bold">Total Sales: {{ number_format($totalSales, 2) }}</p>
+            <p><strong>Amount Net of VAT:</strong> {{ number_format($netOfVat, 2) }}</p>
+            <p><strong>Add: VAT (12%):</strong> {{ number_format($vat, 2) }}</p>
+            <p class="text-lg font-bold">TOTAL AMOUNT DUE: {{ number_format($totalAmountDue, 2) }}</p>
         </div>
 
         <div class="mb-4">
@@ -70,7 +81,7 @@
         <div class="flex justify-end space-x-3 no-print">
             <button onclick="window.print()"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Print</button>
-            <a href="{{ url()->previous() }}"
+            <a href="{{ route('sales-releasing') }}"
                 class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Back</a>
         </div>
     </div>
