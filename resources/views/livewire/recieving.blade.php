@@ -28,7 +28,7 @@
                             icon="user" 
                             label="Approved" 
                             @click="filterByStatus('Approved')" 
-                            x-bind:class="currentTab === 'Approved' ? 'bg-green-600' : 'bg-gray-300'"
+                            x-bind:class="currentTab === 'Approved' ? 'bg-green-100' : 'bg-gray-300'"
                         />
         
                        

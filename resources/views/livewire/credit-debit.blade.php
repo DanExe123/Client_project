@@ -1,20 +1,28 @@
 <div>
-    <div x-data="creditDebitTable()" class="p-4 space-y-6">
+    <div  class="p-4 space-y-6">
 
         <!-- Nav Tabs -->
         <div class="flex space-x-2">
-            <button
-                :class="currentTab === 'Credit' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'"
-                class="px-4 py-2 rounded-md text-sm font-semibold"
-                @click="filterByTab('Credit')">
-                Credit
-            </button>
-            <button
-                :class="currentTab === 'Debit' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'"
-                class="px-4 py-2 rounded-md text-sm font-semibold"
-                @click="filterByTab('Debit')">
-                Debit
-            </button>
+
+            <x-button 
+            rounded="lg" 
+            light 
+            teal  
+            icon="check-circle"  
+            label="Credit"  
+            @click="filterTab('Credit')" 
+            x-bind:class="currentTab=== 'Credit' ? 'bg-blue-600' : 'bg-gray-300'"
+            
+        />
+        <x-button 
+            rounded="lg" 
+            light 
+            green 
+            icon="user" 
+            label="Debit" 
+            @click="filterTab('Debit')" 
+            x-bind:class="currentTab === 'Debit' ? 'bg-green-100' : 'bg-gray-300'"
+        />
         </div>
 
         <!-- Search and Buttons -->
@@ -33,149 +41,91 @@
                 />
             </div>
 
-            <!-- Button Group -->
-            <div class="flex gap-2">
-                <x-button emerald right-icon="plus" @click="$openModal('Add')" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
 
-                <x-modal-card title="Add Credit" name="Add">
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <!-- Left Column -->
-                        <div class="space-y-4">
-                            <!-- Select Date -->
-                            <x-input label="Select Date" type="date" :value="now()->toDateString()" />
-                
-                            <!-- Select Customer -->
-                            <x-select label="Select Customer" placeholder="Choose Customer">
-                                <option value="">Customer A</option>
-                                <option value="">Customer B</option>
-                                <option value="">Customer C</option>
-                            </x-select>
-                
-                            <!-- Select Receivable Doc (DR/Invoice) -->
-                            <x-select label="Select Receivable Doc (DR/INVOICE)" placeholder="Choose Invoice/DR">
-                                <option value="">DR-001</option>
-                                <option value="">INV-202</option>
-                                <option value="">DR-005</option>
-                            </x-select>
-                
-                            <!-- Select Return Slip -->
-                            <x-select label="Select Return Slip" placeholder="Choose Return Slip">
-                                <option value="">RS-101</option>
-                                <option value="">RS-102</option>
-                                <option value="">RS-103</option>
-                            </x-select>
-                
-                            <!-- Remarks -->
-                            <x-textarea label="Remarks (Optional)" placeholder="Add any notes here..." />
-                        </div>
-                
-                        <!-- Right Column -->
-                        <div class="space-y-4">
-                            <!-- Invoice Amount (auto-populated) -->
-                            <x-input label="Invoice Amount" type="number" placeholder="₱0.00" readonly />
-                
-                            <!-- Sales Return Amount (auto-populated) -->
-                            <x-input label="Sales Return Amount" type="number" placeholder="₱0.00" readonly />
-                
-                            <!-- Balance Amount -->
-                            <x-input label="Balance Amount" type="number" placeholder="₱0.00" readonly />
-                        </div>
-                    </div>
-                
-                    <x-slot name="footer" class="flex justify-end gap-x-4">
-                        <x-button flat label="Cancel" x-on:click="close" />
-                        <x-button primary label="Save" wire:click="save" />
-                    </x-slot>
-                </x-modal-card>
-
-                
-                
-
-                <x-button right-icon="pencil" interaction="positive"
-                    x-bind:class="selected.length === 0 ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
-                    x-bind:disabled="selected.length === 0"
-                    @click="$openModal('Edit')" />
-
-                <x-button right-icon="minus" interaction="negative"
-                    x-bind:class="selected.length === 0 ? 'bg-red-300 cursor-not-allowed text-white' : 'bg-red-600 hover:bg-red-700 text-white'"
-                    x-bind:disabled="selected.length === 0"
-                    @click="$openModal('Cancel')" />
+            <!-- Customer Filter -->
+            <div>
+                <label class="text-sm text-gray-700 font-medium mb-1 block">Select Customer</label>
+                <select wire:model="filterCustomer"
+                        class="w-full rounded-md border-gray-300 px-3 py-2 shadow-sm text-sm">
+                    <option value="">All</option>
+                    @foreach ($customerOptions as $id => $name)
+                    <option value="{{ $id }}">{{ $name }}</option>
+                @endforeach                
+                </select>
             </div>
-
+        
+        <!-- Date Filter -->
+        <div>
+            <label class="text-sm text-gray-700 font-medium mb-1 block">Select Date</label>
+            <input type="date"
+                wire:model="filterDate"
+                value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                class="w-full rounded-md border-gray-300 px-3 py-2 shadow-sm text-sm" />
         </div>
 
-        <!-- Table -->
-        <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full">
+
+        
+            <!-- Invoice Filter -->
+            <div>
+                <label class="text-sm text-gray-700 font-medium mb-1 block">Invoice/DR</label>
+                <select wire:model="filterInvoice"
+                        class="w-full rounded-md border-gray-300 px-3 py-2 shadow-sm text-sm">
+                    <option value="">All</option>
+                    @foreach ($invoiceOptions as $invoice)
+                        <option value="{{ $invoice }}">{{ $invoice }}</option>
+                    @endforeach
+                </select>
+            </div>
+        
+       <!-- Return Slip Filter -->
+            <div>
+                <label class="text-sm text-gray-700 font-medium mb-1 block">Return Slip</label>
+                <select wire:model="filterSlip"
+                        class="w-full rounded-md border-gray-300 px-3 py-2 shadow-sm text-sm">
+                    <option value="">All</option>
+                    @foreach ($slipOptions as $slip)
+                    <option value="{{ $slip }}">{{ $slip }}</option>
+                @endforeach
+                </select>
+            </div>
+
+        
+        </div>
+        
+        <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full mt-4">
             <table class="min-w-full border-collapse bg-white text-left text-sm text-gray-500">
                 <thead class="bg-gray-50 sticky top-0 z-10">
                     <tr>
-                        <th class="px-4 py-4">
-                            <input type="checkbox" @change="toggleAll" :checked="isAllSelected" class="h-4 w-4 text-blue-600" />
-                        </th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Date</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Customer Name</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Invoice/Dr #</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Return Slip</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Return Amount</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Barcode</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Product Description</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Quantity</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Unit Price</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Subtotal</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Total Amount</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                    <template x-for="entry in filteredData" :key="entry.id">
+                    @forelse ($returnItems as $item)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-4">
-                                <input type="checkbox" :value="entry.id" x-model="selected" class="h-4 w-4 text-blue-600" />
-                            </td>
-                            <td class="px-6 py-4" x-text="entry.date"></td>
-                            <td class="px-6 py-4" x-text="entry.customer"></td>
-                            <td class="px-6 py-4" x-text="entry.invoice"></td>
-                            <td class="px-6 py-4" x-text="entry.returnSlip"></td>
-                            <td class="px-6 py-4" x-text="entry.amount"></td>
+                            <td class="px-6 py-4">{{ $item->product_barcode }}</td>
+                            <td class="px-6 py-4">{{ $item->product_description }}</td>
+                            <td class="px-6 py-4">{{ $item->quantity }}</td>
+                            <td class="px-6 py-4">₱{{ number_format($item->unit_price, 2) }}</td>
+                            <td class="px-6 py-4">₱{{ number_format($item->subtotal, 2) }}</td>
+                            <td class="px-6 py-4">₱{{ number_format($item->quantity * $item->unit_price, 2) }}</td>
                         </tr>
-                    </template>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No return items found.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
+                
             </table>
         </div>
-        
+    
+
     </div>
 </div>
-
-    
-    
-    <script>
-        function creditDebitTable() {
-            return {
-                search: '',
-                selected: [],
-                currentTab: 'Credit',
-                entries: [
-                    { id: 1, type: 'Credit', date: '2025-06-01', customer: 'John Doe', invoice: 'INV-001', returnSlip: 'RS-001', amount: '$100.00' },
-                    { id: 2, type: 'Debit',  date: '2025-06-02', customer: 'Jane Smith', invoice: 'DR-002', returnSlip: 'RS-002', amount: '$150.00' },
-                    { id: 3, type: 'Credit', date: '2025-06-03', customer: 'Michael Tan', invoice: 'INV-003', returnSlip: 'RS-003', amount: '$200.00' },
-                    { id: 4, type: 'Debit',  date: '2025-06-04', customer: 'Lisa Wong', invoice: 'DR-004', returnSlip: 'RS-004', amount: '$250.00' },
-                ],
-                get filteredData() {
-                    return this.entries.filter(entry =>
-                        entry.type === this.currentTab &&
-                        (entry.customer.toLowerCase().includes(this.search.toLowerCase()) ||
-                         entry.invoice.toLowerCase().includes(this.search.toLowerCase()))
-                    );
-                },
-                filterByTab(tab) {
-                    this.currentTab = tab;
-                    this.selected = [];
-                },
-                toggleAll(event) {
-                    if (event.target.checked) {
-                        this.selected = this.filteredData.map(e => e.id);
-                    } else {
-                        this.selected = [];
-                    }
-                },
-                get isAllSelected() {
-                    return this.filteredData.length > 0 && this.selected.length === this.filteredData.length;
-                },
-            };
-        }
-        </script>
-        
-

@@ -36,4 +36,10 @@ class CustomerReturn extends Model
     {
         return $this->hasMany(CustomerReturnItem::class, 'return_id');
     }
+
+    public function return()
+{
+    return $this->belongsTo(CustomerReturn::class, 'return_id');
+}
+
 }

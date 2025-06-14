@@ -8,7 +8,7 @@
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
-    <flux:header container class="border-b bg-[#00e6e6]  dark:border-zinc-700 dark:bg-zinc-900 py-4">
+    <flux:header container class="border-b bg-[#00e6e6]  dark:border-zinc-700 dark:bg-zinc-900 py-4 sticky top-0 z-50">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
         <a href="{{ route('dashboard') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0"

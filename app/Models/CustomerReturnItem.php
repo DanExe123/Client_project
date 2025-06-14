@@ -34,4 +34,9 @@ class CustomerReturnItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function return()
+{
+    return $this->belongsTo(CustomerReturn::class, 'return_id');
+}
+
 }
