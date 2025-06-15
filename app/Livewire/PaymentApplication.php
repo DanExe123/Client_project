@@ -33,7 +33,7 @@ class PaymentApplication extends Component
     public $transactionDate;
 
         public function savePayment()
-        {
+        {   
         
             foreach ($this->selectedInvoices as $invoice) {
                 try {

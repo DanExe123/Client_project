@@ -148,7 +148,7 @@
                 <input id="transactionDate" type="date" wire:model="transactionDate" class="border rounded px-3 py-2 w-full" />
             </div>
         </div>
-    @endif
+    @endif 
 
    <!-- Save Button -->
 <div class="flex justify-end mt-6">
