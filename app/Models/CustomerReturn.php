@@ -10,6 +10,7 @@ class CustomerReturn extends Model
     use HasFactory;
 
     protected $fillable = [
+        'return_type',
         'customer_id',
         'order_date',
         'total_amount',
@@ -38,8 +39,8 @@ class CustomerReturn extends Model
     }
 
     public function return()
-{
-    return $this->belongsTo(CustomerReturn::class, 'return_id');
-}
+    {
+        return $this->belongsTo(CustomerReturn::class, 'return_id');
+    }
 
 }

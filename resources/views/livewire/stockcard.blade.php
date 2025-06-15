@@ -50,9 +50,11 @@
                         <th class="px-4 py-4 font-medium text-gray-900">Barcode</th>
                         <th class="px-4 py-4 font-medium text-gray-900">Product Name</th>
                         <th class="px-4 py-4 font-medium text-gray-900">Bag (Highest UoM)</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">PC</th>
+                        <th class="px-4 py-4 font-medium text-gray-900">Bag Quantity</th>
+                        <th class="px-4 py-4 font-medium text-gray-900">PC (lowest UoM)</th>
+                        <th class="px-4 py-4 font-medium text-gray-900">PC Quantity</th>
                         <th class="px-4 py-4 font-medium text-gray-900">Damages</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">Quantity</th>
+
                     </tr>
                 @endforeach
             </thead>
@@ -66,39 +68,36 @@
                         <td class="px-4 py-4">{{ $product->barcode }}</td>
                         <td class="px-4 py-4">{{ $product->description }}</td>
                         <td class="px-4 py-4">{{ $product->highest_uom }}</td>
-                        <td class="px-4 py-4">{{ $product->lowest_uom }}</td>
-                        <td class="px-4 py-4">{{ $product->damages }}</td>
                         <td class="px-4 py-4">{{ $product->quantity }}</td>
+                        <td class="px-4 py-4">{{ $product->lowest_uom }}</td>
+                        <td class="px-4 py-4">{{ $product->quantity_lowest }}</td>
+                        <td class="px-4 py-4">{{ $product->damages }}</td>
+
                     </tr>
                 @endforeach
                 @if ($products->isEmpty())
                     <tr>
                         <td colspan="5" class="text-center p-4 text-gray-500">No stock records found.</td>
                     </tr>
-                    @endif
-                </tbody>
-            </table>
-        </div>
-        
-    
+                @endif
+            </tbody>
+        </table>
+    </div>
+
+
     <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('stockCardUI', () => ({
-            search: '',
-            products: [
-                { barcode: '1234567890', name: 'Dog Food Premium', bag: 20, pc: 10, damages: 0 },
-                { barcode: '0987654321', name: 'Cat Litter', bag: 15, pc: 5, damages: 1 },
-                // Add more sample data as needed
-            ],
-            get filteredProducts() {
-                const term = this.search.toLowerCase();
-                return this.products.filter(p =>
-                    p.barcode.includes(term) ||
-                    p.name.toLowerCase().includes(term)
-                );
-            }
-        }));
-    });
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('stockCardUI', () => ({
+                search: '',
+                get filteredProducts() {
+                    const term = this.search.toLowerCase();
+                    return this.products.filter(p =>
+                        p.barcode.includes(term) ||
+                        p.name.toLowerCase().includes(term)
+                    );
+                }
+            }));
+        });
     </script>
-    
+
 </div>

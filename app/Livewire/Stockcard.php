@@ -16,6 +16,7 @@ class Stockcard extends Component
     public $lowest_uom;
     public $damages;
     public $quantity;
+    public $quantity_lowest;
     public $productsData = [];
     public bool $showAdjustmentsModal = false;
 
@@ -43,10 +44,6 @@ class Stockcard extends Component
             ]);
         }
     }
-
-
-
-
     public function toggleSelectAll()
     {
         $paginatedIds = Product::paginate(5)->pluck('id')->toArray();
@@ -67,9 +64,6 @@ class Stockcard extends Component
             return redirect()->route('customeredit', ['id' => $id]);
         }
     }
-
-
-
     public function mount()
     {
         $this->products = Product::all();

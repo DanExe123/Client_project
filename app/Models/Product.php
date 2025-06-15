@@ -12,10 +12,12 @@ class Product extends Model
         'description',
         'quantity',
         'highest_uom',
+        'quantity_lowest',
         'lowest_uom',
         'lowest_uom_quantity',
         'price',
         'status',
         'selling_price',
+        'damages',
     ];
 }
