@@ -15,6 +15,8 @@ class AdjustmentStockcard extends Component
 
     protected $rules = [
         'productsData.*.quantity' => 'required|integer|min:1',
+        'productsData.*.quantity_lowest' => 'required|integer|min:1',
+
     ];
 
     /**
@@ -31,7 +33,8 @@ class AdjustmentStockcard extends Component
             'highestUom' => $product->highest_uom,
             'lowest_uom' => $product->lowest_uom,
             'damages' => $product->damages,
-            'quantity' => $product->quantity, // default
+            'quantity' => $product->quantity,
+            'quantity_lowest' => $product->quantity_lowest,
         ];
     }
 
@@ -39,13 +42,16 @@ class AdjustmentStockcard extends Component
     {
         // Validate quantity only
         $this->validateOnly("productsData.{$this->product->id}.quantity");
+        $this->validateOnly("productsData.{$this->product->id}.quantity_lowest");
 
         // Grab the new quantity
         $quantity = $this->productsData[$this->product->id]['quantity'];
+        $quantity_lowest = $this->productsData[$this->product->id]['quantity_lowest'];
 
         // Persist: you could update the product or create an adjustment record
         $this->product->update([
             'quantity' => $quantity,
+            'quantity_lowest' => $quantity_lowest,
         ]);
 
         session()->flash('success', 'Quantity updated!');

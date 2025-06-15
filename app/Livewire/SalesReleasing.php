@@ -98,7 +98,6 @@ class SalesReleasing extends Component
                 $product->save();
             }
         }
-
         // Mark PO as served
         $po->status = 'served';
         $po->save();

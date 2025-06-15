@@ -37,14 +37,17 @@
                     <x-input label="Product Name" wire:model.defer="productsData.{{ $id }}.productName" readonly />
 
                     <x-input label="Bag (Highest UoM)" wire:model.defer="productsData.{{ $id }}.highestUom" readonly />
+                    <x-input type="number" label="Quantity" wire:model.defer="productsData.{{ $id }}.quantity"
+                        min="1" />
 
                     {{-- Editable fields --}}
                     <x-input label="PC (Lowest UoM)" wire:model.defer="productsData.{{ $id }}.lowest_uom" readonly />
 
+                    <x-input type="number" label="Quantity Lowest"
+                        wire:model.defer="productsData.{{ $id }}.quantity_lowest" min="1" />
                     <x-input label="Damages" wire:model.defer="productsData.{{ $id }}.damages" type="number" />
 
-                    <x-input type="number" label="Quantity" wire:model.defer="productsData.{{ $id }}.quantity"
-                        min="1" />
+
                 </div>
                 <hr class="my-4" />
                 <div class="flex justify-end gap-4">
