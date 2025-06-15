@@ -54,6 +54,31 @@ class SalesReleasing extends Component
         $po = CustomerPurchaseOrder::with(['items', 'customer'])->findOrFail($id);
         $products = json_decode($request->input('products'), true);
 
+        // ✅ Validate quantities BEFORE saving anything
+        foreach ($products as $item) {
+            $orderedQty = $item['quantity'];
+            $poItem = $po->items->firstWhere('product_id', $item['product_id']);
+            $product = Product::find($item['product_id']);
+        
+            if (!$poItem) {
+                return back()->withErrors([
+                    'quantity' => "Product {$item['product_description']} is not in the purchase order."
+                ]);
+            }
+        
+            if ($orderedQty > $poItem->quantity) {
+                return back()->withErrors([
+                    'quantity' => "Quantity for {$item['product_description']} exceeds purchase order quantity."
+                ]);
+            }
+        
+            if (!$product || $orderedQty > $product->quantity) {
+                return back()->withErrors([
+                    'quantity' => "Not enough stock for {$item['product_description']}. Available: {$product->quantity}, Requested: {$orderedQty}."
+                ]);
+            }
+        }
+        
         // Calculate totals
         $subtotal = 0;
         foreach ($products as $item) {

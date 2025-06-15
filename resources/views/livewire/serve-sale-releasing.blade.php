@@ -55,9 +55,24 @@
                                     class="w-full border-none bg-gray-100 outline-none" />
                             </td>
                             <td class="border px-2 py-2">
-                                <input x-model.number="item.quantity" @input="updateTotal(index)" type="number"
-                                    class="w-full border-none outline-none text-right" />
+                                <div class="relative">
+                                    <input
+                                        x-model.number="item.quantity"
+                                        @input="updateTotal(index)"
+                                        type="number"
+                                        min="1"
+                                        class="w-full border bg-gray-100 outline-none text-right"
+                                        :class="{ 'ring-2 ring-red-400': item.error }"
+                                    />
+                                    <p class="text-xs text-gray-500 italic mt-1">
+                                        Max: <span x-text="item.available_quantity"></span>
+                                    </p>
+                                    <p x-show="item.error" class="text-xs text-red-500 italic mt-1">
+                                        Quantity exceeds Purchase Order!
+                                    </p>
+                                </div>
                             </td>
+                            
                             <td class="border px-2 py-2">
                                 <input x-model.number="item.price" type="number" disabled
                                     class="w-full border-none bg-gray-100 outline-none text-right" />
@@ -72,6 +87,14 @@
                 </tbody>
             </table>
         </div>
+        @if ($errors->has('quantity'))
+            <div
+                x-data="{ errorMessage: @js($errors->first('quantity')) }"
+                class="mb-4 p-3 bg-red-100 text-red-700 rounded-md border border-red-300"
+            >
+                <span x-text="errorMessage"></span>
+            </div>
+        @endif
 
         <!-- Remarks and Serve Button -->
         <div class="pt-4">
@@ -98,10 +121,12 @@
             product_id: item.product_id,
             product_barcode: item.product_barcode,
             product_description: item.product_description || 'N/A',
-            quantity: item.quantity,
-            price: parseFloat(item.unit_price),
+            available_quantity: item.quantity, // from DB
+            quantity: item.quantity, // user input
+            price: parseFloat(item.product?.selling_price || 0),
             discount: parseFloat(item.product_discount),
-            total: parseFloat(item.subtotal) || 0
+            total: 0,
+            error: false // track validation
         }));
 
         return {
@@ -116,6 +141,23 @@
 
             updateTotal(index) {
                 const item = this.products[index];
+
+                if (
+                    item.quantity === null ||
+                    item.quantity === '' ||
+                    item.quantity <= 0
+                ) {
+                    item.total = 0;
+                    item.error = false;
+                    return;
+                }
+
+                if (item.quantity > item.available_quantity) {
+                    item.error = true;
+                } else {
+                    item.error = false;
+                }
+
                 const subtotal = item.quantity * item.price;
                 const discountAmount = subtotal * (item.discount / 100);
                 item.total = subtotal - discountAmount;

@@ -202,7 +202,7 @@ class CustomerPo extends Component
     {
         // Basic validation (you can customize this further)
         $this->validate([
-            'selectedCustomerId' => 'required|exists:suppliers,id',
+            'selectedCustomerId' => 'required|exists:customers,id',
             'receiptType' => 'required|string',
             'poDate' => 'required|date',
             'products' => 'required|array|min:1',

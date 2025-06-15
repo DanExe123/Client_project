@@ -76,6 +76,11 @@
 
       <div wire:loading.remove wire:target="submitPO">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input type="date" wire:model="poDate"
+                    class="block w-full rounded-md border border-gray-300 py-2 px-3" />
+              </div>       
               <div> 
                   <label class="block text-sm font-medium text-gray-700 mb-1">Select Supplier</label>
                   <select wire:model="selectedSupplierId" class="block w-full rounded-md border border-gray-300 py-2 px-3">
@@ -87,13 +92,7 @@
                   @error('selectedSupplierId')
                       <span class="text-sm text-red-500">{{ $message }}</span>
                   @enderror
-              </div>
-      
-              <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                  <input type="date" wire:model="poDate"
-                      class="block w-full rounded-md border border-gray-300 py-2 px-3" />
-              </div>        
+              </div> 
           </div>
       
           <h4 class="text-md font-semibold text-gray-700">Products to Return</h4>

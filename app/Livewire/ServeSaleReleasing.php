@@ -11,8 +11,12 @@ class ServeSaleReleasing extends Component
 
     public function mount($id)
     {
-        $this->po = CustomerPurchaseOrder::with(['customer', 'items.product'])->findOrFail($id);
+        $this->po = CustomerPurchaseOrder::with([
+            'customer',
+            'items.product:id,selling_price,id' // explicitly load selling_price
+        ])->findOrFail($id);
     }
+
     public function render()
     {
         return view('livewire.serve-sale-releasing'); // ← path to Blade view

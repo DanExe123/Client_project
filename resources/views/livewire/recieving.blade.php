@@ -133,7 +133,7 @@
                                         @if ($orders->pluck('id')->diff($selectedpoId)->isEmpty()) checked @endif />
                                 </th>
                                 <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
-                                <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
+                                <th class="px-6 py-4 font-medium text-gray-900">Supplier</th>
                                 <th class="px-6 py-4 font-medium text-gray-900">Date</th>
                                 <th class="px-6 py-4 font-medium text-gray-900">Transaction</th>
                                 <th class="px-6 py-4 font-medium text-gray-900">Status</th>

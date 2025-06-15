@@ -97,6 +97,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/payment-to-supplier', PaymentToSupplier::class)->name('payment-to-supplier');
         Route::get('/sales-releasing', SalesReleasing::class)->name('sales-releasing');
         Route::get('/unservered-lacking', UnserveredLacking::class)->name('unservered-lacking');
+        Route::get('/print/unserved', function () {
+            $component = new \App\Livewire\UnserveredLacking();
+            $component->mount(); // this already fetches the data as you said
+            $data = $component->unservedData;
+        
+            return view('livewire.print-unservered', compact('data'));
+        })->name('print-unservered');
+        
         Route::get('/account-recievables', AccountRecievables::class)->name('account-recievables');
         Route::get('/credit-debit', CreditDebit::class)->name('credit-debit');
         Route::get('/payment-application', PaymentApplication::class)->name('payment-application');

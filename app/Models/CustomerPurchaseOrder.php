@@ -39,4 +39,11 @@ class CustomerPurchaseOrder extends Model
     {
         return $this->hasMany(CustomerPurchaseOrderItem::class, 'purchase_order_id');
     }
+
+    // In App\Models\CustomerPurchaseOrder
+    public function salesReleases()
+    {
+        return $this->hasMany(SalesRelease::class, 'purchase_order_id');
+    }
+
 }

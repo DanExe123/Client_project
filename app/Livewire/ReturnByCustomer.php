@@ -19,6 +19,7 @@ class ReturnByCustomer extends Component
     public $selectedCustomerId;
     public $poDate;
     public $remarks;
+    public $receiptType;
 
     public $products = [];
     public $allProducts = [];
@@ -238,6 +239,7 @@ class ReturnByCustomer extends Component
             'returnType' => 'required|in:Good,Damage',
             'selectedCustomerId' => 'required|exists:customers,id',
             'poDate' => 'required|date',
+            'receiptType' => 'required|string',
             'products' => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|numeric|min:1',
@@ -248,6 +250,7 @@ class ReturnByCustomer extends Component
             'return_type' => $this->returnType,
             'customer_id' => $this->selectedCustomerId,
             'order_date' => $this->poDate,
+            'receipt_type' => $this->receiptType,
             'remarks' => $this->remarks,
             'total_amount' => $this->grandTotal,
             'status' => 'pending',
