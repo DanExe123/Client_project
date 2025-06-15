@@ -42,24 +42,24 @@ class ReturnToSupplier extends Component
         $purchasedProducts = PurchaseOrderItem::whereHas('purchaseOrder', function ($query) use ($supplierId) {
             $query->where('supplier_id', $supplierId);
         })
-        ->with('product') // eager-load product
-        ->get()
-        ->map(function ($item) {
-            $product = $item->product;
-        
-            return [
-                'id' => $product->id,
-                'description' => $product->description,
-                'price' => $product->lowest_uom_quantity > 0
-                    ? $product->price / $product->lowest_uom_quantity
-                    : 0,
-                'barcode' => $product->barcode,
-                'lowest_uom_quantity' => $product->lowest_uom_quantity,
-            ];
-        })
-        ->unique('id') // only unique products
-        ->values()
-        ->toArray();
+            ->with('product') // eager-load product
+            ->get()
+            ->map(function ($item) {
+                $product = $item->product;
+
+                return [
+                    'id' => $product->id,
+                    'description' => $product->description,
+                    'price' => $product->lowest_uom_quantity > 0
+                        ? $product->price / $product->lowest_uom_quantity
+                        : 0,
+                    'barcode' => $product->barcode,
+                    'lowest_uom_quantity' => $product->lowest_uom_quantity,
+                ];
+            })
+            ->unique('id') // only unique products
+            ->values()
+            ->toArray();
 
         $this->allProducts = $purchasedProducts;
     }
@@ -91,7 +91,7 @@ class ReturnToSupplier extends Component
         $this->updateGrandTotal();
     }
 
-     // Auto-fill price when a product is selected
+    // Auto-fill price when a product is selected
     public function updatePrice($index)
     {
         $productId = $this->products[$index]['product_id'] ?? null;
@@ -123,14 +123,14 @@ class ReturnToSupplier extends Component
         $this->updateGrandTotal(); // Recalculate grand total
     }
 
-     // Sum all totals from the products and apply global discount
-     public function updateGrandTotal()
-     {
-         $sum = collect($this->products)->sum('total'); // Sum of all product totals
- 
-         // Apply discount to the sum, never go below 0
-         $this->grandTotal = max($sum, 0);
-     }
+    // Sum all totals from the products and apply global discount
+    public function updateGrandTotal()
+    {
+        $sum = collect($this->products)->sum('total'); // Sum of all product totals
+
+        // Apply discount to the sum, never go below 0
+        $this->grandTotal = max($sum, 0);
+    }
 
     // Auto-fill product fields by barcode
     public function fillProductByBarcode($index)
@@ -194,7 +194,7 @@ class ReturnToSupplier extends Component
 
         $suppliers = Supplier::all();
         $products = Product::select('id', 'description', 'price', 'barcode')->get();
-    
+
         /* 
         $returnOrders = CustomerReturn::with('customer') // Eager load relationship
             ->when($search, function ($query) use ($search) {
@@ -203,13 +203,13 @@ class ReturnToSupplier extends Component
             ->paginate(5);
         */
         $returnOrders = SupplierReturn::with('supplier') // Eager load relationship
-        ->when($search, function ($query) use ($search) {
-            $query->whereHas('supplier', function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%');
-            });
-        })
-        ->paginate(5);
-        
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('supplier', function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
+            })
+            ->paginate(5);
+
         return view('livewire.return-to-supplier', [
             'suppliers' => $suppliers,
             'products' => $products,
@@ -238,7 +238,7 @@ class ReturnToSupplier extends Component
             'products.*.quantity' => 'required|numeric|min:1',
         ]);
 
-        // Create purchase order
+        // Create return order
         $returnOrder = SupplierReturn::create([
             'supplier_id' => $this->selectedSupplierId,
             'order_date' => $this->poDate,
@@ -258,19 +258,22 @@ class ReturnToSupplier extends Component
                 'unit_price' => $item['price'],
                 'subtotal' => $item['total'],
             ]);
+
+            // Decrement the damage count in products table
+            $product = Product::find($item['product_id']);
+            if ($product) {
+                $product->damages = max(0, $product->damages - $item['quantity']);
+                $product->save();
+            }
         }
-        /* 
-        $purchaseOrder->update([
-            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 6, '0', STR_PAD_LEFT),
-        ]);
-        */
 
-        $this->resetForm(); // or $this->reset(...)
+        $this->resetForm();
         $this->formKey = uniqid(); // triggers rerender of only that block
+        $this->poDate = now()->toDateString(); // reset date
 
-        $this->poDate = now()->toDateString(); // resaet date
-        session()->flash('message', 'Return by customer saved successfully.');
+        session()->flash('message', 'Return to supplier saved successfully.');
     }
+
 
     protected function getProductDescription($productId)
     {
