@@ -17,6 +17,7 @@ class PaymentInvoice extends Model
         'invoice_amount',
         'amount',
         'deduction',
+         'ewt_amount',
         'remarks',
         'payment_method',
         'bank',

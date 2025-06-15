@@ -1,17 +1,24 @@
 <div>
   <h2 class="text-xl font-semibold">Payment Application</h2>
+  @if (session()->has('message'))
+  <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
+      <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+          class="!bg-green-300 !w-full" />
+  </div>
+@endif
+
   <div class="p-4 space-y-6 max-w-6xl mx-auto border rounded-lg border-gray-200">
     <form wire:submit.prevent="savePayment">
     <!-- Select Date -->
-    <div>
+    <div class="mb-2">
         <label for="date" class="block mb-1 font-semibold">Select Date</label>
-        <input type="date" id="date" wire:model="date" class="border rounded px-3 py-2 w-full" />
+        <input type="date" id="date" wire:model="date" class="border rounded px-3 py-2 w-full"  required/>
     </div>
 
     <!-- Select Customer -->
-    <div>
+    <div class="mb-2">
         <label for="customer" class="block mb-1 font-semibold">Select Customer</label>
-        <select wire:model="filterCustomer" class="rounded border px-3 py-2 text-sm w-full">
+        <select wire:model="filterCustomer" class="rounded border px-3 py-2 text-sm w-full " required>
             <option value="">All Customers</option>
             @foreach ($customerOptions as $id => $name)
                 <option value="{{ $id }}">{{ $name }}</option>
@@ -20,9 +27,9 @@
     </div>
 
     <!-- Invoice Filter -->
-    <div>
+    <div class="mb-2">
         <label class="text-sm text-gray-700 font-medium mb-1 block">Invoice/DR</label>
-        <select wire:model="filterInvoice" class="rounded border px-3 py-2 text-sm w-full mt-2">
+        <select wire:model="filterInvoice" class="rounded border px-3 py-2 text-sm w-full mt-2" required>
             <option value="">All Invoices/DR</option>
             @foreach ($invoiceOptions as $type)
                 <option value="{{ $type }}">{{ $type }}</option>
@@ -63,7 +70,7 @@
     </div>
 
     <!-- Payment Method -->
-    <div>
+    <div class="mb-2">
         <label for="paymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
         <select id="paymentMethod" wire:model="paymentMethod" class="border rounded px-3 py-2 w-full">
             <option value="" disabled>Select Method</option>
@@ -74,19 +81,25 @@
     </div>
 
     <!-- Enter Amount -->
-    <div>
+    <div class="mb-2">
         <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
-        <input id="amount" type="number" min="0" step="0.01" wire:model.lazy="amount" class="border rounded px-3 py-2 w-full" />
+        <input id="amount" type="number" min="0" step="0.01" wire:model.lazy="amount" class="border rounded px-3 py-2 w-full" required/>
     </div>
 
     <!-- Other Deduction -->
-    <div>
+    <div class="mb-2">
         <label for="deduction" class="block mb-1 font-semibold">Other Deduction (optional)</label>
-        <input id="deduction" type="number" min="0" step="0.01" wire:model.lazy="deduction" placeholder="₱0.00" class="border rounded px-3 py-2 w-full" />
+        <input id="deduction" type="number" min="0" step="0.01" wire:model.lazy="deduction" placeholder="₱0.00" class="border rounded px-3 py-2 w-full" required />
+    </div>
+
+     <!-- EWT Amount -->
+     <div class="mb-2">
+        <label for="ewt" class="block mb-1 font-semibold">EWT Amount</label>
+        <input id="ewt" type="number" min="0" step="0.01" wire:model.lazy="ewt" placeholder="₱0.00" class="border rounded px-3 py-2 w-full" required />
     </div>
 
     <!-- Remarks -->
-    <div>
+    <div class="mb-2">
         <label for="remarks" class="block mb-1 font-semibold">Remarks</label>
         <textarea id="remarks" wire:model="remarks" rows="3" class="border rounded px-3 py-2 w-full" placeholder="Add any notes here..."></textarea>
     </div>

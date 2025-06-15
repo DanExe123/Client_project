@@ -20,6 +20,7 @@ class PaymentApplication extends Component
     public $date;
     public $amount;
     public $deduction;
+    public $ewt_amount;
     public $remarks;
     public $paymentMethod;
 
@@ -44,6 +45,7 @@ class PaymentApplication extends Component
                         'invoice_amount'    => $invoice['amount'],
                         'amount'            => $this->amount,
                         'deduction'         => $this->deduction,
+                        'ewt_amount'         => $this->ewt_amount,
                         'remarks'           => $this->remarks,
                         'payment_method'    => $this->paymentMethod,
                         'bank'              => $this->checkBank ?? $this->transferBank,
@@ -59,8 +61,7 @@ class PaymentApplication extends Component
                         'message' => 'Error saving payment: ' . $e->getMessage()
                     ]);
                 }
-            }
-                
+            }  
 
             // Clear fields
             $this->reset([

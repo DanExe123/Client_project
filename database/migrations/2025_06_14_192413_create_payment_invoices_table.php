@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->decimal('invoice_amount', 12, 2);
             $table->decimal('amount', 12, 2);
             $table->decimal('deduction', 12, 2)->nullable();
+            $table->decimal('ewt_amount', 12, 2)->nullable();
             $table->string('remarks')->nullable();
     
             $table->string('payment_method')->nullable(); // Cash, Cheque, etc.
