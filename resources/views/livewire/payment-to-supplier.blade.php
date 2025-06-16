@@ -35,7 +35,7 @@
               <th class="px-4 py-2">Receiving No.</th>
               <th class="px-4 py-2">Receiving Date</th>
               <th class="px-4 py-2">Total Amount</th>
-              <th class="px-4 py-2">Remove</th>
+              <th class="px-4 py-2">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -44,93 +44,132 @@
           <td class="px-4 py-2">{{ $rec['number'] }}</td>
           <td class="px-4 py-2">{{ \Carbon\Carbon::parse($rec['date'])->format('F d, Y') }}</td>
           <td class="px-4 py-2">₱{{ number_format($rec['amount'], 2) }}</td>
-          <td class="px-4 py-2 text-center">
-          <button wire:click="removeReceiving({{ $index }})" class="text-red-600 hover:underline">Remove</button>
-          </td>
+          <td class="text-center flex justify-center gap-2 my-2">
+            <button
+            wire:click.prevent="addToTotal({{ $inv['id'] }})"
+            wire:loading.attr="disabled"
+            wire:target="addToTotal({{ $inv['id'] }})"
+            class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50"
+            wire:key="add-btn-{{ $inv['id'] }}"
+        >
+            <span wire:loading.remove wire:target="addToTotal({{ $inv['id'] }})">Add to Total</span>
+            <span wire:loading wire:target="addToTotal({{ $inv['id'] }})">Loading...</span>
+        </button>
+        <button
+        wire:click.prevent="removeFromTotal({{ $inv['id'] }})"
+        wire:loading.attr="disabled"
+        wire:target="removeFromTotal({{ $inv['id'] }})"
+        class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50"
+        wire:key="remove-btn-{{ $inv['id'] }}"
+    >
+        <span wire:loading.remove wire:target="removeFromTotal({{ $inv['id'] }})">Remove</span>
+        <span wire:loading wire:target="removeFromTotal({{ $inv['id'] }})">Removing...</span>
+    </button>  
+        </td>
         </tr>
       @endforeach
           </tbody>
           <tfoot class="bg-gray-100 font-semibold">
             <tr>
               <td colspan="2" class="px-4 py-2 text-right">Total Amount:</td>
-              <td colspan="2" class="px-4 py-2">₱{{ number_format($this->totalAmount, 2) }}</td>
+              <td colspan="2" class="px-4 py-2">₱{{ number_format($totalAmount, 2) }}</td>
             </tr>
           </tfoot>
         </table>
       </div>
 
-      <!-- Payment Method -->
-      <div class="mb-2">
-        <label for="paymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
-        <select id="paymentMethod" wire:model="paymentMethod" class="border rounded px-3 py-2 w-full">
-          <option value="" disabled>Select Method</option>
-          <option value="Cash">Cash</option>
-          <option value="Check">Check</option>
-          <option value="Bank Transfer">Bank Transfer</option>
-        </select>
-      </div>
-
-      <!-- Enter Amount -->
-      <div class="mb-2">
-        <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
-        <input id="amount" type="number" min="0" step="0.01" wire:model.lazy="amount"
-          class="border rounded px-3 py-2 w-full" required />
-      </div>
-
-      <!-- Other Deduction -->
-      <div class="mb-2">
-        <label for="deduction" class="block mb-1 font-semibold">Other Deduction (optional)</label>
-        <input id="deduction" type="number" min="0" step="0.01" wire:model.lazy="deduction" placeholder="₱0.00"
-          class="border rounded px-3 py-2 w-full" />
-      </div>
-
-      <!-- EWT Amount -->
-      <div class="mb-2">
-        <label for="ewt" class="block mb-1 font-semibold">EWT Amount</label>
-        <input id="ewt" type="number" min="0" step="0.01" wire:model.lazy="ewt" placeholder="₱0.00"
-          class="border rounded px-3 py-2 w-full" required />
-      </div>
-
-      <!-- Remarks -->
-      <div class="mb-2">
-        <label for="remarks" class="block mb-1 font-semibold">Remarks</label>
-        <textarea id="remarks" wire:model="remarks" rows="3" class="border rounded px-3 py-2 w-full"
-          placeholder="Add any notes here..."></textarea>
-      </div>
-
-      <!-- Check or Bank Transfer Fields -->
-      @if ($paymentMethod === 'Check' || $paymentMethod === 'Bank Transfer')
-      <div class="space-y-4 mt-4 border-t pt-4">
-      <div>
-        <label for="bank" class="block mb-1 font-semibold">Select Bank</label>
-        <select id="bank" wire:model="{{ $paymentMethod === 'Check' ? 'checkBank' : 'transferBank' }}"
-        class="border rounded px-3 py-2 w-full">
-        <option value="" disabled>Select Bank</option>
-        <option>BDO Unibank</option>
-        <option>Bank of the Philippine Islands (BPI)</option>
-        <option>Metrobank</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="refOrCheque" class="block mb-1 font-semibold">
-        {{ $paymentMethod === 'Check' ? 'Cheque Number' : 'Reference Number' }}
-        </label>
-        <input id="refOrCheque" type="text"
-        wire:model="{{ $paymentMethod === 'Check' ? 'chequeNumber' : 'referenceNumber' }}"
-        class="border rounded px-3 py-2 w-full" />
-      </div>
-
-      <div>
-        <label for="dateField" class="block mb-1 font-semibold">
-        {{ $paymentMethod === 'Check' ? 'Check Date' : 'Transaction Date' }}
-        </label>
-        <input id="dateField" type="date"
-        wire:model="{{ $paymentMethod === 'Check' ? 'checkDate' : 'transactionDate' }}"
-        class="border rounded px-3 py-2 w-full" />
-      </div>
-      </div>
-    @endif
+      <div x-data="{ method: '' }" class="space-y-4">
+        <!-- Payment Method -->
+        <div>
+            <label for="paymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
+            <select id="paymentMethod"
+                x-model="method"
+                @change="$dispatch('input', $event.target.value)"
+                wire:model="paymentMethod"
+                class="w-full border rounded px-3 py-2"
+            >
+                <option value="" disabled>Select Method</option>
+                <option value="Cash">Cash</option>
+                <option value="Check">Check</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+        </div>
+    
+          <!-- Check Fields -->
+          <div x-show="method === 'Check'" x-transition>
+            <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
+                <div>
+                    <label class="block mb-1 font-semibold">Select Bank</label>
+                    <select wire:model="checkBank" class="w-full border rounded px-3 py-2">
+                        <option value="" disabled>Select Bank</option>
+                        <option>Bank A</option>
+                        <option>Bank B</option>
+                        <option>Bank C</option>
+                    </select>
+                </div>
+    
+                <div>
+                    <label class="block mb-1 font-semibold">Cheque Number</label>
+                    <input type="text" wire:model="chequeNumber" class="w-full border rounded px-3 py-2" />
+                </div>
+    
+                <div>
+                    <label class="block mb-1 font-semibold">Check Date</label>
+                    <input type="date" wire:model="checkDate" class="w-full border rounded px-3 py-2" />
+                </div>
+            </div>
+        </div>
+    
+        <!-- Bank Transfer Fields -->
+        <div x-show="method === 'Bank Transfer'" x-transition>
+            <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
+                <div>
+                    <label class="block mb-1 font-semibold">Select Bank</label>
+                    <select wire:model="transferBank" class="w-full border rounded px-3 py-2">
+                        <option value="" disabled>Select Bank</option>
+                        <option>Bank A</option>
+                        <option>Bank B</option>
+                        <option>Bank C</option>
+                    </select>
+                </div>
+    
+                <div>
+                    <label class="block mb-1 font-semibold">Reference Number</label>
+                    <input type="text" wire:model="referenceNumber" class="w-full border rounded px-3 py-2" />
+                </div>
+    
+                <div>
+                    <label class="block mb-1 font-semibold">Transaction Date</label>
+                    <input type="date" wire:model="transactionDate" class="w-full border rounded px-3 py-2" />
+                </div>
+            </div>
+        </div>
+        
+        <!-- Amount -->
+        <div>
+            <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
+            <input id="amount" type="number" wire:model.lazy="amount" class="w-full border rounded px-3 py-2" />
+        </div>
+    
+        <!-- Other Deduction -->
+        <div>
+            <label for="deduction" class="block mb-1 font-semibold">Other Deduction</label>
+            <input id="deduction" type="number" wire:model.lazy="deduction" class="w-full border rounded px-3 py-2" placeholder="₱0.00" />
+        </div>
+    
+        <!-- EWT -->
+        <div>
+            <label for="ewt_amount" class="block mb-1 font-semibold">EWT Amount</label>
+            <input id="ewt_amount" type="number" wire:model.lazy="ewt_amount" class="w-full border rounded px-3 py-2" placeholder="₱0.00" />
+        </div>
+    
+        <!-- Remarks -->
+        <div>
+            <label for="remarks" class="block mb-1 font-semibold">Remarks</label>
+            <textarea id="remarks" wire:model.lazy="remarks" rows="3" class="w-full border rounded px-3 py-2" placeholder="Add notes..."></textarea>
+        </div>
+    </div>
+    
 
       <!-- Save Button -->
       <div class="flex justify-end mt-6">

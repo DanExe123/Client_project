@@ -150,7 +150,7 @@ class PaymentApplication extends Component
         $this->selectedInvoiceIds = array_filter($this->selectedInvoiceIds, fn($i) => $i != $id);
         $this->selectedInvoiceIds = array_values($this->selectedInvoiceIds); // optional reindex
     }
-    
+      
 
 
     public function addToTotal($id)
