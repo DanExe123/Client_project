@@ -18,7 +18,7 @@
     <!-- Select Customer -->
     <div class="mb-2">
         <label for="customer" class="block mb-1 font-semibold">Select Customer</label>
-        <select wire:model="filterCustomer" class="rounded border px-3 py-2 text-sm w-full " required>
+        <select wire:model.live="filterCustomer"     class="rounded border px-3 py-2 text-sm w-full " required>
             <option value="">All Customers</option>
             @foreach ($customerOptions as $id => $name)
                 <option value="{{ $id }}">{{ $name }}</option>
@@ -49,6 +49,7 @@
                 </tr>
             </thead>
             <tbody>
+                @if ($filterCustomer)
                 @foreach ($selectedInvoices as $index => $inv)
                     <tr class="border-t">
                         <td class="px-4 py-2">{{ $inv['number'] }}</td>
@@ -59,6 +60,7 @@
                         </td>
                     </tr>
                 @endforeach
+                
             </tbody>
             <tfoot class="bg-gray-100 font-semibold">
                 <tr>
@@ -66,6 +68,13 @@
                     <td colspan="2" class="px-4 py-2">₱{{ number_format($this->totalAmount, 2) }}</td>
                 </tr>
             </tfoot>
+            @else
+            <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                    No data found. Please select a customer.
+                </td>
+            </tr>
+        @endif
         </table>
     </div>
 
