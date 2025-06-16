@@ -46,6 +46,7 @@ use App\Livewire\ViewDetailRecieving;
 use App\Livewire\Editrecieving;
 use App\Livewire\ServeSaleReleasing;
 use App\Livewire\ServePrintPreview;
+use App\Livewire\ViewReceivingDetails;
 
 
 use App\Livewire\LoginForm;
@@ -76,11 +77,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/recieving', Recieving::class)->name('recieving');
         Route::get('/recievingapproval/{purchaseOrderId}', Recievingapproval::class)->name('recievingapproval');
         Route::get('/view-detail-recieving/{id}', ViewDetailRecieving::class)->name('view-detail-recieving');
+        Route::get('/receiving/view-details/{id}', ViewReceivingDetails::class)->name('view-receiving-details');
         Route::get('/edit-recieving/{id}', Editrecieving::class)->name('editrecieving');
         Route::get('/serve-sales-releasing/{id}', ServeSaleReleasing::class)->name('serve-sale-releasing');
         Route::post('/sales-releasing/serve/{id}', [SalesReleasing::class, 'serve'])->name('sales-releasing.serve');
         Route::get('/sales-releasing/print-preview/{id}', [SalesReleasing::class, 'printPreview'])->name('serve-print-preview');
-        Route::get('/recieving/cancel/{id}', Recieving::class)    ->name('recieving.cancel');
+        Route::get('/recieving/cancel/{id}', Recieving::class)->name('recieving.cancel');
 
 
 
