@@ -28,32 +28,31 @@
         <!-- Search and Buttons -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-            <!-- Search -->
-            <div class="w-full sm:max-w-xs flex justify-start relative">
+            <div class="w-full sm:max-w-xs flex justify-start relative mb-4">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
                 </span>
                 <input
                     type="text"
-                    x-model="search"
+                    wire:model.live.debounce.300ms="search"
                     placeholder="Search..."
                     class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
             </div>
-
+            
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
 
             <!-- Customer Filter -->
             <div>
                 <label class="text-sm text-gray-700 font-medium mb-1 block">Select Customer</label>
-                <select wire:model="filterCustomer"
-                        class="w-full rounded-md border-gray-300 px-3 py-2 shadow-sm text-sm">
-                    <option value="">All</option>
-                    @foreach ($customerOptions as $id => $name)
-                    <option value="{{ $id }}">{{ $name }}</option>
-                @endforeach                
-                </select>
+                <select wire:model.live="filterCustomer"
+                class="w-full rounded-md border-gray-300 px-3 py-2 shadow-sm text-sm">
+            <option value="">All</option>
+            @foreach ($customerOptions as $id => $name)
+                <option value="{{ $id }}">{{ $name }}</option>
+            @endforeach                
+        </select>        
             </div>
         
         <!-- Date Filter -->
@@ -107,24 +106,36 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                    @forelse ($returnItems as $item)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">{{ $item->product_barcode }}</td>
-                            <td class="px-6 py-4">{{ $item->product_description }}</td>
-                            <td class="px-6 py-4">{{ $item->quantity }}</td>
-                            <td class="px-6 py-4">₱{{ number_format($item->unit_price, 2) }}</td>
-                            <td class="px-6 py-4">₱{{ number_format($item->subtotal, 2) }}</td>
-                            <td class="px-6 py-4">₱{{ number_format($item->quantity * $item->unit_price, 2) }}</td>
-                        </tr>
-                    @empty
+                    @if ($filterCustomer)
+                        @forelse ($returnItems as $item)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">{{ $item->product_barcode }}</td>
+                                <td class="px-6 py-4">{{ $item->product_description }}</td>
+                                <td class="px-6 py-4">{{ $item->quantity }}</td>
+                                <td class="px-6 py-4">₱{{ number_format($item->unit_price, 2) }}</td>
+                                <td class="px-6 py-4">₱{{ number_format($item->subtotal, 2) }}</td>
+                                <td class="px-6 py-4">₱{{ number_format($item->quantity * $item->unit_price, 2) }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    No return items found for this customer.
+                                </td>
+                            </tr>
+                        @endforelse
+                    @else
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No return items found.</td>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                No data found. Please select a customer.
+                            </td>
                         </tr>
-                    @endforelse
+                    @endif
                 </tbody>
-                
             </table>
         </div>
+        
+    
+    
     
 
     </div>

@@ -41,7 +41,6 @@
     <div class="overflow-auto rounded-lg border border-gray-200 mt-2">
         <table class="min-w-[1000px] w-full border-collapse bg-white text-left text-sm text-gray-500">
             <thead class="bg-gray-50 sticky top-0 z-10">
-                @foreach($products as $product)
                     <tr>
                         <th class="px-4 py-4 font-medium text-gray-900">
                             <input type="checkbox" wire:click="toggleSelectAll"
@@ -56,7 +55,6 @@
                         <th class="px-4 py-4 font-medium text-gray-900">Damages</th>
 
                     </tr>
-                @endforeach
             </thead>
             <tbody class="divide-y divide-gray-100 border-t border-gray-100">
                 @foreach($products as $product)
