@@ -125,7 +125,11 @@ class PaymentApplication extends Component
             $query->where('receipt_type', $this->filterInvoice);
         }
 
-        return $query->get();
+        // Exclude Sales Releases that already exist in PaymentInvoice
+        $paidSalesReleaseIds = PaymentInvoice::pluck('sales_release_id')->toArray();
+        $query->whereNotIn('id', $paidSalesReleaseIds);
+
+    return $query->get();
     }
 
     public function removeInvoice($index)
