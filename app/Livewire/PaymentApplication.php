@@ -31,52 +31,65 @@ class PaymentApplication extends Component
     public $transferBank;
     public $referenceNumber;
     public $transactionDate;
+    public $selectedInvoiceIds = [];
+    
 
-        public function savePayment()
-        {   
-        
-            foreach ($this->selectedInvoices as $invoice) {
-                try {
-                    PaymentInvoice::create([
-                        'customer_id'       => $this->filterCustomer,
-                        'sales_release_id'  => $invoice['id'],
-                        'invoice_number'    => $invoice['number'],
-                        'invoice_date'      => $invoice['date'],
-                        'invoice_amount'    => $invoice['amount'],
-                        'amount'            => $this->amount,
-                        'deduction'         => $this->deduction,
-                        'ewt_amount'         => $this->ewt_amount,
-                        'remarks'           => $this->remarks,
-                        'payment_method'    => $this->paymentMethod,
-                        'bank'              => $this->checkBank ?? $this->transferBank,
-                        'cheque_number'     => $this->chequeNumber,
-                        'check_date'        => $this->checkDate,
-                        'reference_number'  => $this->referenceNumber,
-                        'transaction_date'  => $this->transactionDate,
-                    ]);
-                } catch (\Exception $e) {
-                    \Log::error('Payment save failed: ' . $e->getMessage());
-                    $this->dispatch('show-toast', [
-                        'type' => 'error',
-                        'message' => 'Error saving payment: ' . $e->getMessage()
-                    ]);
-                }
-            }  
 
-            // Clear fields
-            $this->reset([
-                'date', 'amount', 'deduction', 'remarks', 'paymentMethod',
-                'checkBank', 'chequeNumber', 'checkDate',
-                'transferBank', 'referenceNumber', 'transactionDate',
-                'selectedInvoices'
-            ]);
-
+    public function savePayment()
+    {
+        $invoicesToSave = collect($this->selectedInvoices)
+            ->filter(fn($invoice) => in_array($invoice['id'], $this->selectedInvoiceIds));
+    
+        if ($invoicesToSave->isEmpty()) {
             $this->dispatch('show-toast', [
-                'type' => 'success',
-                'message' => 'Payment saved successfully!'
+                'type' => 'error',
+                'message' => 'No invoices added to total. Please select at least one.'
             ]);
+            return;
         }
-
+    
+        foreach ($invoicesToSave as $invoice) {
+            try {
+                PaymentInvoice::create([
+                    'customer_id'       => $this->filterCustomer,
+                    'sales_release_id'  => $invoice['id'],
+                    'invoice_number'    => $invoice['number'],
+                    'invoice_date'      => $invoice['date'],
+                    'invoice_amount'    => $invoice['amount'],
+                    'amount'            => $this->amount,
+                    'deduction'         => $this->deduction,
+                    'ewt_amount'        => $this->ewt_amount,
+                    'remarks'           => $this->remarks,
+                    'payment_method'    => $this->paymentMethod,
+                    'bank'              => $this->checkBank ?? $this->transferBank,
+                    'cheque_number'     => $this->chequeNumber,
+                    'check_date'        => $this->checkDate,
+                    'reference_number'  => $this->referenceNumber,
+                    'transaction_date'  => $this->transactionDate,
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Payment save failed: ' . $e->getMessage());
+                $this->dispatch('show-toast', [
+                    'type' => 'error',
+                    'message' => 'Error saving payment: ' . $e->getMessage()
+                ]);
+            }
+        }
+    
+        // Clear fields after successful save
+        $this->reset([
+            'date', 'amount', 'deduction', 'remarks', 'paymentMethod',
+            'checkBank', 'chequeNumber', 'checkDate',
+            'transferBank', 'referenceNumber', 'transactionDate',
+            'selectedInvoices', 'selectedInvoiceIds'
+        ]);
+    
+        $this->dispatch('show-toast', [
+            'type' => 'success',
+            'message' => 'Payment saved successfully!'
+        ]);
+    }
+    
 
     public function mount()
     {
@@ -132,19 +145,35 @@ class PaymentApplication extends Component
     return $query->get();
     }
 
-    public function removeInvoice($index)
+    public function removeFromTotal($id)
     {
-        unset($this->selectedInvoices[$index]);
-        $this->selectedInvoices = array_values($this->selectedInvoices);
+        $this->selectedInvoiceIds = array_filter($this->selectedInvoiceIds, fn($i) => $i != $id);
+        $this->selectedInvoiceIds = array_values($this->selectedInvoiceIds); // optional reindex
     }
+    
+
+
+    public function addToTotal($id)
+    {
+        if (!in_array($id, $this->selectedInvoiceIds)) {
+            $this->selectedInvoiceIds[] = $id;
+        }
+    }
+
 
     public function getTotalAmountProperty()
     {
-        return collect($this->selectedInvoices)->sum('amount');
+        return collect($this->selectedInvoices)
+            ->filter(fn($inv) => in_array($inv['id'], $this->selectedInvoiceIds))
+            ->sum('amount');
     }
+    
+
 
     public function render()
     {
-        return view('livewire.payment-application');
+        return view('livewire.payment-application', [
+            'totalAmount' => $this->totalAmount,
+        ]);
     }
 }
