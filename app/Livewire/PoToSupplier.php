@@ -26,7 +26,7 @@ class PoToSupplier extends Component
     public $grandTotal = 0;
     public $purchase_discount = 0;
     public $formKey;
-    
+
     public function mount()
     {
         $this->poDate = now()->toDateString();
@@ -38,13 +38,12 @@ class PoToSupplier extends Component
     public function updatedSelectedSupplierId()
     {
         if ($this->selectedSupplierId) {
-            // Filter products by supplier (make sure your column name is correct!)
-            $this->allProducts = Product::where('supplier', $this->selectedSupplierId)
+            // Use the correct column name: supplier_id
+            $this->allProducts = Product::where('supplier_id', $this->selectedSupplierId)
                 ->select('id', 'description', 'price', 'barcode')
                 ->get()
                 ->toArray();
         } else {
-            // If no supplier selected, clear available products
             $this->allProducts = [];
         }
     }
@@ -131,7 +130,8 @@ class PoToSupplier extends Component
     {
         $barcode = $this->products[$index]['barcode'] ?? null;
 
-        if (!$barcode) return;
+        if (!$barcode)
+            return;
 
         // Find matching product by barcode
         $product = collect($this->allProducts)->firstWhere('barcode', $barcode);
@@ -158,7 +158,8 @@ class PoToSupplier extends Component
     {
         $description = $this->products[$index]['product_description'] ?? null;
 
-        if (!$description) return;
+        if (!$description)
+            return;
 
         // Find matching product by description
         $product = collect($this->allProducts)->firstWhere('description', $description);
@@ -180,14 +181,16 @@ class PoToSupplier extends Component
         }
     }
 
-    
-    public function updatedSearch() {
+
+    public function updatedSearch()
+    {
         $this->resetPage();
     }
 
-    public function render() {
+    public function render()
+    {
         $search = $this->search;
-        
+
         $suppliers = Supplier::all();
         $products = Product::select('id', 'description', 'price', 'barcode')->get();
         $purchaseOrders = PurchaseOrder::with('supplier') // Eager load relationship
@@ -197,7 +200,7 @@ class PoToSupplier extends Component
                     ->orWhere('remarks', 'like', '%' . $search . '%');
             })
             ->paginate(5);
-    
+
         return view('livewire.po-to-supplier', [
             'suppliers' => $suppliers,
             'products' => $products,
@@ -238,7 +241,7 @@ class PoToSupplier extends Component
             'total_amount' => $this->grandTotal,
             'purchase_discount' => $this->purchase_discount,
             'status' => 'pending',
-           //tobe change 'status' => 'pending',
+            //tobe change 'status' => 'pending',
             'status' => 'Pending',
         ]);
 
@@ -258,7 +261,7 @@ class PoToSupplier extends Component
         $purchaseOrder->update([
             'po_number' => 'PO-' . str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT),
         ]);
-        
+
         $this->resetForm(); // or $this->reset(...)
         $this->formKey = uniqid(); // triggers rerender of only that block
 

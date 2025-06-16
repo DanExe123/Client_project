@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Supplier;
 use App\Models\Receiving;
+use App\Models\ReceivedItem;
 use App\Models\SupplierPayment;
 
 class PaymentToSupplier extends Component
@@ -30,16 +31,11 @@ class PaymentToSupplier extends Component
     public $transferBank;
     public $referenceNumber;
     public $transactionDate;
+
     public function mount()
     {
         $this->date = now()->toDateString();
         $this->supplierOptions = Supplier::pluck('name', 'id')->toArray();
-
-        // If you want display-friendly options like RCV-0001:
-        $this->receivingOptions = Receiving::all()
-            ->mapWithKeys(fn($r) => [$r->id => 'RCV-' . str_pad($r->id, 4, '0', STR_PAD_LEFT)])
-            ->toArray();
-
         $this->loadReceivings();
     }
 
@@ -55,30 +51,34 @@ class PaymentToSupplier extends Component
 
     public function loadReceivings()
     {
-        $this->selectedReceivings = $this->getFilteredReceivings()
-            ->map(function ($receiving) {
+        $this->selectedReceivings = $this->getFilteredReceivedItems()
+            ->map(function ($grouped) {
+                $receiving = $grouped->first()->receiving;
+
                 return [
                     'id' => $receiving->id,
                     'number' => 'RCV-' . str_pad($receiving->id, 4, '0', STR_PAD_LEFT),
-                    'date' => $receiving->receiving_date,
-                    'amount' => $receiving->grand_total,
+                    'date' => $receiving->order_date,
+                    'amount' => $grouped->sum('subtotal'),
                 ];
-            })->toArray();
+            })->values()->toArray();
     }
 
-    public function getFilteredReceivings()
+    public function getFilteredReceivedItems()
     {
-        $query = Receiving::query();
+        $query = ReceivedItem::with('receiving');
 
         if ($this->filterSupplier) {
-            $query->where('supplier_id', $this->filterSupplier);
+            $query->whereHas('receiving', function ($q) {
+                $q->where('supplier_id', $this->filterSupplier);
+            });
         }
 
         if ($this->filterReceiving) {
-            $query->where('id', $this->filterReceiving); // <- FIXED: filter by ID, not 'ref_number'
+            $query->where('receiving_id', $this->filterReceiving);
         }
 
-        return $query->get();
+        return $query->get()->groupBy('receiving_id');
     }
 
     public function removeReceiving($index)
@@ -123,7 +123,6 @@ class PaymentToSupplier extends Component
             }
         }
 
-        // Clear fields
         $this->reset([
             'date',
             'amount',
