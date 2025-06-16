@@ -8,7 +8,7 @@ use Livewire\Component;
 class Editcustomer extends Component
 {
     public $customerId;
-    public $name, $email, $address, $contact, $contact_person, $term;
+    public $name, $email, $address, $contact, $contact_person, $term, $cust_tin_number;
     public $status;
 
     public function mount($id)
@@ -24,29 +24,25 @@ class Editcustomer extends Component
         $this->contact = $customer->contact;
         $this->contact_person = $customer->contact_person;
         $this->term = $customer->term;
+        $this->cust_tin_number = $customer->cust_tin_number;
         $this->status = $customer->status;
     }
 
     public function updateCustomer()
     {
         $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'contact' => 'nullable|string',
-            'contact_person' => 'nullable|string',
-            'term' => 'nullable|string',
+            'name' => 'required|string|regex:/^[a-zA-Z0-9\s]+$/|min:3|unique:customers,name',
+            'email' => 'required|email|unique:customers,email,' . $this->customerId,
+            'address' => 'nullable|string|regex:/^[a-zA-Z0-9\s,.#-]+$/',
+            'contact' => 'required|regex:/^[0-9]+$/',
+            'contact_person' => 'nullable|string|regex:/^[a-zA-Z\s]+$/',
+            'term' => 'nullable|regex:/^[0-9]+$/',
+            'cust_tin_number' => 'nullable|regex:/^[0-9-]+$/',
             'status' => 'required|boolean',
         ]);
 
         Customer::where('id', $this->customerId)->update([
-            'name' => $this->name,
-            'email' => $this->email,
-            'address' => $this->address,
-            'contact' => $this->contact,
-            'contact_person' => $this->contact_person,
-            'term' => $this->term,
-            'status' => $this->status,
+            e
         ]);
 
         session()->flash('message', 'Customer updated successfully.');

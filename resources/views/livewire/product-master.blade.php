@@ -33,15 +33,6 @@
           :disabled="count($selectedProductId) !== 1" 
       />
 
-      <x-button 
-          right-icon="trash" 
-          wire:click="deleteSelected" 
-          :class="count($selectedProductId) === 0 
-              ? 'bg-red-300 text-white cursor-not-allowed' 
-              : 'bg-red-600 hover:bg-red-700 text-white'" 
-          :disabled="count($selectedProductId) === 0" 
-      />
-
       {{-- @include('partials.product-modal.product-delete') --}}
     </div>
   </div>
@@ -51,10 +42,6 @@
       <thead class="bg-gray-50">
         <tr>
           <th class="px-4 py-4">
-            <input type="checkbox"
-              wire:click="toggleSelectAll"
-              @if($products->pluck('id')->diff($selectedProductId)->isEmpty()) checked @endif
-            />
           </th>
           <th class="px-6 py-4 font-medium text-gray-900">Barcode</th>
           <th class="px-6 py-4 font-medium text-gray-900">Supplier</th>
@@ -62,6 +49,7 @@
           <th class="px-6 py-4 font-medium text-gray-900">Highest Unit of Measurement</th>
           <th class="px-6 py-4 font-medium text-gray-900">Lowest Unit of Measurement</th>
           <th class="px-6 py-4 font-medium text-gray-900">Price</th>
+          <th class="px-6 py-4 font-medium text-gray-900">Status</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100 border-t border-gray-100">
@@ -74,11 +62,19 @@
           />
         </td>
         <td class="px-6 py-4">{{ $product->barcode }}</td>
-        <td class="px-6 py-4">{{ $product->supplier }}</td>
+        <td class="px-6 py-4">{{ $product->supplier->name}}</td>
         <td class="px-6 py-4">{{ $product->description }}</td>
         <td class="px-6 py-4">{{ $product->highest_uom }}</td>
         <td class="px-6 py-4">{{ $product->lowest_uom }}</td>
         <td class="px-6 py-4">{{ number_format($product->price, 2) }}</td>
+        <td class="px-6 py-4">
+          <span
+            class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold
+              {{ $product->status ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' }}">
+              <span class="h-1.5 w-1.5 rounded-full {{ $product->status ? 'bg-green-600' : 'bg-red-600' }}"></span>
+               {{ $product->status ? 'Active' : 'Inactive' }}
+            </span>
+        </td>
       </tr>
     @empty
       <tr>

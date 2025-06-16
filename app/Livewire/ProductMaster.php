@@ -61,13 +61,16 @@ class ProductMaster extends Component
     {
         $search = $this->search;
 
-        $products = Product::when($search, function ($query) use ($search) {
+        $products = Product::with('supplier')
+        ->when($search, function ($query) use ($search) {
             $query->where('barcode', 'like', '%' . $search . '%')
-                  ->orWhere('supplier', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%')
-                  ->orWhere('highest_uom', 'like', '%' . $search . '%')
-                  ->orWhere('lowest_uom', 'like', '%' . $search . '%')
-                  ->orWhere('price', 'like', '%' . $search . '%');
+                ->orWhere('description', 'like', '%' . $search . '%')
+                ->orWhere('highest_uom', 'like', '%' . $search . '%')
+                ->orWhere('lowest_uom', 'like', '%' . $search . '%')
+                ->orWhere('price', 'like', '%' . $search . '%')
+                ->orWhereHas('supplier', function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
         })->paginate(5);
         return view('livewire.product-master', compact('products'));
     }

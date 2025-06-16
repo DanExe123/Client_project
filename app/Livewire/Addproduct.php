@@ -9,7 +9,7 @@ use App\Models\Supplier;
 class AddProduct extends Component
 {
     public $barcode;
-    public $supplier;
+    public $supplier_id;
     public $description;
     public $highest_uom;
     public $lowest_uom;
@@ -20,7 +20,7 @@ class AddProduct extends Component
 
     protected $rules = [
         'barcode' => 'required|numeric|min:0|unique:products,barcode',
-        'supplier' => 'required|string',
+        'supplier_id' => 'required|exists:suppliers,id',
         'description' => 'required|string',
         'highest_uom' => 'nullable|string',
         'lowest_uom' => 'nullable|string',
@@ -35,7 +35,7 @@ class AddProduct extends Component
 
         Product::create([
             'barcode' => $this->barcode,
-            'supplier' => $this->supplier,
+            'supplier_id' => $this->supplier_id,
             'description' => $this->description,
             'highest_uom' => $this->highest_uom,
             'lowest_uom' => $this->lowest_uom,

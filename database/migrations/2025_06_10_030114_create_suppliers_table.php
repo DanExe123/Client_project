@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Supplier Name
+            $table->string('email')->unique();
             $table->string('address')->nullable();
             $table->string('term')->nullable(); // Terms (No. of Days)
             $table->string('tin_number')->nullable(); // Tax Identification Number

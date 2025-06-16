@@ -38,10 +38,6 @@
         : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'"
                 :disabled="count($selectedCustomerId) !== 1" />
 
-            <x-button right-icon="trash" wire:click="deleteSelected" :class="count($selectedCustomerId) === 0
-        ? 'bg-red-300 text-white cursor-not-allowed'
-        : 'bg-red-600 hover:bg-red-700 text-white'"
-                :disabled="count($selectedCustomerId) === 0" />
         </div>
     </div>
 
@@ -50,8 +46,6 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-4 py-4">
-                        <input type="checkbox" wire:click="toggleSelectAll"
-                            @if($customers->pluck('id')->diff($selectedCustomerId)->isEmpty()) checked @endif />
                     </th>
                     <th class="px-6 py-4 font-medium text-gray-900">Name</th>
                     <th class="px-6 py-4 font-medium text-gray-900">Status</th>
@@ -77,8 +71,9 @@
                         </td>
                         <td class="px-6 py-4">
                             <span
-                                class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-semibold text-green-600">
-                                <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
+                                class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold
+                                    {{ $customer->status ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' }}">
+                                <span class="h-1.5 w-1.5 rounded-full {{ $customer->status ? 'bg-green-600' : 'bg-red-600' }}"></span>
                                 {{ $customer->status ? 'Active' : 'Inactive' }}
                             </span>
                         </td>

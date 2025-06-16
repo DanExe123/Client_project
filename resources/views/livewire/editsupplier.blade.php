@@ -22,19 +22,33 @@
     <form wire:submit.prevent="updatesupplier" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <x-input label="Supplier Name" wire:model="name" id="name" placeholder="Enter supplier name"
-                :error="$errors->first('name')" />
+               x-on:input="$el.value = $el.value.replace(/[^a-zA-Z0-9\s]/g, '')" :error="$errors->first('name')" />
 
             <x-input label="Address" wire:model="address" id="address" placeholder="Enter address"
+                x-on:input="$el.value = $el.value.replace(/[^a-zA-Z0-9\s,.-]/g, '')"
                 :error="$errors->first('address')" />
 
             <x-input label="Terms (No. of Days)" wire:model="term" id="term" placeholder="Enter term"
-                :error="$errors->first('term')" />
+                x-on:input="$el.value = $el.value.replace(/[^0-9]/g, '')" :error="$errors->first('term')" />
+
+            <x-input label="Tin Number" wire:model="tin_number" id="tin_number" placeholder="Enter Tin number"
+                x-on:input="$el.value = $el.value.replace(/[^0-9-]/g, '')" :error="$errors->first('tin_number')" />
 
             <x-input label="Contact Number" wire:model="contact" id="contact" placeholder="Enter contact number"
-                :error="$errors->first('contact')" />
+                x-on:input="$el.value = $el.value.replace(/[^0-9]/g, '')" :error="$errors->first('contact')" />
 
             <x-input label="Contact Person" wire:model="contact_person" id="contact_person"
-                placeholder="Enter contact person" :error="$errors->first('contact_person')" />
+                placeholder="Enter contact person" x-on:input="$el.value = $el.value.replace(/[^a-zA-Z\s]/g, '')"
+                :error="$errors->first('contact_person')" />
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="status" wire:model="status"
+                    class="mt-1 block w-full h-9 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+                @error('status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
         </div>
         <hr>
         <div class="pt-2 flex justify-center">

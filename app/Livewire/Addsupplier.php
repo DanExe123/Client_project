@@ -8,13 +8,16 @@ use App\Models\Supplier;
 class AddSupplier extends Component
 {
     public $name;
+    public $email;
     public $address;
     public $term;
     public $tin_number; // Assuming TIN is a field in the Supplier model
     public $contact;
     public $contact_person;
+
     protected $rules = [
-        'name' => 'required|string|min:3',
+        'name' => 'required|string|min:3|unique:suppliers,name',
+        'email' => 'required|email|unique:suppliers,email',
         'address' => 'nullable|string',
         'term' => 'nullable|string',
         'tin_number' => 'nullable|string', // Assuming TIN is optional
@@ -27,6 +30,7 @@ class AddSupplier extends Component
 
         Supplier::create([
             'name' => $this->name,
+            'email' => $this->email,
             'address' => $this->address,
             'term' => $this->term,
             'tin_number' => $this->tin_number, // Assuming TIN is a field in the Supplier model

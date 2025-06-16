@@ -30,7 +30,7 @@
         <form wire:submit.prevent="submit" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
                 <x-input label="Name" wire:model="name" id="name" placeholder="Enter your name"
-                    x-on:input="$el.value = $el.value.replace(/[^a-zA-Z\s]/g, '')" :error="$errors->first('name')" />
+                   x-on:input="$el.value = $el.value.replace(/[^a-zA-Z0-9\s,.-]/g, '')" :error="$errors->first('name')" />
 
                 <x-input label="Email" wire:model="email" id="email" type="email" placeholder="Enter your email"
                     :error="$errors->first('email')" />

@@ -20,7 +20,7 @@
                 :error="$errors->first('barcode')" />
             <div>
                 <label for="supplier" class="block text-sm font-medium text-gray-700 mb-1">Select Supplier</label>
-                <select id="supplier" name="supplier" wire:model="supplier"
+                <select id="supplier" name="supplier" wire:model="supplier_id"
                     class="block w-full rounded-md border border-gray-300 bg-white py-2 px-1 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                     <option value="" selected>Select a supplier</option>
                     @foreach($suppliers as $supplier)

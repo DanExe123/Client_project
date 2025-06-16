@@ -21,7 +21,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
             <x-input label="Supplier Name" wire:model="name" id="name" placeholder="Enter supplier name"
-                x-on:input="$el.value = $el.value.replace(/[^a-zA-Z\s]/g, '')" :error="$errors->first('name')" />
+                x-on:input="$el.value = $el.value.replace(/[^a-zA-Z0-9\s]/g, '')"
+                :error="$errors->first('name')" />
+
+            <x-input label="Email" wire:model="email" id="email" type="email" placeholder="Enter your email"
+                    :error="$errors->first('email')" />
 
             <x-input label="Address" wire:model="address" id="address" placeholder="Enter address"
                 x-on:input="$el.value = $el.value.replace(/[^a-zA-Z0-9\s,.-]/g, '')"

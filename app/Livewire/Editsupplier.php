@@ -13,6 +13,8 @@ class Editsupplier extends Component
     public $term;
     public $contact;
     public $contact_person;
+    public $tin_number;
+    public $status;
 
     public function mount($id)
     {
@@ -23,28 +25,33 @@ class Editsupplier extends Component
         // Pre-fill the form
         $this->name = $supplier->name;
         $this->address = $supplier->address;
-        $this->term = $supplier->term;
         $this->contact = $supplier->contact;
         $this->contact_person = $supplier->contact_person;
+        $this->term = $supplier->term;
+        $this->tin_number = $supplier->tin_number;
+        $this->status = $supplier->status;
     }
 
     public function updatesupplier()
     {
-        $this->validate([
-            'name' => 'required|string|min:3',
-            'address' => 'nullable|string',
-            'term' => 'nullable|string',
-            'conatct' => 'required|numeric|min:0',
-            'contact_person' => 'nullable|string',
+        $this->validate([          
+            'name' => 'required|string||regex:/^[a-zA-Z0-9\s,.#-]+$/',
+            'address' => 'nullable|string|regex:/^[a-zA-Z0-9\s,.#-]+$/',
+            'contact' => 'required|regex:/^[0-9]+$/',
+            'contact_person' => 'nullable|string|regex:/^[a-zA-Z\s]+$/',
+            'term' => 'nullable|regex:/^[0-9]+$/',
+            'tin_number' => 'nullable|regex:/^[0-9-]+$/',
+            'status' => 'required|boolean',
         ]);
 
         supplier::where('id', $this->supplierId)->update([
             'name' => $this->name,
             'address' => $this->address,
-            'term' => $this->term,
             'contact' => $this->contact,
             'contact_person' => $this->contact_person,
-            'status' => true,
+            'term' => $this->term,
+            'tin_number' => $this->tin_number,
+            'status' => $this->status,
         ]);
 
         session()->flash('message', 'Supplier updated successfully.');

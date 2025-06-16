@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'barcode',
-        'supplier',
+        'supplier_id',
         'description',
         'quantity',
         'highest_uom',
@@ -20,4 +23,10 @@ class Product extends Model
         'selling_price',
         'damages',
     ];
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
 }

@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('barcode')->unique();
-            $table->string('supplier')->nullable();
+            $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
             $table->string('description');
             $table->string('quantity')->default(0);
             $table->string('highest_uom')->nullable();

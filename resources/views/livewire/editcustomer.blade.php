@@ -25,6 +25,8 @@
             <x-input label="Contact Person" wire:model="contact_person" id="contact_person" placeholder="Enter contact person" />
 
             <x-input label="Term" wire:model="term" id="term" placeholder="Enter term" />
+
+            <x-input label="Tin Number" wire:model="cust_tin_number" id="cust_tin_number" placeholder="Enter Customer Tin Number" />
             <div>
                 <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                 <select id="status" wire:model="status"

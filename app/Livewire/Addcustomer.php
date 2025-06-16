@@ -17,7 +17,7 @@ class Addcustomer extends Component
 
 
     protected $rules = [
-        'name' => 'required|string|regex:/^[a-zA-Z\s]+$/|min:3',
+        'name' => 'required|string|min:3|unique:suppliers,name',
         'email' => 'required|email|unique:customers,email',
         'address' => 'nullable|string|regex:/^[a-zA-Z0-9\s,.#-]+$/',
         'contact' => 'required|regex:/^[0-9]+$/',
