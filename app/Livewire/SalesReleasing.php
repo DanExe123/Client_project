@@ -54,81 +54,105 @@ class SalesReleasing extends Component
         $po = CustomerPurchaseOrder::with(['items', 'customer'])->findOrFail($id);
         $products = json_decode($request->input('products'), true);
 
-        // ✅ Validate quantities BEFORE saving anything
+        $subtotal = 0;
+        $validatedItems = [];
+
         foreach ($products as $item) {
             $orderedQty = $item['quantity'];
             $poItem = $po->items->firstWhere('product_id', $item['product_id']);
             $product = Product::find($item['product_id']);
-        
+
             if (!$poItem) {
                 return back()->withErrors([
                     'quantity' => "Product {$item['product_description']} is not in the purchase order."
                 ]);
             }
-        
+
             if ($orderedQty > $poItem->quantity) {
                 return back()->withErrors([
                     'quantity' => "Quantity for {$item['product_description']} exceeds purchase order quantity."
                 ]);
             }
-        
+
             if (!$product || $orderedQty > $product->quantity) {
                 return back()->withErrors([
                     'quantity' => "Not enough stock for {$item['product_description']}. Available: {$product->quantity}, Requested: {$orderedQty}."
                 ]);
             }
-        }
-        
-        // Calculate totals
-        $subtotal = 0;
-        foreach ($products as $item) {
-            $subtotal += $item['total'];
-        }
-        $vatPercent = 12;
-        $vatAmount = $subtotal * ($vatPercent / 100);
-        $totalWithVat = $subtotal + $vatAmount;
 
-        // Create the sales release
+            // ✅ Calculate subtotal per item on backend
+            $unitPrice = floatval($item['price']);
+            $discountRate = floatval($item['discount']);
+            $lineSubtotal = $unitPrice * $orderedQty;
+            $lineDiscount = $lineSubtotal * ($discountRate / 100);
+            $lineTotal = $lineSubtotal - $lineDiscount;
+
+            $subtotal += $lineTotal;
+
+            $validatedItems[] = [
+                'product_id' => $item['product_id'],
+                'product_description' => $item['product_description'],
+                'product_barcode' => $item['product_barcode'],
+                'quantity' => $orderedQty,
+                'unit_price' => $unitPrice,
+                'discount' => $discountRate,
+                'subtotal' => round($lineTotal, 2)
+            ];
+        }
+
+        // Final totals
+        $poDiscountRate = floatval($po->purchase_discount ?? 0);
+        $discountAmount = $subtotal * ($poDiscountRate / 100);
+        $totalAfterDiscount = $subtotal - $discountAmount;
+        $vatPercent = 12;
+        $amountNetOfVat = $totalAfterDiscount / 1.12;
+        $addVat = $amountNetOfVat * 0.12;
+        $grandTotal = $totalAfterDiscount;
+
+        // Create Sales Release
         $release = SalesRelease::create([
             'purchase_order_id' => $po->id,
             'receipt_type' => $po->receipt_type,
             'customer_id' => $po->customer_id,
             'release_date' => now(),
-            'discount' => $po->purchase_discount,
             'remarks' => $po->remarks,
-            'created_by' => Auth::id(),
+            'discount' => $poDiscountRate,
+            'discount_amount' => round($discountAmount, 2),
+            'total_amount' => round($subtotal, 2),
             'vat_percent' => $vatPercent,
-            'total_amount' => $subtotal,
-            'vat_amount' => $vatAmount,
-            'total_with_vat' => $totalWithVat,
+            'amount_net_of_vat' => round($amountNetOfVat, 2),
+            'add_vat' => round($addVat, 2),
+            'total_with_vat' => round($grandTotal, 2),
+            'created_by' => Auth::id(),
         ]);
 
-        // Loop through items
-        foreach ($products as $item) {
+        // Create Item Rows
+        foreach ($validatedItems as $item) {
             SalesReleaseItem::create([
                 'sales_release_id' => $release->id,
                 'product_id' => $item['product_id'],
                 'product_description' => $item['product_description'],
                 'product_barcode' => $item['product_barcode'],
                 'quantity' => $item['quantity'],
-                'unit_price' => $item['price'],
+                'unit_price' => $item['unit_price'],
                 'discount' => $item['discount'],
-                'subtotal' => $item['total'],
+                'subtotal' => $item['subtotal'],
             ]);
 
-            // 🔽 Deduct quantity from product stock
+            // Deduct stock
             $product = Product::find($item['product_id']);
             if ($product) {
                 $product->quantity -= $item['quantity'];
                 $product->save();
             }
         }
-        // Mark PO as served
+
         $po->status = 'served';
         $po->save();
 
         return redirect()->route('serve-print-preview', $release->id);
     }
+
     public function printPreview($id)
     {
         $release = SalesRelease::with(['customer', 'items'])->findOrFail($id);

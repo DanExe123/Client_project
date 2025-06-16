@@ -30,7 +30,7 @@ class CustomerPo extends Component
     public function mount()
     {
         $this->poDate = now()->toDateString();
-        $this->allProducts = Product::select('id', 'description', 'price', 'barcode')->get()->toArray();
+        $this->allProducts = Product::select('id', 'description', 'selling_price', 'barcode')->get()->toArray();
         $this->formKey = uniqid();
     }
 
@@ -67,7 +67,7 @@ class CustomerPo extends Component
         $this->updateGrandTotal();
     }
 
-     // Auto-fill price when a product is selected
+    // Auto-fill price when a product is selected
     public function updatePrice($index)
     {
         $productId = $this->products[$index]['product_id'] ?? null;
@@ -76,7 +76,7 @@ class CustomerPo extends Component
         $product = collect($this->allProducts)->firstWhere('id', $productId);
 
         if ($product) {
-            $this->products[$index]['price'] = $product['price']; // Set price
+            $this->products[$index]['price'] = $product['selling_price'];
             $this->updateTotal($index); // Recalculate total for that item
         }
     }
@@ -100,15 +100,15 @@ class CustomerPo extends Component
         $this->updateGrandTotal(); // Recalculate grand total
     }
 
-     // Sum all totals from the products and apply global discount
-     public function updateGrandTotal()
-     {
-         $sum = collect($this->products)->sum('total'); // Sum of all product totals
-         $discount = is_numeric($this->purchase_discount) ? (float) $this->purchase_discount : 0;
- 
-         // Apply discount to the sum, never go below 0
-         $this->grandTotal = max($sum - $discount, 0);
-     }
+    // Sum all totals from the products and apply global discount
+    public function updateGrandTotal()
+    {
+        $sum = collect($this->products)->sum('total'); // Sum of all product totals
+        $discount = is_numeric($this->purchase_discount) ? (float) $this->purchase_discount : 0;
+
+        // Apply discount to the sum, never go below 0
+        $this->grandTotal = max($sum - $discount, 0);
+    }
 
     // Auto-fill product fields by barcode
     public function fillProductByBarcode($index)
@@ -125,7 +125,7 @@ class CustomerPo extends Component
             // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['product_description'] = $product['description'];
-            $this->products[$index]['price'] = $product['price'];
+            $this->products[$index]['price'] = $product['selling_price'];
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
             $this->updateTotal($index); // Update row total
         } else {
@@ -153,7 +153,7 @@ class CustomerPo extends Component
             // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['barcode'] = $product['barcode'];
-            $this->products[$index]['price'] = $product['price'];
+            $this->products[$index]['price'] = $product['selling_price'];
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
             $this->updateTotal($index); // Update row total
         } else {
@@ -171,7 +171,7 @@ class CustomerPo extends Component
         $search = $this->search;
 
         $customers = Customer::all();
-        $products = Product::select('id', 'description', 'price', 'barcode')->get();
+        $products = Product::select('id', 'description', 'selling_price', 'barcode')->get();
         $purchaseOrders = CustomerPurchaseOrder::with('customer') // Eager load relationship
             ->when($search, function ($query) use ($search) {
                 return $query->where('po_number', 'like', '%' . $search . '%')

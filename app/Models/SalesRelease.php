@@ -19,8 +19,9 @@ class SalesRelease extends Model
         'created_by',
         'vat_percent',
         'total_amount',
-        'vat_amount',
-        'total_with_vat'
+        'amount_net_of_vat',
+        'total_with_vat',
+        'add_vat',
     ];
     public function items()
     {

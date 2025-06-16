@@ -9,24 +9,44 @@ class SalesBook extends Component
 {
     public $startDate;
     public $endDate;
+    public $showTable = false;
+
+    public function updatedStartDate()
+    {
+        $this->checkDates();
+    }
+
+    public function updatedEndDate()
+    {
+        $this->checkDates();
+    }
+
+    public function checkDates()
+    {
+        if ($this->startDate && $this->endDate) {
+            $this->showTable = true;
+        } else {
+            $this->showTable = false;
+        }
+    }
+
+    public function getSalesProperty()
+    {
+        if (!$this->showTable)
+            return collect();
+
+        return SalesRelease::with('customer')
+            ->where('receipt_type', 'Invoice')
+            ->whereDate('release_date', '>=', $this->startDate)
+            ->whereDate('release_date', '<=', $this->endDate)
+            ->orderBy('release_date', 'desc')
+            ->get();
+    }
 
     public function render()
     {
-        $query = SalesRelease::with('customer')
-            ->where('receipt_type', 'Invoice');
-
-        if ($this->startDate) {
-            $query->whereDate('release_date', '>=', $this->startDate);
-        }
-
-        if ($this->endDate) {
-            $query->whereDate('release_date', '<=', $this->endDate);
-        }
-
-        $sales = $query->orderBy('release_date', 'desc')->get();
-
         return view('livewire.sales-book', [
-            'sales' => $sales,
+            'sales' => $this->sales,
         ]);
     }
 }

@@ -9,6 +9,9 @@ use App\Models\CustomerReturn;
 use App\Models\CustomerReturnItem;
 use App\Models\CustomerPurchaseOrderItem;
 use App\Models\CustomerPurchaseOrder;
+use App\Models\SalesRelease;
+use App\Models\SalesReleaseItem;
+
 
 class ReturnByCustomer extends Component
 {
@@ -42,26 +45,26 @@ class ReturnByCustomer extends Component
             return;
         }
 
-        // Get all products purchased by this customer
-        $purchasedProducts = CustomerPurchaseOrderItem::whereHas('purchaseOrder', function ($query) use ($customerId) {
-            $query->where('customer_id', $customerId);
-        })
-            ->with('product') // eager-load product
-            ->get()
-            ->map(function ($item) {
-                $product = $item->product;
+        // Get the latest sales_release_items for the customer
+        $latestReleases = SalesRelease::where('customer_id', $customerId)
+            ->orderByDesc('release_date')
+            ->pluck('id');
 
+        $purchasedProducts = SalesReleaseItem::whereIn('sales_release_id', $latestReleases)
+            ->with('product')
+            ->get()
+            ->sortByDesc(function ($item) use ($latestReleases) {
+                return array_search($item->sales_release_id, $latestReleases->toArray());
+            })
+            ->unique('product_id')
+            ->map(function ($item) {
                 return [
-                    'id' => $product->id,
-                    'description' => $product->description,
-                    'selling_price' => $product->lowest_uom_quantity > 0
-                        ? $product->selling_price / $product->lowest_uom_quantity
-                        : 0,
-                    'barcode' => $product->barcode,
-                    'lowest_uom_quantity' => $product->lowest_uom_quantity,
+                    'id' => $item->product_id,
+                    'description' => $item->product_description,
+                    'barcode' => $item->product_barcode,
+                    'unit_price' => $item->unit_price,
                 ];
             })
-            ->unique('id') // only unique products
             ->values()
             ->toArray();
 
@@ -113,19 +116,13 @@ class ReturnByCustomer extends Component
     public function updateTotal($index)
     {
         $item = $this->products[$index];
-
-        // Safely convert values to float, fallback to 0 if not numeric
         $qty = isset($item['quantity']) && is_numeric($item['quantity']) ? (float) $item['quantity'] : 0;
         $selling_price = isset($item['selling_price']) && is_numeric($item['selling_price']) ? (float) $item['selling_price'] : 0;
-
-        // Calculate subtotal with discount applied
         $subtotal = $selling_price * $qty;
-
-        // Ensure total is not negative
         $this->products[$index]['total'] = max($subtotal, 0);
-
-        $this->updateGrandTotal(); // Recalculate grand total
+        $this->updateGrandTotal();
     }
+
 
     // Sum all totals from the products and apply global discount
     public function updateGrandTotal()
@@ -199,13 +196,6 @@ class ReturnByCustomer extends Component
         $customers = Customer::all();
         $products = Product::select('id', 'description', 'selling_price', 'barcode')->get();
 
-        /* 
-        $returnOrders = CustomerReturn::with('customer') // Eager load relationship
-            ->when($search, function ($query) use ($search) {
-                return $query->where('name', 'like', '%' . $search . '%');
-            })
-            ->paginate(5);
-        */
         $returnOrders = CustomerReturn::with('customer') // Eager load relationship
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('customer', function ($q) use ($search) {

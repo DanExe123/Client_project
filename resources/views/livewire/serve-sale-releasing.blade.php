@@ -47,6 +47,7 @@
                         <th class="border px-2 py-1 font-medium">Subtotal</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     <template x-for="(item, index) in products" :key="index">
                         <tr class="hover:bg-gray-50">
@@ -56,14 +57,9 @@
                             </td>
                             <td class="border px-2 py-2">
                                 <div class="relative">
-                                    <input
-                                        x-model.number="item.quantity"
-                                        @input="updateTotal(index)"
-                                        type="number"
-                                        min="1"
-                                        class="w-full border bg-gray-100 outline-none text-right"
-                                        :class="{ 'ring-2 ring-red-400': item.error }"
-                                    />
+                                    <input x-model.number="item.quantity" @input="updateTotal(index)" type="number"
+                                        min="1" class="w-full border bg-gray-100 outline-none text-right"
+                                        :class="{ 'ring-2 ring-red-400': item.error }" />
                                     <p class="text-xs text-gray-500 italic mt-1">
                                         Max: <span x-text="item.available_quantity"></span>
                                     </p>
@@ -72,7 +68,6 @@
                                     </p>
                                 </div>
                             </td>
-                            
                             <td class="border px-2 py-2">
                                 <input x-model.number="item.price" type="number" disabled
                                     class="w-full border-none bg-gray-100 outline-none text-right" />
@@ -85,13 +80,19 @@
                         </tr>
                     </template>
                 </tbody>
+
+                <!-- Total Row -->
+                <tfoot>
+                    <tr class="bg-gray-50 font-semibold text-gray-800">
+                        <td colspan="4" class="border px-2 py-2 text-right">Total:</td>
+                        <td class="border px-2 py-2 text-right" x-text="subtotal.toFixed(2)"></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         @if ($errors->has('quantity'))
-            <div
-                x-data="{ errorMessage: @js($errors->first('quantity')) }"
-                class="mb-4 p-3 bg-red-100 text-red-700 rounded-md border border-red-300"
-            >
+            <div x-data="{ errorMessage: @js($errors->first('quantity')) }"
+                class="mb-4 p-3 bg-red-100 text-red-700 rounded-md border border-red-300">
                 <span x-text="errorMessage"></span>
             </div>
         @endif
@@ -128,6 +129,13 @@
             total: 0,
             error: false // track validation
         }));
+        // Auto-calculate totals on load
+        products.forEach((item, index) => {
+            const subtotal = item.quantity * item.price;
+            const discountAmount = subtotal * (item.discount / 100);
+            item.total = subtotal - discountAmount;
+        });
+
 
         return {
             po: {
@@ -142,27 +150,27 @@
             updateTotal(index) {
                 const item = this.products[index];
 
-                if (
-                    item.quantity === null ||
-                    item.quantity === '' ||
-                    item.quantity <= 0
-                ) {
+                if (!item.quantity || item.quantity <= 0) {
                     item.total = 0;
                     item.error = false;
                     return;
                 }
 
-                if (item.quantity > item.available_quantity) {
-                    item.error = true;
-                } else {
-                    item.error = false;
-                }
+                item.error = item.quantity > item.available_quantity;
 
                 const subtotal = item.quantity * item.price;
                 const discountAmount = subtotal * (item.discount / 100);
                 item.total = subtotal - discountAmount;
+            },
+
+            get subtotal() {
+                return this.products.reduce((sum, item) => sum + item.total, 0);
+            },
+            get total() {
+                const discount = this.po.purchase_discount || 0;
+                return this.subtotal - (this.subtotal * (discount / 100));
             }
         };
-
     }
+
 </script>

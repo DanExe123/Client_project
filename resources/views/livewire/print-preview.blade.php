@@ -115,7 +115,7 @@
         </div>
         @if ($release->printed_at)
             <div class="fixed left-0 right-0 text-center text-gray-400 text-sm ">
-                DUPLICATE COPY
+
             </div>
         @endif
     </div>

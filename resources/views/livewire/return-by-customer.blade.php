@@ -148,7 +148,6 @@
                                             <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
                                         @enderror
                                     </td>
-                                    {{-- //HOYY!! DRI KA NAG UNTAT --}}
                                     <td wire:ignore.self class="border px-2 py-2">
                                         <input type="text" wire:model.lazy="products.{{ $index }}.product_description"
                                             list="product_descriptions" placeholder="enter and select description"
@@ -173,7 +172,7 @@
                                     </td>
                                     <td class="border px-2 py-2">
                                         <input type="number" step="0.01" readonly
-                                            value="{{ $products[$index]['selling_price'] ?? 0 }}"
+                                            value="{{ $products[$index]['unit_price'] ?? 0 }}"
                                             class="w-full border-gray-300 rounded-md px-2 py-1 text-sm bg-gray-100" />
                                     </td>
                                     <td class="border px-2 py-2">
