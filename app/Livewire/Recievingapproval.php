@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\PurchaseOrderItem;
 use Livewire\Component;
 use App\Models\Supplier;
+use App\Models\ReceivedItem;
+
 use Carbon\Carbon;
 
 
@@ -57,6 +59,7 @@ class Recievingapproval extends Component
     {
         try {
             $this->grandTotal = collect($this->items)->sum('subtotal');
+
             // 1. Create the receiving record
             $receiving = Receiving::create([
                 'po_number' => $this->po_number,
@@ -71,10 +74,32 @@ class Recievingapproval extends Component
                 'approved_at' => now(),
             ]);
 
-            // 2. Loop through items and create ReceivingItem entries
+            // 2. Loop through items and create ReceivingItem + ReceivedItem entries
             foreach ($this->items as $item) {
                 ReceivingItem::create([
                     'receiving_id' => $receiving->id,
+                    'barcode' => $item['barcode'],
+                    'description' => $item['description'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'discount' => $item['discount'] ?? 0,
+                    'subtotal' => $item['subtotal'],
+                ]);
+
+                // 👉 Also create flattened ReceivedItem record
+                ReceivedItem::create([
+                    'receiving_id' => $receiving->id,
+                    'po_number' => $this->po_number,
+                    'supplier_id' => $receiving->supplier_id,
+                    'receipt_type' => $this->receipt_type,
+                    'order_date' => $this->order_date,
+                    'purchase_discount' => $this->purchase_discount ?? 0,
+                    'grand_total' => $this->grandTotal,
+                    'remarks' => $this->remarks,
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+
                     'barcode' => $item['barcode'],
                     'description' => $item['description'],
                     'quantity' => $item['quantity'],

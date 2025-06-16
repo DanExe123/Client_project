@@ -6,6 +6,7 @@ use App\Models\CustomerPurchaseOrder;
 use App\Models\SalesRelease;
 use App\Models\SalesReleaseItem;
 use App\Models\Product;
+use App\Models\ReleasedItem;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Illuminate\Http\Request;
@@ -80,7 +81,6 @@ class SalesReleasing extends Component
                 ]);
             }
 
-            // ✅ Calculate subtotal per item on backend
             $unitPrice = floatval($item['price']);
             $discountRate = floatval($item['discount']);
             $lineSubtotal = $unitPrice * $orderedQty;
@@ -100,7 +100,6 @@ class SalesReleasing extends Component
             ];
         }
 
-        // Final totals
         $poDiscountRate = floatval($po->purchase_discount ?? 0);
         $discountAmount = $subtotal * ($poDiscountRate / 100);
         $totalAfterDiscount = $subtotal - $discountAmount;
@@ -109,7 +108,6 @@ class SalesReleasing extends Component
         $addVat = $amountNetOfVat * 0.12;
         $grandTotal = $totalAfterDiscount;
 
-        // Create Sales Release
         $release = SalesRelease::create([
             'purchase_order_id' => $po->id,
             'receipt_type' => $po->receipt_type,
@@ -126,7 +124,6 @@ class SalesReleasing extends Component
             'created_by' => Auth::id(),
         ]);
 
-        // Create Item Rows
         foreach ($validatedItems as $item) {
             SalesReleaseItem::create([
                 'sales_release_id' => $release->id,
@@ -136,6 +133,32 @@ class SalesReleasing extends Component
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
                 'discount' => $item['discount'],
+                'subtotal' => $item['subtotal'],
+            ]);
+
+            // 👉 Create ReleasedItem entry
+            ReleasedItem::create([
+                'sales_release_id' => $release->id,
+                'purchase_order_id' => $po->id,
+                'receipt_type' => $po->receipt_type,
+                'customer_id' => $po->customer_id,
+                'release_date' => now(),
+                'discount' => $poDiscountRate,
+                'remarks' => $po->remarks,
+                'created_by' => Auth::id(),
+                'vat_percent' => $vatPercent,
+                'total_amount' => round($subtotal, 2),
+                'amount_net_of_vat' => round($amountNetOfVat, 2),
+                'total_with_vat' => round($grandTotal, 2),
+                'printed_at' => null,
+                'add_vat' => true,
+
+                'product_id' => $item['product_id'],
+                'product_description' => $item['product_description'],
+                'product_barcode' => $item['product_barcode'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price'],
+                'discount_item' => $item['discount'],
                 'subtotal' => $item['subtotal'],
             ]);
 
@@ -152,7 +175,6 @@ class SalesReleasing extends Component
 
         return redirect()->route('serve-print-preview', $release->id);
     }
-
     public function printPreview($id)
     {
         $release = SalesRelease::with(['customer', 'items'])->findOrFail($id);

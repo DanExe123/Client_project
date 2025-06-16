@@ -8,6 +8,8 @@ use App\Models\Product;
 class Stockcard extends Component
 {
     public $products;
+    public $product;
+
     public $selectedProductId = [];
 
     public $barcode;

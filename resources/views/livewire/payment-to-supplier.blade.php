@@ -1,5 +1,6 @@
 <div>
   <h2 class="text-xl font-semibold">Payment to Supplier</h2>
+
   @if (session()->has('message'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
     <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
@@ -15,47 +16,36 @@
         <input type="date" id="date" wire:model="date" class="border rounded px-3 py-2 w-full" required />
       </div>
 
-      <!-- Select Customer -->
+      <!-- Select Supplier -->
       <div class="mb-2">
-        <label for="customer" class="block mb-1 font-semibold">Select Customer</label>
-        <select wire:model="filterCustomer" class="rounded border px-3 py-2 text-sm w-full " required>
-          <option value="">All Customers</option>
-          @foreach ($customerOptions as $id => $name)
+        <label for="supplier" class="block mb-1 font-semibold">Select Supplier</label>
+        <select wire:model="filterSupplier" class="rounded border px-3 py-2 text-sm w-full" required>
+          <option value="">All Suppliers</option>
+          @foreach ($supplierOptions as $id => $name)
         <option value="{{ $id }}">{{ $name }}</option>
       @endforeach
         </select>
       </div>
 
-      <!-- Invoice Filter -->
-      <div class="mb-2">
-        <label class="text-sm text-gray-700 font-medium mb-1 block">Invoice/DR</label>
-        <select wire:model="filterInvoice" class="rounded border px-3 py-2 text-sm w-full mt-2" required>
-          <option value="">All Invoices/DR</option>
-          @foreach ($invoiceOptions as $type)
-        <option value="{{ $type }}">{{ $type }}</option>
-      @endforeach
-        </select>
-      </div>
-
-      <!-- Invoice Table -->
+      <!-- Receiving Table -->
       <div class="overflow-auto rounded border border-gray-300 mt-3">
         <table class="w-full text-left text-sm text-gray-700">
           <thead class="bg-gray-100">
             <tr>
-              <th class="px-4 py-2">Invoice Number</th>
-              <th class="px-4 py-2">Invoice Date</th>
-              <th class="px-4 py-2">Invoice Amount</th>
+              <th class="px-4 py-2">Receiving No.</th>
+              <th class="px-4 py-2">Receiving Date</th>
+              <th class="px-4 py-2">Total Amount</th>
               <th class="px-4 py-2">Remove</th>
             </tr>
           </thead>
           <tbody>
-            @foreach ($selectedInvoices as $index => $inv)
+            @foreach ($selectedReceivings as $index => $rec)
         <tr class="border-t">
-          <td class="px-4 py-2">{{ $inv['number'] }}</td>
-          <td class="px-4 py-2">{{ \Carbon\Carbon::parse($inv['date'])->format('F d, Y') }}</td>
-          <td class="px-4 py-2">₱{{ number_format($inv['amount'], 2) }}</td>
+          <td class="px-4 py-2">{{ $rec['number'] }}</td>
+          <td class="px-4 py-2">{{ \Carbon\Carbon::parse($rec['date'])->format('F d, Y') }}</td>
+          <td class="px-4 py-2">₱{{ number_format($rec['amount'], 2) }}</td>
           <td class="px-4 py-2 text-center">
-          <button wire:click="removeInvoice({{ $index }})" class="text-red-600 hover:underline">Remove</button>
+          <button wire:click="removeReceiving({{ $index }})" class="text-red-600 hover:underline">Remove</button>
           </td>
         </tr>
       @endforeach
@@ -91,7 +81,7 @@
       <div class="mb-2">
         <label for="deduction" class="block mb-1 font-semibold">Other Deduction (optional)</label>
         <input id="deduction" type="number" min="0" step="0.01" wire:model.lazy="deduction" placeholder="₱0.00"
-          class="border rounded px-3 py-2 w-full" required />
+          class="border rounded px-3 py-2 w-full" />
       </div>
 
       <!-- EWT Amount -->
@@ -108,58 +98,44 @@
           placeholder="Add any notes here..."></textarea>
       </div>
 
-      <!-- Check Fields -->
-      @if ($paymentMethod === 'Check')
-      <div class="space-y-4">
+      <!-- Check or Bank Transfer Fields -->
+      @if ($paymentMethod === 'Check' || $paymentMethod === 'Bank Transfer')
+      <div class="space-y-4 mt-4 border-t pt-4">
       <div>
-        <label for="checkBank" class="block mb-1 font-semibold">Select Bank</label>
-        <select id="checkBank" wire:model="checkBank" class="border rounded px-3 py-2 w-full">
+        <label for="bank" class="block mb-1 font-semibold">Select Bank</label>
+        <select id="bank" wire:model="{{ $paymentMethod === 'Check' ? 'checkBank' : 'transferBank' }}"
+        class="border rounded px-3 py-2 w-full">
         <option value="" disabled>Select Bank</option>
-        <option>Bank A</option>
-        <option>Bank B</option>
-        <option>Bank C</option>
+        <option>BDO Unibank</option>
+        <option>Bank of the Philippine Islands (BPI)</option>
+        <option>Metrobank</option>
         </select>
       </div>
+
       <div>
-        <label for="chequeNumber" class="block mb-1 font-semibold">Cheque Number</label>
-        <input id="chequeNumber" type="text" wire:model="chequeNumber" class="border rounded px-3 py-2 w-full" />
+        <label for="refOrCheque" class="block mb-1 font-semibold">
+        {{ $paymentMethod === 'Check' ? 'Cheque Number' : 'Reference Number' }}
+        </label>
+        <input id="refOrCheque" type="text"
+        wire:model="{{ $paymentMethod === 'Check' ? 'chequeNumber' : 'referenceNumber' }}"
+        class="border rounded px-3 py-2 w-full" />
       </div>
+
       <div>
-        <label for="checkDate" class="block mb-1 font-semibold">Check Date</label>
-        <input id="checkDate" type="date" wire:model="checkDate" class="border rounded px-3 py-2 w-full" />
+        <label for="dateField" class="block mb-1 font-semibold">
+        {{ $paymentMethod === 'Check' ? 'Check Date' : 'Transaction Date' }}
+        </label>
+        <input id="dateField" type="date"
+        wire:model="{{ $paymentMethod === 'Check' ? 'checkDate' : 'transactionDate' }}"
+        class="border rounded px-3 py-2 w-full" />
       </div>
       </div>
     @endif
 
-      <!-- Bank Transfer Fields -->
-      @if ($paymentMethod === 'Bank Transfer')
-      <div class="space-y-4">
-      <div>
-        <label for="transferBank" class="block mb-1 font-semibold">Select Bank</label>
-        <select id="transferBank" wire:model="transferBank" class="border rounded px-3 py-2 w-full">
-        <option value="" disabled>Select Bank</option>
-        <option>Bank A</option>
-        <option>Bank B</option>
-        <option>Bank C</option>
-        </select>
-      </div>
-      <div>
-        <label for="referenceNumber" class="block mb-1 font-semibold">Reference Number</label>
-        <input id="referenceNumber" type="text" wire:model="referenceNumber"
-        class="border rounded px-3 py-2 w-full" />
-      </div>
-      <div>
-        <label for="transactionDate" class="block mb-1 font-semibold">Transaction Date</label>
-        <input id="transactionDate" type="date" wire:model="transactionDate"
-        class="border rounded px-3 py-2 w-full" />
-      </div>
-      </div>
-    @endif
       <!-- Save Button -->
       <div class="flex justify-end mt-6">
         <x-button type="submit" blue label="Save as payment" />
       </div>
-
     </form>
   </div>
 </div>

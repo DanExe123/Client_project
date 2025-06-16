@@ -3,24 +3,23 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Customer;
-use App\Models\SalesRelease;
-use App\Models\PaymentInvoice;
+use App\Models\Supplier;
+use App\Models\Receiving;
+use App\Models\SupplierPayment;
 
 class PaymentToSupplier extends Component
 {
-    public $filterCustomer = '';
-    public $filterInvoice = '';
+    public $filterSupplier = '';
+    public $filterReceiving = '';
 
-    public $customerOptions = [];
-    public $invoiceOptions = [];
-
-    public $selectedInvoices = [];
+    public $supplierOptions = [];
+    public $receivingOptions = [];
+    public $selectedReceivings = [];
 
     public $date;
     public $amount;
     public $deduction;
-    public $ewt_amount;
+    public $ewt;
     public $remarks;
     public $paymentMethod;
 
@@ -31,21 +30,82 @@ class PaymentToSupplier extends Component
     public $transferBank;
     public $referenceNumber;
     public $transactionDate;
+    public function mount()
+    {
+        $this->date = now()->toDateString();
+        $this->supplierOptions = Supplier::pluck('name', 'id')->toArray();
+
+        // If you want display-friendly options like RCV-0001:
+        $this->receivingOptions = Receiving::all()
+            ->mapWithKeys(fn($r) => [$r->id => 'RCV-' . str_pad($r->id, 4, '0', STR_PAD_LEFT)])
+            ->toArray();
+
+        $this->loadReceivings();
+    }
+
+    public function updatedFilterSupplier()
+    {
+        $this->loadReceivings();
+    }
+
+    public function updatedFilterReceiving()
+    {
+        $this->loadReceivings();
+    }
+
+    public function loadReceivings()
+    {
+        $this->selectedReceivings = $this->getFilteredReceivings()
+            ->map(function ($receiving) {
+                return [
+                    'id' => $receiving->id,
+                    'number' => 'RCV-' . str_pad($receiving->id, 4, '0', STR_PAD_LEFT),
+                    'date' => $receiving->receiving_date,
+                    'amount' => $receiving->grand_total,
+                ];
+            })->toArray();
+    }
+
+    public function getFilteredReceivings()
+    {
+        $query = Receiving::query();
+
+        if ($this->filterSupplier) {
+            $query->where('supplier_id', $this->filterSupplier);
+        }
+
+        if ($this->filterReceiving) {
+            $query->where('id', $this->filterReceiving); // <- FIXED: filter by ID, not 'ref_number'
+        }
+
+        return $query->get();
+    }
+
+    public function removeReceiving($index)
+    {
+        unset($this->selectedReceivings[$index]);
+        $this->selectedReceivings = array_values($this->selectedReceivings);
+    }
+
+    public function getTotalAmountProperty()
+    {
+        return collect($this->selectedReceivings)->sum('amount');
+    }
 
     public function savePayment()
     {
-
-        foreach ($this->selectedInvoices as $invoice) {
+        foreach ($this->selectedReceivings as $receiving) {
             try {
-                PaymentInvoice::create([
-                    'customer_id' => $this->filterCustomer,
-                    'sales_release_id' => $invoice['id'],
-                    'invoice_number' => $invoice['number'],
-                    'invoice_date' => $invoice['date'],
-                    'invoice_amount' => $invoice['amount'],
+                SupplierPayment::create([
+                    'supplier_id' => $this->filterSupplier,
+                    'receiving_id' => $receiving['id'],
+                    'receiving_number' => $receiving['number'],
+                    'receiving_date' => $receiving['date'],
+                    'receiving_amount' => $receiving['amount'],
+                    'payment_date' => $this->date,
                     'amount' => $this->amount,
                     'deduction' => $this->deduction,
-                    'ewt_amount' => $this->ewt_amount,
+                    'ewt' => $this->ewt,
                     'remarks' => $this->remarks,
                     'payment_method' => $this->paymentMethod,
                     'bank' => $this->checkBank ?? $this->transferBank,
@@ -68,6 +128,7 @@ class PaymentToSupplier extends Component
             'date',
             'amount',
             'deduction',
+            'ewt',
             'remarks',
             'paymentMethod',
             'checkBank',
@@ -76,7 +137,7 @@ class PaymentToSupplier extends Component
             'transferBank',
             'referenceNumber',
             'transactionDate',
-            'selectedInvoices'
+            'selectedReceivings',
         ]);
 
         $this->dispatch('show-toast', [
@@ -85,70 +146,8 @@ class PaymentToSupplier extends Component
         ]);
     }
 
-
-    public function mount()
-    {
-        // Load customer name options (id => name)
-        $this->customerOptions = Customer::pluck('name', 'id')->toArray();
-
-        // Load unique receipt types from SalesRelease
-        $this->invoiceOptions = SalesRelease::distinct()->pluck('receipt_type')->toArray();
-
-        // Initially load all
-        $this->loadInvoices();
-    }
-
-    public function updatedFilterCustomer()
-    {
-        $this->loadInvoices();
-    }
-
-    public function updatedFilterInvoice()
-    {
-        $this->loadInvoices();
-    }
-
-    public function loadInvoices()
-    {
-        $this->selectedInvoices = $this->getFilteredSalesReleases()
-            ->map(function ($invoice) {
-                return [
-                    'id' => $invoice->id,
-                    'number' => 'INV-' . str_pad($invoice->id, 4, '0', STR_PAD_LEFT),
-                    'date' => $invoice->release_date,
-                    'amount' => $invoice->total_with_vat,
-                ];
-            })->toArray();
-    }
-
-    public function getFilteredSalesReleases()
-    {
-        $query = SalesRelease::with('customer');
-
-        if ($this->filterCustomer) {
-            $query->where('customer_id', $this->filterCustomer);
-        }
-
-        if ($this->filterInvoice) {
-            $query->where('receipt_type', $this->filterInvoice);
-        }
-
-        return $query->get();
-    }
-
-    public function removeInvoice($index)
-    {
-        unset($this->selectedInvoices[$index]);
-        $this->selectedInvoices = array_values($this->selectedInvoices);
-    }
-
-    public function getTotalAmountProperty()
-    {
-        return collect($this->selectedInvoices)->sum('amount');
-    }
-
     public function render()
     {
-        return view('livewire.payment-application');
+        return view('livewire.payment-to-supplier');
     }
 }
