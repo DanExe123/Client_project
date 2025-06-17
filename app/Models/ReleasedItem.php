@@ -53,4 +53,9 @@ class ReleasedItem extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function returnCredits()
+{
+    return $this->hasMany(SaveReturnCredit::class, 'product_barcode', 'product_barcode')
+        ->whereColumn('save_return_credit.customer_id', 'released_items.customer_id');
+}
 }
