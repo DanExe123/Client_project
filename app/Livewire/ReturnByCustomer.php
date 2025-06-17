@@ -58,11 +58,15 @@ class ReturnByCustomer extends Component
             })
             ->unique('product_id')
             ->map(function ($item) {
+                $lowestQty = $item->product->lowest_uom_quantity ?: 1; // Default to 1 to avoid division by zero
+                $convertedUnitPrice = $lowestQty > 0 ? ($item->unit_price / $lowestQty) : $item->unit_price;
+
                 return [
                     'id' => $item->product_id,
                     'description' => $item->product_description,
                     'barcode' => $item->product_barcode,
-                    'unit_price' => $item->unit_price,
+                    'unit_price' => round($convertedUnitPrice, 2), // Display price per lowest UOM
+                    'lowest_uom_quantity' => $lowestQty,
                 ];
             })
             ->values()
@@ -85,7 +89,7 @@ class ReturnByCustomer extends Component
             'product_id' => '',
             'product_description' => '',
             'quantity' => 0,
-            'selling_price' => 0,
+            'unit_price' => 0, // ← Changed
             'total' => 0,
         ];
     }
@@ -105,10 +109,9 @@ class ReturnByCustomer extends Component
 
         // Find the product from the list of all products
         $product = collect($this->allProducts)->firstWhere('id', $productId);
-
         if ($product) {
-            $this->products[$index]['selling_price'] = $product['selling_price']; // Set price
-            $this->updateTotal($index); // Recalculate total for that item
+            $this->products[$index]['unit_price'] = $product['unit_price']; // ← Changed
+            $this->updateTotal($index);
         }
     }
 
@@ -117,8 +120,8 @@ class ReturnByCustomer extends Component
     {
         $item = $this->products[$index];
         $qty = isset($item['quantity']) && is_numeric($item['quantity']) ? (float) $item['quantity'] : 0;
-        $selling_price = isset($item['selling_price']) && is_numeric($item['selling_price']) ? (float) $item['selling_price'] : 0;
-        $subtotal = $selling_price * $qty;
+        $unit_price = isset($item['unit_price']) && is_numeric($item['unit_price']) ? (float) $item['unit_price'] : 0;
+        $subtotal = $unit_price * $qty;
         $this->products[$index]['total'] = max($subtotal, 0);
         $this->updateGrandTotal();
     }
@@ -141,21 +144,21 @@ class ReturnByCustomer extends Component
         if (!$barcode)
             return;
 
-        // Find matching product by barcode
         $product = collect($this->allProducts)->firstWhere('barcode', $barcode);
 
         if ($product) {
-            // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['product_description'] = $product['description'];
-            $this->products[$index]['selling_price'] = $product['selling_price'];
+
+            $unitPrice = $product['unit_price'] ?? 0;
+            $this->products[$index]['unit_price'] = round($unitPrice, 2);
+
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
-            $this->updateTotal($index); // Update row total
+            $this->updateTotal($index);
         } else {
-            // Reset if barcode not found
             $this->products[$index]['product_id'] = '';
             $this->products[$index]['product_description'] = '';
-            $this->products[$index]['selling_price'] = 0;
+            $this->products[$index]['unit_price'] = 0;
             $this->products[$index]['quantity'] = 0;
             $this->products[$index]['total'] = 0;
         }
@@ -176,14 +179,15 @@ class ReturnByCustomer extends Component
             // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['barcode'] = $product['barcode'];
-            $this->products[$index]['selling_price'] = $product['selling_price'];
+            $unitPrice = $product['unit_price'] ?? 0;
+            $this->products[$index]['unit_price'] = round($unitPrice, 2);
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
             $this->updateTotal($index); // Update row total
         } else {
             // Reset if description not found
             $this->products[$index]['product_id'] = '';
             $this->products[$index]['barcode'] = '';
-            $this->products[$index]['selling_price'] = 0;
+            $this->products[$index]['unit_price'] = 0; // ← Changed
             $this->products[$index]['quantity'] = 0;
             $this->products[$index]['total'] = 0;
         }
@@ -194,7 +198,7 @@ class ReturnByCustomer extends Component
         $search = $this->search;
 
         $customers = Customer::all();
-        $products = Product::select('id', 'description', 'selling_price', 'barcode')->get();
+        $products = Product::select('id', 'description', 'barcode')->get();
 
         $returnOrders = CustomerReturn::with('customer') // Eager load relationship
             ->when($search, function ($query) use ($search) {
@@ -255,7 +259,7 @@ class ReturnByCustomer extends Component
                 'product_description' => $this->getProductDescription($item['product_id']),
                 'product_barcode' => $item['barcode'] ?? null,
                 'quantity' => $item['quantity'],
-                'unit_price' => $item['selling_price'],
+                'unit_price' => $item['unit_price'], // ← Changed
                 'subtotal' => $item['total'],
             ]);
 
