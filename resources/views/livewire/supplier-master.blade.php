@@ -43,6 +43,7 @@
           <th class="px-4 py-4">
           </th>
           <th class="px-6 py-4 font-medium text-gray-900">Supplier Name</th>
+          <th class="px-6 py-4 font-medium text-gray-900">Email</th>
           <th class="px-6 py-4 font-medium text-gray-900">Address</th>
           <th class="px-6 py-4 font-medium text-gray-900">Term</th>
           <th class="px-6 py-4 font-medium text-gray-900">Tin Number</th>
@@ -58,6 +59,7 @@
         <input type="checkbox" wire:click="selectSupplier({{ $supplier->id }})" @if(in_array($supplier->id, $selectedSupplierId)) checked @endif />
         </td>
         <td class="px-6 py-4">{{ $supplier->name }}</td>
+        <td class="px-6 py-4">{{ $supplier->email }}</td>
         <td class="px-6 py-4">{{ $supplier->address }}</td>
         <td class="px-6 py-4">{{ $supplier->term }}</td>
         <td class="px-6 py-4">{{ $supplier->tin_number }}</td>

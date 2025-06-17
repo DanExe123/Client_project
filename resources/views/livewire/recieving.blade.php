@@ -117,8 +117,6 @@
                             <thead class="bg-gray-50 sticky top-0 z-10">
                                 <tr>
                                     <th class="px-4 py-4 font-medium text-gray-900">
-                                        <input type="checkbox" wire:click="toggleSelectAll"
-                                            @if ($orders->pluck('id')->diff($selectedpoId)->isEmpty()) checked @endif />
                                     </th>
                                     <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
                                     <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
