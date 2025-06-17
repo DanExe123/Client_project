@@ -9,24 +9,20 @@ use App\Models\CustomerReturn;
 use App\Models\CustomerReturnItem;
 use App\Models\CustomerPurchaseOrderItem;
 use App\Models\CustomerPurchaseOrder;
-use App\Models\SalesRelease;
-use App\Models\SalesReleaseItem;
-
 
 class ReturnByCustomer extends Component
 {
 
     public $search = '';
-    public $returnType;
 
     public $selectedCustomerId;
     public $poDate;
     public $remarks;
-    public $receiptType;
 
     public $products = [];
     public $allProducts = [];
     public $grandTotal = 0;
+    public $returnType;
 
     public $formKey;
 
@@ -45,32 +41,28 @@ class ReturnByCustomer extends Component
             return;
         }
 
-        // Get the latest sales_release_items for the customer
-        $latestReleases = SalesRelease::where('customer_id', $customerId)
-            ->orderByDesc('release_date')
-            ->pluck('id');
-
-        $purchasedProducts = SalesReleaseItem::whereIn('sales_release_id', $latestReleases)
-            ->with('product')
-            ->get()
-            ->sortByDesc(function ($item) use ($latestReleases) {
-                return array_search($item->sales_release_id, $latestReleases->toArray());
-            })
-            ->unique('product_id')
-            ->map(function ($item) {
-                $lowestQty = $item->product->lowest_uom_quantity ?: 1; // Default to 1 to avoid division by zero
-                $convertedUnitPrice = $lowestQty > 0 ? ($item->unit_price / $lowestQty) : $item->unit_price;
-
-                return [
-                    'id' => $item->product_id,
-                    'description' => $item->product_description,
-                    'barcode' => $item->product_barcode,
-                    'unit_price' => round($convertedUnitPrice, 2), // Display price per lowest UOM
-                    'lowest_uom_quantity' => $lowestQty,
-                ];
-            })
-            ->values()
-            ->toArray();
+        // Get all products purchased by this customer
+        $purchasedProducts = CustomerPurchaseOrderItem::whereHas('purchaseOrder', function ($query) use ($customerId) {
+            $query->where('customer_id', $customerId);
+        })
+        ->with('product') // eager-load product
+        ->get()
+        ->map(function ($item) {
+            $product = $item->product;
+        
+            return [
+                'id' => $product->id,
+                'description' => $product->description,
+                'price' => $product->lowest_uom_quantity > 0
+                    ? $product->price / $product->lowest_uom_quantity
+                    : 0,
+                'barcode' => $product->barcode,
+                'lowest_uom_quantity' => $product->lowest_uom_quantity,
+            ];
+        })
+        ->unique('id') // only unique products
+        ->values()
+        ->toArray();
 
         $this->allProducts = $purchasedProducts;
     }
@@ -89,7 +81,7 @@ class ReturnByCustomer extends Component
             'product_id' => '',
             'product_description' => '',
             'quantity' => 0,
-            'unit_price' => 0, // ← Changed
+            'price' => 0,
             'total' => 0,
         ];
     }
@@ -102,16 +94,17 @@ class ReturnByCustomer extends Component
         $this->updateGrandTotal();
     }
 
-    // Auto-fill price when a product is selected
+     // Auto-fill price when a product is selected
     public function updatePrice($index)
     {
         $productId = $this->products[$index]['product_id'] ?? null;
 
         // Find the product from the list of all products
         $product = collect($this->allProducts)->firstWhere('id', $productId);
+
         if ($product) {
-            $this->products[$index]['unit_price'] = $product['unit_price']; // ← Changed
-            $this->updateTotal($index);
+            $this->products[$index]['price'] = $product['price']; // Set price
+            $this->updateTotal($index); // Recalculate total for that item
         }
     }
 
@@ -119,22 +112,28 @@ class ReturnByCustomer extends Component
     public function updateTotal($index)
     {
         $item = $this->products[$index];
+
+        // Safely convert values to float, fallback to 0 if not numeric
         $qty = isset($item['quantity']) && is_numeric($item['quantity']) ? (float) $item['quantity'] : 0;
-        $unit_price = isset($item['unit_price']) && is_numeric($item['unit_price']) ? (float) $item['unit_price'] : 0;
-        $subtotal = $unit_price * $qty;
+        $price = isset($item['price']) && is_numeric($item['price']) ? (float) $item['price'] : 0;
+
+        // Calculate subtotal with discount applied
+        $subtotal = $price * $qty;
+
+        // Ensure total is not negative
         $this->products[$index]['total'] = max($subtotal, 0);
-        $this->updateGrandTotal();
+
+        $this->updateGrandTotal(); // Recalculate grand total
     }
 
-
-    // Sum all totals from the products and apply global discount
-    public function updateGrandTotal()
-    {
-        $sum = collect($this->products)->sum('total'); // Sum of all product totals
-
-        // Apply discount to the sum, never go below 0
-        $this->grandTotal = max($sum, 0);
-    }
+     // Sum all totals from the products and apply global discount
+     public function updateGrandTotal()
+     {
+         $sum = collect($this->products)->sum('total'); // Sum of all product totals
+ 
+         // Apply discount to the sum, never go below 0
+         $this->grandTotal = max($sum, 0);
+     }
 
     // Auto-fill product fields by barcode
     public function fillProductByBarcode($index)
@@ -144,21 +143,21 @@ class ReturnByCustomer extends Component
         if (!$barcode)
             return;
 
+        // Find matching product by barcode
         $product = collect($this->allProducts)->firstWhere('barcode', $barcode);
 
         if ($product) {
+            // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['product_description'] = $product['description'];
-
-            $unitPrice = $product['unit_price'] ?? 0;
-            $this->products[$index]['unit_price'] = round($unitPrice, 2);
-
+            $this->products[$index]['price'] = $product['price'];
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
-            $this->updateTotal($index);
+            $this->updateTotal($index); // Update row total
         } else {
+            // Reset if barcode not found
             $this->products[$index]['product_id'] = '';
             $this->products[$index]['product_description'] = '';
-            $this->products[$index]['unit_price'] = 0;
+            $this->products[$index]['price'] = 0;
             $this->products[$index]['quantity'] = 0;
             $this->products[$index]['total'] = 0;
         }
@@ -179,15 +178,14 @@ class ReturnByCustomer extends Component
             // Fill in product details
             $this->products[$index]['product_id'] = $product['id'];
             $this->products[$index]['barcode'] = $product['barcode'];
-            $unitPrice = $product['unit_price'] ?? 0;
-            $this->products[$index]['unit_price'] = round($unitPrice, 2);
+            $this->products[$index]['price'] = $product['price'];
             $this->products[$index]['quantity'] = $this->products[$index]['quantity'] ?? 1;
             $this->updateTotal($index); // Update row total
         } else {
             // Reset if description not found
             $this->products[$index]['product_id'] = '';
             $this->products[$index]['barcode'] = '';
-            $this->products[$index]['unit_price'] = 0; // ← Changed
+            $this->products[$index]['price'] = 0;
             $this->products[$index]['quantity'] = 0;
             $this->products[$index]['total'] = 0;
         }
@@ -198,16 +196,23 @@ class ReturnByCustomer extends Component
         $search = $this->search;
 
         $customers = Customer::all();
-        $products = Product::select('id', 'description', 'barcode')->get();
-
+        $products = Product::select('id', 'description', 'price', 'barcode')->get();
+    
+        /* 
         $returnOrders = CustomerReturn::with('customer') // Eager load relationship
             ->when($search, function ($query) use ($search) {
-                $query->whereHas('customer', function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
-                });
+                return $query->where('name', 'like', '%' . $search . '%');
             })
             ->paginate(5);
-
+        */
+        $returnOrders = CustomerReturn::with('customer') // Eager load relationship
+        ->when($search, function ($query) use ($search) {
+            $query->whereHas('customer', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        })
+        ->paginate(5);
+        
         return view('livewire.return-by-customer', [
             'customers' => $customers,
             'products' => $products,
@@ -217,7 +222,6 @@ class ReturnByCustomer extends Component
 
     public function resetForm()
     {
-        $this->returnType = '';
         $this->selectedCustomerId = '';
         $this->poDate = now()->toDateString();
         $this->remarks = '';
@@ -228,78 +232,48 @@ class ReturnByCustomer extends Component
 
     public function submitReturn()
     {
-        // Validation
+        // Basic validation (you can customize this further)
         $this->validate([
             'returnType' => 'required|in:Good,Damage',
-            'selectedCustomerId' => 'required|exists:customers,id',
+            'selectedCustomerId' => 'required|exists:suppliers,id',
             'poDate' => 'required|date',
-            'receiptType' => 'required|string',
             'products' => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|numeric|min:1',
         ]);
 
-        // Create return order
+        // Create purchase order
         $returnOrder = CustomerReturn::create([
             'return_type' => $this->returnType,
             'customer_id' => $this->selectedCustomerId,
             'order_date' => $this->poDate,
-            'receipt_type' => $this->receiptType,
             'remarks' => $this->remarks,
             'total_amount' => $this->grandTotal,
             'status' => 'pending',
         ]);
 
-        // Loop through items and update related tables
+        // Loop and insert each product item
         foreach ($this->products as $item) {
-            // Create return item entry
             CustomerReturnItem::create([
                 'return_id' => $returnOrder->id,
                 'product_id' => $item['product_id'],
                 'product_description' => $this->getProductDescription($item['product_id']),
                 'product_barcode' => $item['barcode'] ?? null,
                 'quantity' => $item['quantity'],
-                'unit_price' => $item['unit_price'], // ← Changed
+                'unit_price' => $item['price'],
                 'subtotal' => $item['total'],
             ]);
-
-            // Fetch the product
-            $product = Product::find($item['product_id']);
-
-            if (!$product)
-                continue;
-
-            // If return is Damage: add to `damages`
-            if ($this->returnType === 'Damage') {
-                $product->increment('damages', $item['quantity']);
-            }
-
-            // If return is Good: add to `quantity_lowest` and check conversion
-            if ($this->returnType === 'Good') {
-                // Step 1: Add to quantity_lowest
-                $product->quantity_lowest += $item['quantity'];
-
-                // Step 2: Check if it meets or exceeds lowest_uom_quantity
-                $lowestUom = $product->lowest_uom_quantity;
-                if ($lowestUom > 0 && $product->quantity_lowest >= $lowestUom) {
-                    $addToQuantity = intdiv($product->quantity_lowest, $lowestUom);
-                    $remainingLowest = $product->quantity_lowest % $lowestUom;
-
-                    // Step 3: Apply the conversion
-                    $product->quantity += $addToQuantity;
-                    $product->quantity_lowest = $remainingLowest;
-                }
-
-                // Step 4: Save the product
-                $product->save();
-            }
         }
+        /* 
+        $purchaseOrder->update([
+            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 6, '0', STR_PAD_LEFT),
+        ]);
+        */
 
-        // Reset form
-        $this->resetForm();
-        $this->formKey = uniqid();
-        $this->poDate = now()->toDateString();
+        $this->resetForm(); // or $this->reset(...)
+        $this->formKey = uniqid(); // triggers rerender of only that block
 
+        $this->poDate = now()->toDateString(); // resaet date
         session()->flash('message', 'Return by customer saved successfully.');
     }
 
