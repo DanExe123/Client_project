@@ -32,9 +32,6 @@
                 <table class="min-w-xl w-full border-collapse bg-white text-left text-sm text-gray-500">
                     <thead class="bg-gray-50 sticky top-0 z-10">
                         <tr>
-                            <th class="px-4 py-4">
-                                <input type="checkbox" class="h-4 w-4 text-green-600" />
-                            </th>
                             <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Date</th>
@@ -46,9 +43,6 @@
                     <tbody class="divide-y divide-gray-100 border-t border-gray-100">
                         @foreach ($invoiceOrders as $poItem)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-4">
-                                    <input type="checkbox" value="{{ $poItem->id }}" class="h-4 w-4 text-green-600" />
-                                </td>
                                 <td class="px-6 py-4">{{ $poItem->po_number }}</td>
                                 <td class="px-6 py-4">{{ $poItem->customer->name ?? 'N/A' }}</td>
                                 <td class="px-6 py-4">{{ $poItem->order_date?->format('Y-m-d') }}</td>
@@ -71,9 +65,6 @@
                 <table class="min-w-xl w-full border-collapse bg-white text-left text-sm text-gray-500">
                     <thead class="bg-gray-50 sticky top-0 z-10">
                         <tr>
-                            <th class="px-4 py-4">
-                                <input type="checkbox" class="h-4 w-4 text-blue-600" />
-                            </th>
                             <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
                             <th class="px-6 py-4 font-medium text-gray-900">Date</th>
@@ -86,9 +77,6 @@
                     <tbody class="divide-y divide-gray-100 border-t border-gray-100">
                         @foreach ($drOrders as $poItem)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-4">
-                                    <input type="checkbox" value="{{ $poItem->id }}" class="h-4 w-4 text-blue-600" />
-                                </td>
                                 <td class="px-6 py-4">{{ $poItem->po_number }}</td>
                                 <td class="px-6 py-4">{{ $poItem->customer->name ?? 'N/A' }}</td>
                                 <td class="px-6 py-4">{{ $poItem->order_date?->format('Y-m-d') }}</td>

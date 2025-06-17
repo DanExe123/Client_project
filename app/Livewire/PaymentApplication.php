@@ -93,6 +93,7 @@ class PaymentApplication extends Component
 
     public function mount()
     {
+        $this->date = now()->toDateString();
         // Load customer name options (id => name)
         $this->customerOptions = Customer::pluck('name', 'id')->toArray();
 
@@ -116,34 +117,37 @@ class PaymentApplication extends Component
     public function loadInvoices()
     {
         $this->selectedInvoices = $this->getFilteredSalesReleases()
-            ->map(function ($invoice) {
+            ->map(function ($item) {
                 return [
-                    'id' => $invoice->id,
-                    'number' => 'INV-' . str_pad($invoice->id, 4, '0', STR_PAD_LEFT),
-                    'date' => $invoice->release_date,
-                    'amount' => $invoice->total_with_vat,
+                    'id' => $item->sales_release_id,
+                    'number' => 'INV-' . str_pad($item->sales_release_id, 4, '0', STR_PAD_LEFT),
+                    'date' => $item->release_date,
+                    'amount' => $item->total_with_vat, // This comes from ReleasedItem
                 ];
             })->toArray();
     }
 
+
     public function getFilteredSalesReleases()
     {
-        $query = SalesRelease::with('customer');
-
+        $query = ReleasedItem::query();
+    
         if ($this->filterCustomer) {
             $query->where('customer_id', $this->filterCustomer);
         }
-
+    
         if ($this->filterInvoice) {
             $query->where('receipt_type', $this->filterInvoice);
         }
-
-        // Exclude Sales Releases that already exist in PaymentInvoice
+    
+        // Exclude invoices already in payments
         $paidSalesReleaseIds = PaymentInvoice::pluck('sales_release_id')->toArray();
-        $query->whereNotIn('id', $paidSalesReleaseIds);
-
-    return $query->get();
+        $query->whereNotIn('sales_release_id', $paidSalesReleaseIds);
+    
+        // Group by sales_release_id to prevent duplicates
+        return $query->groupBy('sales_release_id')->get();
     }
+    
 
     public function removeFromTotal($id)
     {

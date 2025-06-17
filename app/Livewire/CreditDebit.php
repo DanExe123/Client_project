@@ -35,6 +35,11 @@ class CreditDebit extends Component
 
     public function saveCredit()
     {
+        if (empty($this->savedItems)) {
+            session()->flash('message', 'No data to save.');
+            return redirect()->route('credit-debit');
+        }
+        
         foreach ($this->savedItems as $itemId) {
             $item = CustomerReturnItem::with('return')->find($itemId);
     
@@ -64,7 +69,7 @@ class CreditDebit extends Component
             }
     
     
-            $item->delete();
+            $item->delete(); 
         }
     
         // Reset state

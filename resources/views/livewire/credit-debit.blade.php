@@ -60,16 +60,29 @@
                     class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
             </div>
-            
-            @if (session()->has('message'))
-            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
-                <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
-                    class="!bg-green-300 !w-full" />
-            </div>
-        @endif
-
         
         </div>
+
+        @if (session()->has('message'))
+        @php
+            $message = session('message');
+            $isWarning = $message === 'No data to save.';
+        @endphp
+
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
+            <x-alert 
+                :title="$message" 
+                :icon="$isWarning ? 'x-circle' : 'check-circle'" 
+                :color="$isWarning ? 'warning' : 'success'" 
+                flat 
+                :class="$isWarning ? '!bg-yellow-300' : '!bg-green-300'"
+                class="!w-full" 
+            />
+        </div>
+    @endif
+
+    
+
         <div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
 
             <!-- Customer Filter -->
@@ -276,7 +289,7 @@
                     
                     </tfoot>
                     
-                    
+                     
                 </table>   
                 <div class="space-y-2 mb-2 px-2">
                     {{ $returnItemsPaginated->links() }}

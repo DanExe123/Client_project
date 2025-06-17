@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SaveReturnCredit extends Model
 {
-    use HasFactory;
+    use HasFactory; 
 
     protected $table = 'save_return_credit';
 
