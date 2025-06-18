@@ -35,7 +35,7 @@ class SalesBook extends Component
         if (!$this->showTable)
             return collect();
 
-        return SalesRelease::with('customer')
+        return SalesRelease::with(['customer', 'paymentInvoice'])
             ->where('receipt_type', 'Invoice')
             ->whereDate('release_date', '>=', $this->startDate)
             ->whereDate('release_date', '<=', $this->endDate)

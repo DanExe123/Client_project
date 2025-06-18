@@ -20,8 +20,7 @@ class Recievingapproval extends Component
     public $supplier_name;
     public $purchaseOrderId;
     public $items = [];
-    public $grandTotal = 0;
-
+    public $grandTotal;
     public $receipt_type, $order_date, $po_number, $total_amount, $purchase_discount, $remarks, $status;
 
     public function mount($purchaseOrderId)
@@ -53,6 +52,7 @@ class Recievingapproval extends Component
                 'subtotal' => $item->subtotal,
             ];
         })->toArray();
+        $this->grandTotal = collect($this->items)->sum('subtotal');
     }
 
     public function approve()

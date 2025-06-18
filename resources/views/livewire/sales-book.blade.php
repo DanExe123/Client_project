@@ -51,7 +51,10 @@
       <td class="px-4 py-2 text-right">₱{{ number_format($sale->total_amount, 2) }}</td>
       <td class="px-4 py-2 text-right">₱{{ number_format($sale->add_vat, 2) }}</td>
       <td class="px-4 py-2 text-right">₱{{ number_format($sale->amount_net_of_vat, 2) }}</td>
-      <td class="px-4 py-2">-</td>
+      <td class="px-4 py-2">
+        {{ $sale->paymentInvoice && $sale->paymentInvoice->payment_method ? 'Paid' : 'Unpaid' }}
+      </td>
+      
       </tr>
       @empty
       <tr>

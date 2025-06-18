@@ -48,4 +48,10 @@ class SalesRelease extends Model
         return $this->hasMany(ReleasedItem::class);
     }
 
+    public function paymentInvoice()
+    {
+        return $this->hasOne(PaymentInvoice::class);
+    }
+
+
 }

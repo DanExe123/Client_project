@@ -106,79 +106,102 @@
           @endif
       </table>
   </div>
+
+  <!-- Amount Receivable -->
+    <div wire:poll class="mt-4 p-4 bg-gray-50 border border-gray-300 rounded">
+        <h3 class="text-md font-semibold ">Amount Receivable:</h3>
+        <p class="text-lg font-bold">
+            ₱{{ number_format($totalAmount, 2) }}
+        </p>
+    </div>
   
-  <div x-data="{ method: '' }" class="space-y-4">
-      <!-- Payment Method -->
-      <div>
-          <label for="paymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
-          <select id="paymentMethod"
-              x-model="method"
-              @change="$dispatch('input', $event.target.value)"
-              wire:model="paymentMethod"
-              class="w-full border rounded px-3 py-2"
-          >
-              <option value="" disabled>Select Method</option>
-              <option value="Cash">Cash</option>
-              <option value="Check">Check</option>
-              <option value="Bank Transfer">Bank Transfer</option>
-          </select>
-      </div>
-  
+    <div class="space-y-4 mt-6">
+        <!-- Payment Method -->
+        <div>
+            <label for="paymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
+            <select id="paymentMethod"
+                    wire:model="paymentMethod"
+                    class="w-full border rounded px-3 py-2"
+                    required
+            >
+                <option value="" disabled>Select Method</option>
+                <option value="Cash">Cash</option>
+                <option value="Check">Check</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+            @error('paymentMethod') <span class="text-red-600">{{ $message }}</span> @enderror
+        </div>
+    
         <!-- Check Fields -->
-        <div x-show="method === 'Check'" x-transition>
-          <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
-              <div>
-                  <label class="block mb-1 font-semibold">Select Bank</label>
-                  <select wire:model="checkBank" class="w-full border rounded px-3 py-2">
-                      <option value="" disabled>Select Bank</option>
-                      <option>Bank A</option>
-                      <option>Bank B</option>
-                      <option>Bank C</option>
-                  </select>
-              </div>
-  
-              <div>
-                  <label class="block mb-1 font-semibold">Cheque Number</label>
-                  <input type="text" wire:model="chequeNumber" class="w-full border rounded px-3 py-2" />
-              </div>
-  
-              <div>
-                  <label class="block mb-1 font-semibold">Check Date</label>
-                  <input type="date" wire:model="checkDate" class="w-full border rounded px-3 py-2" />
-              </div>
-          </div>
-      </div>
-  
-      <!-- Bank Transfer Fields -->
-      <div x-show="method === 'Bank Transfer'" x-transition>
-          <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
-              <div>
-                  <label class="block mb-1 font-semibold">Select Bank</label>
-                  <select wire:model="transferBank" class="w-full border rounded px-3 py-2">
-                      <option value="" disabled>Select Bank</option>
-                      <option>Bank A</option>
-                      <option>Bank B</option>
-                      <option>Bank C</option>
-                  </select>
-              </div>
-  
-              <div>
-                  <label class="block mb-1 font-semibold">Reference Number</label>
-                  <input type="text" wire:model="referenceNumber" class="w-full border rounded px-3 py-2" />
-              </div>
-  
-              <div>
-                  <label class="block mb-1 font-semibold">Transaction Date</label>
-                  <input type="date" wire:model="transactionDate" class="w-full border rounded px-3 py-2" />
-              </div>
-          </div>
-      </div>
+        @if($paymentMethod === 'Check')
+            <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
+                <div>
+                    <label class="block mb-1 font-semibold">Select Bank</label>
+                    <select wire:model="checkBank" class="w-full border rounded px-3 py-2" required>
+                        <option value="" disabled>Select Bank</option>
+                        <option>Bank A</option>
+                        <option>Bank B</option>
+                        <option>Bank C</option>
+                    </select>
+                    @error('checkBank') <span class="text-red-600">{{ $message }}</span> @enderror
+                </div>
+                <div>
+                    <label class="block mb-1 font-semibold">Cheque Number</label>
+                    <input type="text" wire:model="chequeNumber" class="w-full border rounded px-3 py-2" required />
+                    @error('chequeNumber') <span class="text-red-600">{{ $message }}</span> @enderror
+                </div>
+                <div>
+                    <label class="block mb-1 font-semibold">Check Date</label>
+                    <input type="date" wire:model="checkDate" class="w-full border rounded px-3 py-2" required />
+                    @error('checkDate') <span class="text-red-600">{{ $message }}</span> @enderror
+                </div>
+            </div>
+        @endif
+    
+        <!-- Bank Transfer Fields -->
+        @if($paymentMethod === 'Bank Transfer')
+            <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
+                <div>
+                    <label class="block mb-1 font-semibold">Select Bank</label>
+                    <select wire:model="transferBank" class="w-full border rounded px-3 py-2" required>
+                        <option value="" disabled>Select Bank</option>
+                        <option>Bank A</option>
+                        <option>Bank B</option>
+                        <option>Bank C</option>
+                    </select>
+                    @error('transferBank') <span class="text-red-600">{{ $message }}</span> @enderror
+                </div>
+                <div>
+                    <label class="block mb-1 font-semibold">Reference Number</label>
+                    <input type="text" wire:model="referenceNumber" class="w-full border rounded px-3 py-2" required />
+                    @error('referenceNumber') <span class="text-red-600">{{ $message }}</span> @enderror
+                </div>
+                <div>
+                    <label class="block mb-1 font-semibold">Transaction Date</label>
+                    <input type="date" wire:model="transactionDate" class="w-full border rounded px-3 py-2" required />
+                    @error('transactionDate') <span class="text-red-600">{{ $message }}</span> @enderror
+                </div>
+            </div>
+        @endif
+    </div>
+    
       
       <!-- Amount -->
-      <div>
-          <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
-          <input id="amount" type="number" wire:model.lazy="amount" class="w-full border rounded px-3 py-2" />
-      </div>
+    <!-- Amount -->
+    <div>
+        <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
+
+        <input
+            type="text"
+            id="amount"
+            wire:model.lazy="amount"
+            inputmode="numeric"
+            class="w-full border rounded px-3 py-2"
+            oninput="formatAmount(this)"
+        />
+    </div>
+
+    
   
       <!-- Other Deduction -->
       <div>
@@ -207,6 +230,19 @@
   
       </form>
   </div>
+
+    <script>
+        function formatAmount(el) {
+            const cursor = el.selectionStart;
+            const raw = el.value.replace(/,/g, '');
+            if (!isNaN(raw) && raw !== '') {
+                const formatted = Number(raw).toLocaleString('en-US');
+                el.value = formatted;
+            }
+            el.setSelectionRange(cursor, cursor);
+        }
+
+    </script>
   
              
   </div>

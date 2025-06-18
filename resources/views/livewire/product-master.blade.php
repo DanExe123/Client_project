@@ -49,6 +49,7 @@
           <th class="px-6 py-4 font-medium text-gray-900">Highest Unit of Measurement</th>
           <th class="px-6 py-4 font-medium text-gray-900">Lowest Unit of Measurement</th>
           <th class="px-6 py-4 font-medium text-gray-900">Price</th>
+          <th class="px-6 py-4 font-medium text-gray-900">Selling Price</th>
           <th class="px-6 py-4 font-medium text-gray-900">Status</th>
         </tr>
       </thead>
@@ -67,6 +68,7 @@
         <td class="px-6 py-4">{{ $product->highest_uom }}</td>
         <td class="px-6 py-4">{{ $product->lowest_uom }}</td>
         <td class="px-6 py-4">{{ number_format($product->price, 2) }}</td>
+        <td class="px-6 py-4">{{ number_format($product->selling_price, 2) }}</td>
         <td class="px-6 py-4">
           <span
             class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold
