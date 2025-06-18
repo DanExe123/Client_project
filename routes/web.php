@@ -47,7 +47,7 @@ use App\Livewire\Editrecieving;
 use App\Livewire\ServeSaleReleasing;
 use App\Livewire\ServePrintPreview;
 use App\Livewire\ViewReceivingDetails;
-
+use App\Livewire\Viewtransaction;
 
 use App\Livewire\LoginForm;
 
@@ -108,6 +108,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         })->name('print-unservered');
         
         Route::get('/account-recievables', AccountRecievables::class)->name('account-recievables');
+        Route::get('/view-transaction/{customer}', Viewtransaction::class)->name('viewtransaction');
+
         Route::get('/credit-debit', CreditDebit::class)->name('credit-debit');
         Route::get('/payment-application', PaymentApplication::class)->name('payment-application');
         Route::get('/account-payable', AccountPayable::class)->name('account-payable');

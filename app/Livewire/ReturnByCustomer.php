@@ -67,7 +67,6 @@ class ReturnByCustomer extends Component
 
         $this->allProducts = $purchasedProducts;
     }
-
     public function updatedProducts()
     {
         $this->updateGrandTotal();

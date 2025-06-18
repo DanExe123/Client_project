@@ -193,7 +193,6 @@ class PaymentToSupplier extends Component
                 $receiving->save();
             }
         }
-
         session()->flash('message', 'Payment saved and grand totals updated!');
         $this->reset([
             'selectedReturns',

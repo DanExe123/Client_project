@@ -25,7 +25,6 @@ class Payment extends Model
         'remarks',
         'received_item_ids',
     ];
-
     protected $casts = [
         'received_item_ids' => 'array',
         'check_date' => 'date',

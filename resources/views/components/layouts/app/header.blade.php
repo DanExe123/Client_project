@@ -92,10 +92,12 @@
         <flux:dropdown position="bottom" align="end">
             <flux:profile name="Payable" />
             <flux:navmenu>
-                <flux:navmenu.item wire:navigate href="{{ route('account-payable') }}" icon="currency-dollar">
+              {{--   <flux:navmenu.item wire:navigate href="{{ route('account-payable') }}" icon="currency-dollar">
                     Account Payable
-                </flux:navmenu.item>
-
+                </flux:navmenu.item> --}}
+                <flux:navmenu.item wire:navigate href="{{ route('payment-to-supplier') }}" icon="receipt-refund">
+                                    Payment to Supplier
+                                </flux:navmenu.item>        
                 <flux:navmenu.item wire:navigate href="{{ route('payable-ledger') }}" icon="document-text">
                     Payable Ledger
                 </flux:navmenu.item>
@@ -104,9 +106,7 @@
                     Expenses
                 </flux:navmenu.item>
                
-                <flux:navmenu.item wire:navigate href="{{ route('payment-to-supplier') }}" icon="receipt-refund">
-                    Payment to Supplier
-                </flux:navmenu.item>                
+                      
                 
 
             </flux:navmenu>
