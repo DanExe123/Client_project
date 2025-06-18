@@ -15,7 +15,6 @@
         class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
     </div>
 
-    <!-- Table -->
     <div class="overflow-auto rounded-lg border border-gray-200">
       <table class="min-w-full border-collapse bg-white text-left text-sm text-gray-700">
         <thead class="bg-gray-50 sticky top-0 z-10">
@@ -24,28 +23,33 @@
             <th class="px-4 py-3 font-medium text-gray-900">Transaction Date</th>
             <th class="px-4 py-3 font-medium text-gray-900">Reference Type</th>
             <th class="px-4 py-3 font-medium text-gray-900">Reference Number</th>
-            <th class="px-4 py-3 font-medium text-gray-900 text-center">Debit</th>
             <th class="px-4 py-3 font-medium text-gray-900 text-center">Credit</th>
             <th class="px-4 py-3 font-medium text-gray-900 text-center">Balance</th>
             <th class="px-4 py-3 font-medium text-gray-900 text-center">Remarks</th>
-
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-          <template x-for="(customer, index) in filteredCustomers" :key="index">
+          @foreach ($suppliers as $supplier)
             <tr class="hover:bg-gray-50">
-
-              <x-button sm label="View Transactions" x-on:click="$openModal('Transactions')" />
-              </td>
+              <td class="px-4 py-2">{{ $supplier->name }}</td>
+              <td class="px-4 py-2"></td>
+              <td class="px-4 py-2"></td>
+              <td class="px-4 py-2"></td>
+              <td class="px-4 py-2 text-center"></td>
+              <td class="px-4 py-2 text-center"></td>
+              <td class="px-4 py-2 text-center"></td>
             </tr>
-          </template>
-          <tr x-show="filteredCustomers.length === 0">
-            <td colspan="4" class="text-center p-4 text-gray-500">No customers found.</td>
-          </tr>
+          @endforeach
+    
+          @if ($suppliers->isEmpty())
+            <tr>
+              <td colspan="7" class="text-center p-4 text-gray-500">No suppliers found.</td>
+            </tr>
+          @endif
         </tbody>
       </table>
     </div>
-
+    
     <!-- Modal -->
     <x-modal-card title="Transactions" name="Transactions">
       <div class="mb-4">
