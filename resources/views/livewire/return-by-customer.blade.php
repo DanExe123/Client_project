@@ -2,13 +2,7 @@
     <div x-cloak class="space-y-2">
         <h2 class="text-2xl font-semibold text-gray-900">Return by customer</h2>
         {{-- Success Alert --}}
-        @if (session()->has('message'))
-            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
-                class="mt-2">
-                <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
-                    class="!bg-green-300 !w-full" />
-            </div>
-        @endif
+
         <div class="flex gap-2 justify-end">
             <div class="w-full sm:max-w-xs flex justify-start relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -29,7 +23,6 @@
                 x-on:click="$openModal('Delete')">
             </x-button>
         </div>
-
         <div class="overflow-auto rounded-lg border border-gray-200">
             <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
                 <thead class="bg-gray-50 sticky top-0 z-10">
@@ -45,7 +38,6 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-
                     @forelse ($returnOrders as $returnOrder)
                         <tr>
                             <td class="px-6 py-4">
@@ -65,20 +57,15 @@
                 </tbody>
             </table>
         </div>
-
         <hr>
-
-        <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
         <div wire:key="po-form-{{ $formKey }}"
             class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
             <h3 class="text-lg font-bold text-gray-800">
                 Add <span class="text-blue-500">Return</span> by <span class="text-blue-500">Customer</span>
             </h3>
-
             <div wire:loading wire:target="submitPO">
                 <p class="text-blue-600 font-semibold">Submitting PO... please wait.</p>
             </div>
-
             <div wire:loading.remove wire:target="submitPO">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Return Type -->
@@ -93,7 +80,6 @@
                             <span class="text-sm text-red-500">{{ $message }}</span>
                         @enderror
                     </div>
-
                     <!-- Select Customer -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Select Customer</label>
@@ -108,7 +94,6 @@
                             <span class="text-sm text-red-500">{{ $message }}</span>
                         @enderror
                     </div>
-
                     <!-- Date -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -116,7 +101,6 @@
                             class="block w-full rounded-md border border-gray-300 py-2 px-3" />
                     </div>
                 </div>
-
                 <h4 class="text-md font-semibold text-gray-700">Products to Return</h4>
                 <div class="overflow-x-auto">
                     <table wire:poll class="w-full text-sm text-left text-gray-700 border border-gray-200 rounded-lg">
@@ -133,22 +117,24 @@
                         <tbody>
                             @foreach($products as $index => $p)
                                 <tr class="hover:bg-gray-50">
-                                    <td wire:poll.prevent class="border px-2 py-2">
+                                    <!-- Hidden Product ID -->
+                                    <input type="hidden" wire:model="products.{{ $index }}.product_id" />
+
+                                    <!-- Barcode -->
+                                    <td class="border px-2 py-2">
                                         <input type="text" wire:model.lazy="products.{{ $index }}.barcode" list="barcodes"
                                             placeholder="enter and select barcode"
                                             class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
                                             wire:change="fillProductByBarcode({{ $index }})" />
-
                                         <datalist id="barcodes">
                                             @foreach($allProducts as $product)
                                                 <option value="{{ $product['barcode'] }}">{{ $product['description'] }}</option>
                                             @endforeach
                                         </datalist>
-                                        @error('products')
-                                            <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
-                                        @enderror
                                     </td>
-                                    <td wire:ignore.self class="border px-2 py-2">
+
+                                    <!-- Description -->
+                                    <td class="border px-2 py-2">
                                         <input type="text" wire:model.lazy="products.{{ $index }}.product_description"
                                             list="product_descriptions" placeholder="enter and select description"
                                             class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
@@ -158,9 +144,6 @@
                                                 <option value="{{ $product['description'] }}">{{ $product['barcode'] }}</option>
                                             @endforeach
                                         </datalist>
-                                        @error('products')
-                                            <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
-                                        @enderror
                                     </td>
                                     <td class="border px-2 py-2">
                                         <input type="number" wire:model.lazy="products.{{ $index }}.quantity"
@@ -225,7 +208,6 @@
                             </tr>
                         </tfoot>
                     </table>
-
                     <div class="pt-2 ml-2">
                         <button wire:click="addProduct" @disabled(!$selectedCustomerId)
                             class="px-4 py-2 rounded-md text-white font-semibold
@@ -235,7 +217,6 @@
                             Add Product
                         </button>
                     </div>
-
                     <div class="pt-4">
                         <x-textarea wire:model="remarks" name="remarks" label="Remarks"
                             placeholder="Write your remarks" />
