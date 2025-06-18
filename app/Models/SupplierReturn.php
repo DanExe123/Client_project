@@ -32,8 +32,13 @@ class SupplierReturn extends Model
     /**
      * A purchase order has many items.
      */
+
     public function items()
     {
         return $this->hasMany(SupplierReturnItem::class, 'return_id');
+    }
+    public function payments()
+    {
+        return $this->belongsToMany(Payment::class, 'payment_return', 'return_id', 'payment_id');
     }
 }
