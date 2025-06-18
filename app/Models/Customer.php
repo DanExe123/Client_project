@@ -17,4 +17,15 @@ class Customer extends Model
         'cust_tin_number',
         'status',
     ];
+
+    public function releasedItems()
+{
+    return $this->hasMany(ReleasedItem::class);
+}
+
+public function salesReleases()
+{
+    return $this->hasMany(SalesRelease::class, 'customer_id');
+}
+
 }
