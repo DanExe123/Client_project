@@ -178,7 +178,6 @@ class ReturnByCustomer extends Component
             'returnType' => 'required|in:Good,Damage',
             'selectedCustomerId' => 'required|exists:customers,id',
             'poDate' => 'required|date',
-            'receiptType' => 'required|string',
             'products' => 'required|array|min:1',
             'products.*.product_id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|numeric|min:1',
