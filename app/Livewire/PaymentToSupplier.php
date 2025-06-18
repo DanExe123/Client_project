@@ -171,7 +171,6 @@ class PaymentToSupplier extends Component
             'remarks' => $this->remarks,
             'received_item_ids' => json_encode($this->selectedReceivedIds),
         ]);
-
         // Attach selected return records
         if (!empty($this->addedReturns)) {
             $payment->returns()->attach($this->addedReturns);

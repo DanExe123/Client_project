@@ -43,29 +43,29 @@
           <tbody>
           @foreach ($selectedReceived as $recid)
           <tr class="border-t">
-            @php
-          $formatted = str_pad($recid['id'], 9, '0', STR_PAD_LEFT);
-          $displayId = 'RCV-' . substr($formatted, 0, 3) . '-' . substr($formatted, 3, 3) . '-' . substr($formatted, 6, 3);
-          @endphp
-            <td class="px-4 py-2">{{ $displayId }}</td>
-            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($recid['created_at'])->format('F d, Y') }}</td>
-            <td class="px-4 py-2">{{ $recid['receipt_type'] }}</td>
-            <td class="px-4 py-2">₱{{ number_format($recid['grand_total'], 2) }}</td>
-            <td class="px-4 py-2 text-center flex justify-center gap-2">
-            <button wire:click.prevent="addToTotal({{ $recid['id'] }})" @if(in_array($recid['id'], $addedReceivings)) disabled @endif
+          @php
+        $formatted = str_pad($recid['id'], 9, '0', STR_PAD_LEFT);
+        $displayId = 'RCV-' . substr($formatted, 0, 3) . '-' . substr($formatted, 3, 3) . '-' . substr($formatted, 6, 3);
+        @endphp
+          <td class="px-4 py-2">{{ $displayId }}</td>
+          <td class="px-4 py-2">{{ \Carbon\Carbon::parse($recid['created_at'])->format('F d, Y') }}</td>
+          <td class="px-4 py-2">{{ $recid['receipt_type'] }}</td>
+          <td class="px-4 py-2">₱{{ number_format($recid['grand_total'], 2) }}</td>
+          <td class="px-4 py-2 text-center flex justify-center gap-2">
+          <button wire:click.prevent="addToTotal({{ $recid['id'] }})" @if(in_array($recid['id'], $addedReceivings)) disabled @endif
             class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50">
             Add to Total
             <span wire:loading wire:target="addToTotal({{ $recid['id'] }})">Loading...</span>
-            </button>
+          </button>
 
-            <button wire:click.prevent="removeFromTotal({{ $recid['id'] }})" wire:loading.attr="disabled"
+          <button wire:click.prevent="removeFromTotal({{ $recid['id'] }})" wire:loading.attr="disabled"
             wire:target="removeFromTotal({{ $recid['id'] }})"
             class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50"
             wire:key="remove-btn-{{ $recid['id'] }}">
             <span wire:loading.remove wire:target="removeFromTotal({{ $recid['id'] }})">Remove</span>
             <span wire:loading wire:target="removeFromTotal({{ $recid['id'] }})">Removing...</span>
-            </button>
-            </td>
+          </button>
+          </td>
           </tr>
         @endforeach
           </tbody>
@@ -105,27 +105,27 @@
           <tbody>
           @foreach ($selectedReturns as $return)
           <tr class="border-t">
-            @php
-          $formatted = str_pad($return['id'], 9, '0', STR_PAD_LEFT);
-          $returnId = 'RTN-' . substr($formatted, 0, 3) . '-' . substr($formatted, 3, 3) . '-' . substr($formatted, 6, 3);
-          @endphp
-            <td class="px-4 py-2">{{ $returnId }}</td>
-            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($return['created_at'])->format('F d, Y') }}</td>
-            <td class="px-4 py-2">{{ $return['return_type'] }}</td>
-            <td class="px-4 py-2">₱{{ number_format($return['total'], 2) }}</td>
-            <td class="px-4 py-2 text-center flex justify-center gap-2">
-            <button wire:click.prevent="addReturnToTotal({{ $return['id'] }})" @if(in_array($return['id'], $addedReturns)) disabled @endif
+          @php
+        $formatted = str_pad($return['id'], 9, '0', STR_PAD_LEFT);
+        $returnId = 'RTN-' . substr($formatted, 0, 3) . '-' . substr($formatted, 3, 3) . '-' . substr($formatted, 6, 3);
+        @endphp
+          <td class="px-4 py-2">{{ $returnId }}</td>
+          <td class="px-4 py-2">{{ \Carbon\Carbon::parse($return['created_at'])->format('F d, Y') }}</td>
+          <td class="px-4 py-2">{{ $return['return_type'] }}</td>
+          <td class="px-4 py-2">₱{{ number_format($return['total'], 2) }}</td>
+          <td class="px-4 py-2 text-center flex justify-center gap-2">
+          <button wire:click.prevent="addReturnToTotal({{ $return['id'] }})" @if(in_array($return['id'], $addedReturns)) disabled @endif
             class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50">
             Add to Total
             <span wire:loading wire:target="addReturnToTotal({{ $return['id'] }})">Loading...</span>
-            </button>
+          </button>
 
-            <button wire:click.prevent="removeReturnFromTotal({{ $return['id'] }})" wire:loading.attr="disabled"
+          <button wire:click.prevent="removeReturnFromTotal({{ $return['id'] }})" wire:loading.attr="disabled"
             class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50">
             <span wire:loading.remove wire:target="removeReturnFromTotal({{ $return['id'] }})">Remove</span>
             <span wire:loading wire:target="removeReturnFromTotal({{ $return['id'] }})">Removing...</span>
-            </button>
-            </td>
+          </button>
+          </td>
           </tr>
         @endforeach
           </tbody>
