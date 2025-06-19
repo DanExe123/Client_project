@@ -58,4 +58,8 @@ class ReleasedItem extends Model
     return $this->hasMany(SaveReturnCredit::class, 'product_barcode', 'product_barcode')
         ->whereColumn('save_return_credit.customer_id', 'released_items.customer_id');
 }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 }

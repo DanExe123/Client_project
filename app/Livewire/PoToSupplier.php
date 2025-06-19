@@ -13,6 +13,8 @@ class PoToSupplier extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'tailwind';
+
     public $search = '';
 
     public $selectedSupplierId;
@@ -273,5 +275,10 @@ class PoToSupplier extends Component
     {
         $product = collect($this->allProducts)->firstWhere('id', $productId);
         return $product ? $product['description'] : '';
+    }
+
+    public function getPaginatedPurchaseOrders()
+    {
+        return PurchaseOrder::with('supplier')->orderBy('order_date', 'desc')->paginate(5);
     }
 }

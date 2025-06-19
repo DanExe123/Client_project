@@ -53,7 +53,14 @@ class SaveReturnCredit extends Model
      * Get the released item that the credit was applied to.
      */
     public function releasedItem()
-    {
-        return $this->belongsTo(ReleasedItem::class, 'released_item_id');
-    }
+{
+    return $this->belongsTo(ReleasedItem::class, 'product_barcode', 'product_barcode')
+        ->whereColumn('save_return_credit.customer_id', 'released_items.customer_id');
+}
+public function supplier()
+{
+    return $this->belongsTo(Supplier::class, 'supplier_id');
+}
+
+
 }

@@ -52,6 +52,10 @@ class SalesRelease extends Model
     {
         return $this->hasOne(PaymentInvoice::class);
     }
-
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+    
 
 }

@@ -19,7 +19,7 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
                 </span>
-                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..."
+                <input type="text" wire:model.live.debounce.100ms="search" placeholder="Search..."
                   class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
             </div>
         </div>
@@ -55,11 +55,15 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-6 text-gray-500">No purchase orders found.</td>
+                            <td colspan="6" class="text-center py-6 text-gray-500">No purchase orders found.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            <hr>
+            <div class="mt-4 px-4 mb-2">
+                {{ $purchaseOrders->links() }}
+            </div>   
         </div>
     </div>
 
@@ -147,23 +151,31 @@
                                     @enderror
                                 </td>
                                 {{-- //HOYY!! DRI KA NAG UNTAT --}}
+                                {{-- //HOYY!! DRI KA NAG UNTAT --}}
                                 <td wire:ignore.self class="border px-2 py-2">
-                                    <input type="text"
-                                        wire:model.lazy="products.{{ $index }}.product_description"
-                                        list="product_descriptions"
-                                        placeholder="enter and select description"
-                                        class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
-                                        wire:change="fillProductByDescription({{ $index }})"
-                                    />
-                                    <datalist id="product_descriptions">
-                                        @foreach($allProducts as $product)
-                                            <option value="{{ $product['description'] }}">{{ $product['barcode'] }}</option>
-                                        @endforeach
-                                    </datalist>
-                                    @error('products')
+                                    @if(!empty($products[$index]['product_description']))
+                                        {{-- Show auto-filled description when barcode is selected --}}
+                                        <input
+                                            type="text"
+                                            value="{{ $products[$index]['product_description'] }}"
+                                            class="w-full border-gray-100 bg-gray-100 rounded-md px-2 py-1 text-sm text-gray-600"
+                                            readonly
+                                        />
+                                    @else
+                                        {{-- Show default input if no product_description yet --}}
+                                        <input
+                                            type="text"
+                                            value="No Barcode selected"
+                                            class="w-full border-gray-200 bg-white rounded-md px-2 py-1 text-sm text-gray-400 italic"
+                                            readonly
+                                        />
+                                    @endif
+                                
+                                    @error("products.$index.barcode")
                                         <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
                                     @enderror
-                                </td>                            
+                                </td>
+
                                 <td class="border px-2 py-2">
                                     <input type="number"
                                         wire:model.lazy="products.{{ $index }}.quantity"
@@ -236,7 +248,7 @@
         
                 <div class="pt-4">
                     <x-textarea wire:model="remarks" name="remarks" label="Remarks" placeholder="Write your remarks" />
-                    <div class="flex justify-end pt-2">
+                    <div class="flex justify-end pt-2 mr-2 mb-1">
                         <x-button blue label="Submit" wire:click="submitPO" />
                     </div>
                 </div>
