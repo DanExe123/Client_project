@@ -1,11 +1,14 @@
 <div>
     <h2 class="text-xl font-semibold">Payment Application</h2>
-    @if (session()->has('message'))
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
+   {{-- Success Alert --}}
+   @if (session()->has('message'))
+    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+        class="mt-2">
         <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
             class="!bg-green-300 !w-full" />
     </div>
-  @endif
+    @endif
+
   
     <div class="p-4 space-y-6 max-w-6xl mx-auto border rounded-lg border-gray-200">
       <form wire:submit.prevent="savePayment">
@@ -197,7 +200,6 @@
             wire:model.lazy="amount"
             inputmode="numeric"
             class="w-full border rounded px-3 py-2"
-            oninput="formatAmount(this)"
         />
     </div>
 
@@ -230,19 +232,6 @@
   
       </form>
   </div>
-
-    <script>
-        function formatAmount(el) {
-            const cursor = el.selectionStart;
-            const raw = el.value.replace(/,/g, '');
-            if (!isNaN(raw) && raw !== '') {
-                const formatted = Number(raw).toLocaleString('en-US');
-                el.value = formatted;
-            }
-            el.setSelectionRange(cursor, cursor);
-        }
-
-    </script>
   
              
   </div>

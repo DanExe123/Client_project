@@ -72,68 +72,90 @@ class PaymentApplication extends Component
     }
 
     public function savePayment()
-    {
-        // Sanitize amount (remove commas)
-        $this->amount = str_replace(',', '', $this->amount);
+{
+    $this->amount = str_replace(',', '', $this->amount);
+    $this->validate();
 
-        $this->validate();
+    $remainingAmount = $this->amount;
 
-        $invoicesToSave = collect($this->selectedInvoices)
-            ->filter(fn($invoice) => in_array($invoice['id'], $this->selectedInvoiceIds));
+    $invoiceIds = collect($this->selectedInvoices)
+        ->filter(fn($invoice) => in_array($invoice['id'], $this->selectedInvoiceIds))
+        ->pluck('id')
+        ->unique();
 
-        if ($invoicesToSave->isEmpty()) {
-            $this->dispatch('show-toast', [
-                'type' => 'error',
-                'message' => 'No invoices added to total. Please select at least one.'
-            ]);
-            return;
-        }
+    $groupedInvoices = SalesRelease::with('releasedItems')
+        ->whereIn('id', $invoiceIds)
+        ->get();
 
-        foreach ($invoicesToSave as $invoice) {
-            try {
-                PaymentInvoice::create([
-                    'customer_id' => $this->filterCustomer,
-                    'sales_release_id' => $invoice['id'],
-                    'invoice_number' => $invoice['id'],
-                    'invoice_date' => $invoice['date'],
-                    'invoice_amount' => $invoice['amount'],
-                    'amount' => $this->amount,
-                    'deduction' => $this->deduction,
-                    'ewt_amount' => $this->ewt_amount,
-                    'remarks' => $this->remarks,
-                    'payment_method' => $this->paymentMethod,
-                    'bank' => $this->checkBank ?? $this->transferBank,
-                    'cheque_number' => $this->chequeNumber,
-                    'check_date' => $this->checkDate,
-                    'reference_number' => $this->referenceNumber,
-                    'transaction_date' => $this->transactionDate,
-                ]);
-            } catch (\Exception $e) {
-                \Log::error('Payment save failed: ' . $e->getMessage());
-                $this->dispatch('show-toast', [
-                    'type' => 'error',
-                    'message' => 'Error saving payment: ' . $e->getMessage()
-                ]);
-                return; // Stop on first failure
+    foreach ($groupedInvoices as $salesRelease) {
+        if ($remainingAmount <= 0) break;
+
+        $items = $salesRelease->releasedItems;
+        $itemCount = $items->count();
+
+        if ($itemCount === 0) continue;
+
+        // All items have the same total_amount (as per your rule)
+        $itemTotalAmount = $items->first()->total_amount;
+        $invoiceTotalAmount = $itemTotalAmount; // NOT SUM
+        $totalThisInvoice = $invoiceTotalAmount; // We treat invoice as ONE BLOCK
+
+        if ($remainingAmount >= $totalThisInvoice) {
+            // Full payment → Set ALL items to 0
+            foreach ($items as $item) {
+                $item->total_amount = 0;
+                $item->save();
             }
+
+            $paidAmount = $totalThisInvoice;
+        } else {
+            // Partial payment → Calculate new equal value
+            $newAmount = $itemTotalAmount - $remainingAmount;
+            foreach ($items as $item) {
+                $item->total_amount = round($newAmount, 2);
+                $item->save();
+            }
+
+            $paidAmount = $remainingAmount;
         }
 
-        // Reset fields after successful save
-        $this->reset([
-            'date', 'amount', 'deduction', 'remarks', 'paymentMethod',
-            'checkBank', 'chequeNumber', 'checkDate',
-            'transferBank', 'referenceNumber', 'transactionDate',
-            'selectedInvoices', 'selectedInvoiceIds'
+        // Create payment invoice
+        PaymentInvoice::create([
+            'customer_id' => $this->filterCustomer,
+            'sales_release_id' => $salesRelease->id,
+            'invoice_number' => $salesRelease->id,
+            'invoice_date' => $salesRelease->release_date,
+            'invoice_amount' => $itemTotalAmount,
+            'amount' => $paidAmount,
+            'deduction' => $this->deduction,
+            'ewt_amount' => $this->ewt_amount,
+            'remarks' => $this->remarks,
+            'payment_method' => $this->paymentMethod,
+            'bank' => $this->checkBank ?? $this->transferBank,
+            'cheque_number' => $this->chequeNumber,
+            'check_date' => $this->checkDate,
+            'reference_number' => $this->referenceNumber,
+            'transaction_date' => $this->transactionDate,
         ]);
 
-        $this->dispatch('show-toast', [
-            'type' => 'success',
-            'message' => 'Payment saved successfully!'
-        ]);
+        $remainingAmount -= $paidAmount;
     }
+
+    $this->reset([
+        'date', 'amount', 'deduction', 'remarks', 'paymentMethod',
+        'checkBank', 'chequeNumber', 'checkDate',
+        'transferBank', 'referenceNumber', 'transactionDate',
+        'selectedInvoices', 'selectedInvoiceIds'
+    ]);
+
+    session()->flash('message', 'Payment applied successfully. Items with same invoice share exact same value.');
+}
+
+    
 
     public function mount()
     {
+        $this->checkDate = now()->toDateString();
         $this->date = now()->toDateString();
         $this->customerOptions = Customer::pluck('name', 'id')->toArray();
         $this->invoiceOptions = SalesRelease::distinct()->pluck('receipt_type')->toArray();
@@ -158,7 +180,7 @@ class PaymentApplication extends Component
                     'id' => $invoice->id,
                     'number' => 'INV-' . str_pad($invoice->id, 4, '0', STR_PAD_LEFT),
                     'date' => $invoice->release_date,
-                    'amount' => $invoice->releasedItems->sum('subtotal'),
+                    'amount' => optional($invoice->releasedItems->first())->total_amount ?? 0, // ✅ just get from 1 item
                 ];
             })->toArray();
     }
@@ -175,11 +197,21 @@ class PaymentApplication extends Component
             $query->where('receipt_type', $this->filterInvoice);
         }
 
-        $paidSalesReleaseIds = PaymentInvoice::pluck('sales_release_id')->toArray();
-        $query->whereNotIn('id', $paidSalesReleaseIds);
+        $salesReleases = $query->get();
 
-        return $query->get();
+        // 🔧 Fix here: use total_amount directly from the main table
+        $unpaidOrPartiallyPaid = $salesReleases->filter(function ($release) {
+            $totalAmount = $release->total_amount;
+
+            $totalPaid = PaymentInvoice::where('sales_release_id', $release->id)->sum('amount');
+
+            return $totalPaid < $totalAmount;
+        });
+
+        return $unpaidOrPartiallyPaid;
     }
+
+
 
     public function removeFromTotal($id)
     {
