@@ -51,40 +51,40 @@
           <td class="px-4 py-2">{{ \Carbon\Carbon::parse($recid['created_at'])->format('F d, Y') }}</td>
           <td class="px-4 py-2">{{ $recid['receipt_type'] }}</td>
           <td class="px-4 py-2">₱{{ number_format($recid['grand_total'], 2) }}</td>
-          <td class="px-4 py-2 text-center flex justify-center gap-2">
-          <button wire:click.prevent="addToTotal({{ $recid['id'] }})" @if(in_array($recid['id'], $addedReceivings)) disabled @endif
+          <t d class="px-4 py-2 text-center flex justify-center gap-2">
+          <b utton wire:click.prevent="addToTotal({{ $recid['id'] }})" @if(in_array($recid['id'], $addedReceivings)) disabled @endif
             class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50">
             Add to Total
             <span wire:loading wire:target="addToTotal({{ $recid['id'] }})">Loading...</span>
-          </button>
+            </ button>
 
-          <button wire:click.prevent="removeFromTotal({{ $recid['id'] }})" wire:loading.attr="disabled"
+            <b utton wire:click.prevent="removeFromTotal({{ $recid['id'] }})" wire:loading.attr="disabled"
             wire:target="removeFromTotal({{ $recid['id'] }})"
             class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50"
             wire:key="remove-btn-{{ $recid['id'] }}">
             <span wire:loading.remove wire:target="removeFromTotal({{ $recid['id'] }})">Remove</span>
             <span wire:loading wire:target="removeFromTotal({{ $recid['id'] }})">Removing...</span>
-          </button>
-          </td>
+            </b>
+            </td>
           </tr>
         @endforeach
           </tbody>
 
-          <tfoot class="bg-gray-100 font-semibold">
+          <t foot class="bg-gray-100 font-semibold">
           <tr>
             <td colspan="3" class="px-4 py-2 text-right">Total Amount:</td>
             <td colspan="3" class="px-4 py-2">₱{{ number_format($totalAmount, 2) }}</td>
           </tr>
-          </tfoot>
+          </t>
       @else
-        <tbody>
-        <tr>
+        <t body>
+        <t r>
           <td colspan="4" class="px-6 py-4 text-center text-gray-500">
           No data found. Please select a supplier.
           </td>
-        </tr>
+        </t>
         </tbody>
-      @endif
+    @endif
         </table>
       </div>
       <!-- Returns Table from returns table -->
@@ -102,40 +102,40 @@
           </thead>
 
           @if ($filterSupplier)
-          <tbody>
-          @foreach ($selectedReturns as $return)
-          <tr class="border-t">
-          @php
-        $formatted = str_pad($return['id'], 9, '0', STR_PAD_LEFT);
-        $returnId = 'RTN-' . substr($formatted, 0, 3) . '-' . substr($formatted, 3, 3) . '-' . substr($formatted, 6, 3);
-        @endphp
-          <td class="px-4 py-2">{{ $returnId }}</td>
-          <td class="px-4 py-2">{{ \Carbon\Carbon::parse($return['created_at'])->format('F d, Y') }}</td>
-          <td class="px-4 py-2">{{ $return['return_type'] }}</td>
-          <td class="px-4 py-2">₱{{ number_format($return['total'], 2) }}</td>
-          <td class="px-4 py-2 text-center flex justify-center gap-2">
-          <button wire:click.prevent="addReturnToTotal({{ $return['id'] }})" @if(in_array($return['id'], $addedReturns)) disabled @endif
-            class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50">
-            Add to Total
-            <span wire:loading wire:target="addReturnToTotal({{ $return['id'] }})">Loading...</span>
-          </button>
+        <tbody>
+        @foreach ($selectedReturns as $return)
+        <tr class="border-t">
+        @php
+      $formatted = str_pad($return['id'], 9, '0', STR_PAD_LEFT);
+      $returnId = 'RTN-' . substr($formatted, 0, 3) . '-' . substr($formatted, 3, 3) . '-' . substr($formatted, 6, 3);
+      @endphp
+        <td class="px-4 py-2">{{ $returnId }}</td>
+        <t d class="px-4 py-2">{{ \Carbon\Carbon::parse($return['created_at'])->format('F d, Y') }}</t>
+        <t d class="px-4 py-2">{{ $return['return_type'] }}</t>
+        <td class="px-4 py-2">₱{{ number_format($return['total'], 2) }}</td>
+        <td class="px-4 py-2 text-center flex justify-center gap-2">
+        <button wire:click.prevent="addReturnToTotal({{ $return['id'] }})" @if(in_array($return['id'], $addedReturns)) disabled @endif
+          class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50">
+          Add to Total
+          <span wire:loading wire:target="addReturnToTotal({{ $return['id'] }})">Loading...</span>
+        </button>
 
-          <button wire:click.prevent="removeReturnFromTotal({{ $return['id'] }})" wire:loading.attr="disabled"
-            class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50">
-            <span wire:loading.remove wire:target="removeReturnFromTotal({{ $return['id'] }})">Remove</span>
-            <span wire:loading wire:target="removeReturnFromTotal({{ $return['id'] }})">Removing...</span>
-          </button>
-          </td>
-          </tr>
-        @endforeach
-          </tbody>
+        <button wire:click.prevent="removeReturnFromTotal({{ $return['id'] }})" wire:loading.attr="disabled"
+          class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50">
+          <span wire:loading.remove wire:target="removeReturnFromTotal({{ $return['id'] }})">Remove</span>
+          <span wire:loading wire:target="removeReturnFromTotal({{ $return['id'] }})">Removing...</span>
+        </button>
+        </td>
+        </ tr>
+      @endforeach
+        </tbody>
 
-          <tfoot class="bg-gray-100 font-semibold">
-          <tr>
-            <td colspan="3" class="px-4 py-2 text-right">Total Returns Amount:</td>
-            <td colspan="3" class="px-4 py-2">₱{{ number_format($totalReturnsAmount, 2) }}</td>
-          </tr>
-          </tfoot>
+        <tfoot class="bg-gray-100 font-semibold">
+        <tr>
+          <td colspan="3" class="px-4 py-2 text-right">Total Returns Amount:</td>
+          <td colspan="3" class="px-4 py-2">₱{{ number_format($totalReturnsAmount, 2) }}</td>
+        </tr>
+        </tfoot>
       @else
         <tbody>
         <tr>
