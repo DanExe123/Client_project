@@ -176,7 +176,6 @@ class PaymentToSupplier extends Component
             $payment->returns()->attach($this->addedReturns);
             SupplierReturn::whereIn('id', $this->addedReturns)->update(['status' => 'approved']);
         }
-
         // Total of grand_total from selected receivings
         $totalReceivingGrand = Receiving::whereIn('id', $this->selectedReceivedIds)->sum('grand_total');
 
