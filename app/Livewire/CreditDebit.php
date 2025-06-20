@@ -22,19 +22,13 @@ class CreditDebit extends Component
     public $releasedItems = [];
     public $filterCustomer = '';
     public $customerOptions = [];
-    // public $invoiceOptions = ['DR', 'INVOICE']; // Currently unused
-    // public $slipOptions = []; // Currently unused
 
-    // Renamed for clarity:
     public array $selectedReturnItemIds = []; // Stores IDs of CustomerReturnItem chosen for credit
     public array $selectedReleasedItemIds = []; // Stores IDs of ReleasedItem chosen to deduct from
 
     // Properties for summary totals - keep these for UI display
     public $totalSelectedReleased = 0;
     public $totalSelectedReturns = 0;
-
-    // Remove $savedRows, as we'll use $selectedReturnItemIds for our core logic.
-    // public $savedRows; // No longer needed
 
     public function mount()
     {
@@ -78,14 +72,9 @@ class CreditDebit extends Component
     public function loadReturnItems()
     {
         if (empty($this->filterCustomer)) {
-            // $this->returnItems = collect(); // This property is only for the non-paginated list if you had one.
-            // The `render` method handles the paginated collection.
             return;
         }
 
-        // The actual items for the table are loaded in the render method via $returnItemsPaginated
-        // This method can still set properties if you have a non-paginated list somewhere else.
-        // For the current setup, it's primarily used by `render()`.
     }
 
     // --- Selection and Deselection Methods ---
@@ -173,6 +162,7 @@ class CreditDebit extends Component
 
             $currentReleasedItemIndex = 0;
             $remainingReturnAmountToApply = $this->totalSelectedReturns;
+            $processedReturnIds = [];
 
             foreach ($returnItemsToProcess as $returnItem) {
                 $returnItemAmount = $returnItem->quantity * $returnItem->unit_price;
@@ -216,12 +206,12 @@ class CreditDebit extends Component
                         $currentReleasedItemIndex++;
                     }
                 }
-
-                // After a return item's amount has been distributed (or if no released items were available),
-                // delete the CustomerReturnItem.
-                $returnItem->delete();
+                // Keep track of this return_id for status update
+                $processedReturnIds[] = $returnItem->return_id;
             }
-
+            // Mark all related CustomerReturn records as approved
+            CustomerReturn::whereIn('id', array_unique($processedReturnIds))
+                ->update(['status' => 'approved']);
             DB::commit(); // Commit the transaction
 
             // Reset component state after successful save
@@ -246,6 +236,7 @@ class CreditDebit extends Component
     {
         $returnItemsPaginated = CustomerReturnItem::with(['product', 'return'])
             ->whereHas('return', function ($q) {
+                $q->where('status', 'pending'); // Only pending returns
                 if (!empty($this->filterCustomer)) {
                     $q->where('customer_id', $this->filterCustomer);
                 }
@@ -256,14 +247,7 @@ class CreditDebit extends Component
                         ->orWhere('product_description', 'like', '%' . $this->search . '%');
                 });
             })
-            // Exclude items that are already in $this->selectedReturnItemIds
-            // If you want to show them selected, remove this line.
-            // ->whereNotIn('id', $this->selectedReturnItemIds) // Only show items not yet selected for credit
             ->paginate($this->perPage);
-
-        // $savedRows is no longer explicitly needed as a separate property
-        // The check in the blade is `in_array($item->id, $selectedReturnItemIds)`
-
         return view('livewire.credit-debit', compact('returnItemsPaginated'));
     }
 }

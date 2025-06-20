@@ -1,9 +1,17 @@
 <div>
+  <!-- Top Actions -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold">Cash Flow Summary</h2>
+
+    {{-- View Monthly Button --}}
+    <a href="{{ route('view-monthly-cashflow') }}">
+      <x-button primary label="View Monthly Cash Flow" />
+    </a>
+  </div>
+
   <!-- Cash Flow Table -->
   <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full mx-auto p-4"
     x-data="cashFlowComponent(@js($cashFlowEntries))">
-
-    <h2 class="text-xl font-semibold mb-4">Cash Flow Summary</h2>
 
     <table class="min-w-full border-collapse bg-white text-left text-sm text-gray-500">
       <thead class="bg-gray-50 sticky top-0 z-10">
@@ -20,21 +28,24 @@
         <template x-for="(entry, index) in cashFlowEntries" :key="index">
           <tr class="hover:bg-gray-50">
             <td class="px-6 py-4" x-text="formatDate(entry.date)"></td>
-            <td class="px-6 py-4" x-text="formatCurrency(entry.beginning_balance)"></td>
+            <td class="px-6 py-4 font-semibold" :class="entry.beginning_balance < 0 ? 'text-red-600' : 'text-green-600'"
+              x-text="formatCurrency(entry.beginning_balance)">
+            </td>
             <td class="px-6 py-4" x-text="formatCurrency(entry.customer_payments)"></td>
             <td class="px-6 py-4" x-text="formatCurrency(entry.payment_to_supplier)"></td>
             <td class="px-6 py-4" x-text="formatCurrency(entry.expenses)"></td>
-            <td class="px-6 py-4" x-text="formatCurrency(entry.ending_balance)"></td>
+            <td class="px-6 py-4 font-semibold" :class="entry.ending_balance < 0 ? 'text-red-600' : 'text-green-600'"
+              x-text="formatCurrency(entry.ending_balance)">
+            </td>
           </tr>
         </template>
         <tr x-show="cashFlowEntries.length === 0">
-          <td colspan="5" class="px-6 py-4 text-center text-gray-500">No cash flow data available.</td>
+          <td colspan="6" class="px-6 py-4 text-center text-gray-500">No cash flow data available.</td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
-
 <script>
   function cashFlowComponent(data) {
     return {

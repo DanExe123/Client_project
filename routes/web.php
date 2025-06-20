@@ -48,6 +48,7 @@ use App\Livewire\ServeSaleReleasing;
 use App\Livewire\ServePrintPreview;
 use App\Livewire\ViewReceivingDetails;
 use App\Livewire\Viewtransaction;
+use App\Livewire\ViewMonthlyCashFlow;
 
 use App\Livewire\LoginForm;
 
@@ -119,6 +120,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/sales-summary', SalesSummary::class)->name('sales-summary');
         Route::get('/sales-book', SalesBook::class)->name('sales-book');
         Route::get('/cash-flow', CashFlow::class)->name('cash-flow');
+        Route::get('/cashflow/monthly', ViewMonthlyCashFlow::class)->name('view-monthly-cashflow');
         Route::get('/testform', Testform::class)->name('testform');
     });
 });

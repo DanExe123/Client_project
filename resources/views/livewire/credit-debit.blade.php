@@ -40,20 +40,6 @@
                 </div>
             </div>
         </div>
-        <!-- Search and Buttons -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="w-full sm:max-w-xs flex justify-start relative mb-4">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
-                </span>
-                <input
-                    type="text"
-                    wire:model.live.debounce.300ms="search"
-                    placeholder="Search..."
-                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-            </div>
-        </div>
         @if (session()->has('message'))
             @php
                 $message = session('message');

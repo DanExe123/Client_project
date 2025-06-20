@@ -38,9 +38,15 @@
                                 </td>
                                 <td class="px-4 py-2">{{ $item['type'] }}</td>
                                 <td class="px-4 py-2">{{ $item['reference'] }}</td>
-                                <td class="px-4 py-2">₱{{ number_format($item['credit'], 2) }}</td>
-                                <td class="px-4 py-2">₱{{ number_format($item['payment'], 2) }}</td>
-                                <td class="px-4 py-2">₱{{ number_format($item['sales'], 2) }}</td>
+                                <td class="px-4 py-2">
+                                    {{ is_numeric($item['credit']) ? '₱' . number_format($item['credit'], 2) : $item['credit'] }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ is_numeric($item['payment']) ? '₱' . number_format($item['payment'], 2) : $item['payment'] }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ is_numeric($item['sales']) ? '₱' . number_format($item['sales'], 2) : $item['sales'] }}
+                                </td>
                                 <td class="px-4 py-2">
                                     ₱{{ is_null($item['running_balance']) ? 'Running Balance' : number_format($item['running_balance'], 2) }}
                                 </td>

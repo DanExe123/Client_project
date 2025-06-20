@@ -81,8 +81,8 @@ class Viewtransaction extends Component
                 'created_at' => $item->created_at,
                 'type' => 'Sales',
                 'reference' => 'INV-' . $item->id,
-                'credit' => 0,
-                'payment' => 0,
+                'credit' => '-',
+                'payment' => '-',
                 'sales' => $item->total_amount ?? 0,
                 'running_balance' => null,
             ]);
@@ -98,8 +98,8 @@ class Viewtransaction extends Component
                 'type' => 'Return',
                 'reference' => 'RS-' . $item->id,
                 'credit' => $item->subtotal ?? 0,
-                'payment' => 0,
-                'sales' => 0,
+                'payment' => '-',
+                'sales' => '-',
                 'running_balance' => null,
             ]);
     }
@@ -113,9 +113,9 @@ class Viewtransaction extends Component
                 'created_at' => $item->created_at,
                 'type' => 'Payment',
                 'reference' => 'PAY-' . $item->id,
-                'credit' => 0,
+                'credit' => '-',
                 'payment' => $item->amount ?? 0,
-                'sales' => 0,
+                'sales' => '-',
                 'running_balance' => null,
             ]);
     }
