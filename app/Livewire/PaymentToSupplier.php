@@ -7,6 +7,7 @@ use App\Models\Receiving;
 use App\Models\Payment;
 use App\Models\SupplierReturn;
 use App\Models\SupplierReturnItem;
+use App\Models\ReceivedItem;
 
 
 class PaymentToSupplier extends Component
@@ -22,10 +23,31 @@ class PaymentToSupplier extends Component
     public $selectedReceivedIds = [];
     public $totalAmount = 0;
     public $addedReceivings = [];
-    public $PaymentMethod;
+    public $amount, $deduction = 0, $ewt_amount = 0, $remarks;
+
+    public $paymentMethod = '' ;
     public $checkBank, $chequeNumber, $checkDate;
     public $transferBank, $referenceNumber, $transactionDate;
-    public $amount, $deduction = 0, $ewt_amount = 0, $remarks;
+
+    public function updatedpaymentMethod($value)
+    {
+        if ($value !== 'Check') {
+            $this->transferBank = null;
+            $this->referenceNumber = null;
+            $this->transactionDate = null;
+        } elseif ($value !== 'Bank Transfer') {
+            $this->checkBank = null;
+            $this->chequeNumber = null;
+            $this->checkDate = null;
+        } else {
+            $this->checkBank = null;
+            $this->chequeNumber = null;
+            $this->checkDate = null;
+            $this->transferBank = null;
+            $this->referenceNumber = null;
+            $this->transactionDate = null;
+        }
+    }
 
     public function mount()
     {
@@ -65,21 +87,33 @@ class PaymentToSupplier extends Component
 
     public function loadReceivedItems()
     {
-        // Load Receivings
-        $this->selectedReceived = Receiving::where('supplier_id', $this->filterSupplier)
-            ->where('grand_total', '>', 0)
+        $receivedItems = ReceivedItem::where('supplier_id', $this->filterSupplier)
+            ->orderBy('receiving_id')
             ->get()
-            ->map(function ($rec) {
-                return [
-                    'id' => $rec->id,
-                    'created_at' => $rec->created_at,
-                    'receipt_type' => $rec->receipt_type,
-                    'grand_total' => $rec->grand_total,
-                ];
-            })
-            ->toArray();
+            ->groupBy('receiving_id');
 
-        // Load Returns
+            $this->selectedReceived = [];
+
+            foreach ($receivedItems as $receivingId => $items) {
+                $firstItem = $items->first();
+        
+                // ✅ Get actual grand_total from DB
+                $grandTotal = $firstItem->grand_total ?? 0;
+        
+                // ✅ Skip display if grand_total is zero
+                if ($grandTotal <= 0) {
+                    continue;
+                }
+        
+                $this->selectedReceived[] = [
+                    'id' => $receivingId,
+                    'created_at' => $firstItem->created_at,
+                    'receipt_type' => $firstItem->receipt_type ?? 'N/A',
+                    'grand_total' => $grandTotal,
+                ];
+            }
+
+        // Returns untouched
         $this->selectedReturns = SupplierReturn::with('items')
             ->where('supplier_id', $this->filterSupplier)
             ->where('status', 'pending')
@@ -88,82 +122,92 @@ class PaymentToSupplier extends Component
                 return [
                     'id' => $return->id,
                     'created_at' => $return->created_at,
-                    'return_type' => $return->status, // Or use another type field if you have one
+                    'return_type' => $return->status,
                     'remarks' => $return->remarks,
                     'total' => $return->items->sum(fn($item) => $item->quantity * $item->unit_price),
                 ];
             })
             ->toArray();
 
-        // Reset totals
         $this->addedReceivings = [];
         $this->totalAmount = 0;
-
         $this->addedReturns = [];
         $this->totalReturnsAmount = 0;
     }
 
-    public function addToTotal($id)
-    {
-        if (!in_array($id, $this->addedReceivings)) {
-            $receiving = Receiving::find($id);
+    
 
-            if ($receiving) {
-                $this->totalAmount += $receiving->grand_total;
-                $this->addedReceivings[] = $id;
-                $this->selectedReceivedIds[] = $id;
-            }
+    public function addToTotal($receivingId)
+    {
+        if (!in_array($receivingId, $this->addedReceivings)) {
+            // Find the grand_total from $this->selectedReceived
+            $grand = collect($this->selectedReceived)
+                ->firstWhere('id', $receivingId)['grand_total'] ?? 0;
+
+            $this->totalAmount += $grand;
+            $this->addedReceivings[] = $receivingId;
+            $this->selectedReceivedIds[] = $receivingId;
         }
     }
 
-    public function removeFromTotal($id)
+    public function removeFromTotal($receivingId)
     {
-        if (($key = array_search($id, $this->addedReceivings)) !== false) {
-            $receiving = Receiving::find($id);
-            if ($receiving) {
-                $this->totalAmount -= $receiving->grand_total;
-                unset($this->addedReceivings[$key]);
-            }
+        if (($key = array_search($receivingId, $this->addedReceivings)) !== false) {
+            $grand = collect($this->selectedReceived)
+                ->firstWhere('id', $receivingId)['grand_total'] ?? 0;
+
+            $this->totalAmount -= $grand;
+            unset($this->addedReceivings[$key]);
         }
 
-        if (($index = array_search($id, $this->selectedReceivedIds)) !== false) {
+        if (($index = array_search($receivingId, $this->selectedReceivedIds)) !== false) {
             unset($this->selectedReceivedIds[$index]);
         }
     }
-    public function updatedPaymentMethod()
-    {
-        // Reset fields based on payment method change
-        $this->reset([
-            'checkBank',
-            'chequeNumber',
-            'checkDate',
-            'transferBank',
-            'referenceNumber',
-            'transactionDate',
 
-        ]);
+    protected function rules()
+    {
+        return [
+            'date' => 'required|date',
+            'filterSupplier' => 'required|exists:suppliers,id',
+            'paymentMethod' => 'required|string|in:Cash,Check,Bank Transfer',
+            'amount' => 'required|numeric|min:0.01',
+    
+            'checkBank' => 'required_if:paymentMethod,Check',
+            'chequeNumber' => 'required_if:paymentMethod,Check',
+            'checkDate' => 'required_if:paymentMethod,Check|date',
+    
+            'transferBank' => 'required_if:paymentMethod,Bank Transfer',
+            'referenceNumber' => 'required_if:paymentMethod,Bank Transfer',
+            'transactionDate' => 'required_if:paymentMethod,Bank Transfer|date',
+    
+            'deduction' => 'nullable|numeric|min:0',
+            'ewt_amount' => 'nullable|numeric|min:0',
+            'remarks' => 'nullable|string|max:500',
+        ];
     }
 
     public function savePayments()
     {
-        $this->validate([
-            'date' => 'required|date',
-            'filterSupplier' => 'required|exists:suppliers,id',
-            'PaymentMethod' => 'required',
-            'amount' => 'required|numeric|min:0',
-        ]);
+        $this->validate();
+
+        if (empty($this->selectedReceivedIds)) {
+            $this->addError('selectedReceivedIds', 'Please select at least one Received item.');
+            return;
+        }
 
         $totalToDeduct = $this->amount + $this->ewt_amount + $this->deduction + $this->totalReturnsAmount;
 
+        // Save Payment
         $payment = Payment::create([
             'date' => $this->date,
             'supplier_id' => $this->filterSupplier,
-            'payment_method' => $this->PaymentMethod,
-            'bank' => $this->PaymentMethod === 'Check' ? $this->checkBank : ($this->PaymentMethod === 'Bank Transfer' ? $this->transferBank : null),
-            'cheque_number' => $this->PaymentMethod === 'Check' ? $this->chequeNumber : null,
-            'check_date' => $this->PaymentMethod === 'Check' ? $this->checkDate : null,
-            'reference_number' => $this->PaymentMethod === 'Bank Transfer' ? $this->referenceNumber : null,
-            'transaction_date' => $this->PaymentMethod === 'Bank Transfer' ? $this->transactionDate : null,
+            'payment_method' => $this->paymentMethod,
+            'bank' => $this->paymentMethod === 'Check' ? $this->checkBank : ($this->paymentMethod === 'Bank Transfer' ? $this->transferBank : null),
+            'cheque_number' => $this->paymentMethod === 'Check' ? $this->chequeNumber : null,
+            'check_date' => $this->paymentMethod === 'Check' ? $this->checkDate : null,
+            'reference_number' => $this->paymentMethod === 'Bank Transfer' ? $this->referenceNumber : null,
+            'transaction_date' => $this->paymentMethod === 'Bank Transfer' ? $this->transactionDate : null,
             'total_amount' => $this->totalAmount,
             'amount_paid' => $this->amount,
             'ewt_amount' => $this->ewt_amount,
@@ -171,27 +215,61 @@ class PaymentToSupplier extends Component
             'remarks' => $this->remarks,
             'received_item_ids' => json_encode($this->selectedReceivedIds),
         ]);
-        // Attach selected return records
+
+        // Approve selected returns
         if (!empty($this->addedReturns)) {
             $payment->returns()->attach($this->addedReturns);
             SupplierReturn::whereIn('id', $this->addedReturns)->update(['status' => 'approved', 'approved_at' => now(),]);
         }
-        // Total of grand_total from selected receivings
-        $totalReceivingGrand = Receiving::whereIn('id', $this->selectedReceivedIds)->sum('grand_total');
 
-        // Loop through and apply proportional deduction
-        foreach ($this->selectedReceivedIds as $receivingId) {
-            $receiving = Receiving::find($receivingId);
+        // Deduct from Receiving::grand_total (in order)
+        $remainingAmount = $totalToDeduct;
 
-            if ($receiving && $totalReceivingGrand > 0) {
-                $shareRatio = $receiving->grand_total / $totalReceivingGrand;
-                $deductAmount = $totalToDeduct * $shareRatio;
 
-                $receiving->grand_total = max(0, $receiving->grand_total - $deductAmount);
-                $receiving->save();
+        // Fetch one row per receiving_id
+        $receivedGroups = ReceivedItem::whereIn('receiving_id', $this->selectedReceivedIds)
+            ->orderByRaw("FIELD(receiving_id, " . implode(',', $this->selectedReceivedIds) . ")")
+            ->get()
+            ->groupBy('receiving_id');
+        
+            foreach ($this->selectedReceivedIds as $receivingId) {
+                if ($remainingAmount <= 0) break;
+            
+                $items = $receivedGroups[$receivingId] ?? collect();
+                if ($items->isEmpty()) continue;
+            
+                // Use first item to get shared grand_total
+                $firstItem = $items->first();
+                $grandTotal = $firstItem->grand_total;
+            
+                if ($grandTotal <= 0) continue;
+            
+                if ($remainingAmount >= $grandTotal) {
+                    // Enough to pay full grand_total
+                    $remainingAmount -= $grandTotal;
+            
+                    foreach ($items as $item) {
+                        $item->grand_total = 0;
+                        $item->save();
+                    }
+            
+                } else {
+                    // Partial payment, reduce grand_total
+                    $updatedTotal = round($grandTotal - $remainingAmount, 2);
+                    $remainingAmount = 0;
+            
+                    foreach ($items as $item) {
+                        $item->grand_total = $updatedTotal;
+                        $item->save();
+                    }
+                }
             }
-        }
+            
+        
+
+        // Finish
         session()->flash('message', 'Payment saved and grand totals updated!');
+
         $this->reset([
             'selectedReturns',
             'addedReturns',
@@ -202,7 +280,7 @@ class PaymentToSupplier extends Component
             'selectedReceivedIds',
             'totalAmount',
             'addedReceivings',
-            'PaymentMethod',
+            'paymentMethod',
             'checkBank',
             'chequeNumber',
             'checkDate',
@@ -214,12 +292,20 @@ class PaymentToSupplier extends Component
             'ewt_amount',
             'remarks',
         ]);
+
         $this->date = now()->format('Y-m-d');
         $this->supplierOptions = Supplier::pluck('name', 'id')->toArray();
         $this->loadReceivedItems();
     }
+
+    
+    
     public function render()
     {
-        return view('livewire.payment-to-supplier');
+        return view('livewire.payment-to-supplier', [
+            'totalAmount' => $this->totalAmount,
+        'totalReturnsAmount' => $this->totalReturnsAmount,
+        'payableAmount' => $this->payableAmount,
+        ]);
     }
 }
