@@ -38,7 +38,6 @@ class PaymentApplication extends Component
         return [
             'date' => 'required|date',
             'filterCustomer' => 'required|exists:customers,id',
-            'filterInvoice' => 'required|string',
             'amount' => 'required|numeric|min:0.01',
             'paymentMethod' => 'required|string|in:Cash,Check,Bank Transfer',
 
@@ -72,84 +71,90 @@ class PaymentApplication extends Component
     }
 
     public function savePayment()
-{
-    $this->amount = str_replace(',', '', $this->amount);
-    $this->validate();
+    {
+        $this->amount = str_replace(',', '', $this->amount);
+        $this->validate(); 
 
-    $remainingAmount = $this->amount;
-
-    $invoiceIds = collect($this->selectedInvoices)
-        ->filter(fn($invoice) => in_array($invoice['id'], $this->selectedInvoiceIds))
-        ->pluck('id')
-        ->unique();
-
-    $groupedInvoices = SalesRelease::with('releasedItems')
-        ->whereIn('id', $invoiceIds)
-        ->get();
-
-    foreach ($groupedInvoices as $salesRelease) {
-        if ($remainingAmount <= 0) break;
-
-        $items = $salesRelease->releasedItems;
-        $itemCount = $items->count();
-
-        if ($itemCount === 0) continue;
-
-        // All items have the same total_amount (as per your rule)
-        $itemTotalAmount = $items->first()->total_amount;
-        $invoiceTotalAmount = $itemTotalAmount; // NOT SUM
-        $totalThisInvoice = $invoiceTotalAmount; // We treat invoice as ONE BLOCK
-
-        if ($remainingAmount >= $totalThisInvoice) {
-            // Full payment → Set ALL items to 0
-            foreach ($items as $item) {
-                $item->total_amount = 0;
-                $item->save();
-            }
-
-            $paidAmount = $totalThisInvoice;
-        } else {
-            // Partial payment → Calculate new equal value
-            $newAmount = $itemTotalAmount - $remainingAmount;
-            foreach ($items as $item) {
-                $item->total_amount = round($newAmount, 2);
-                $item->save();
-            }
-
-            $paidAmount = $remainingAmount;
+        if (empty($this->selectedInvoiceIds)) {
+            $this->addError('selectedInvoiceIds', 'Please select at least one invoice.');
+            return;
         }
 
-        // Create payment invoice
-        PaymentInvoice::create([
-            'customer_id' => $this->filterCustomer,
-            'sales_release_id' => $salesRelease->id,
-            'invoice_number' => $salesRelease->id,
-            'invoice_date' => $salesRelease->release_date,
-            'invoice_amount' => $itemTotalAmount,
-            'amount' => $paidAmount,
-            'deduction' => $this->deduction,
-            'ewt_amount' => $this->ewt_amount,
-            'remarks' => $this->remarks,
-            'payment_method' => $this->paymentMethod,
-            'bank' => $this->checkBank ?? $this->transferBank,
-            'cheque_number' => $this->chequeNumber,
-            'check_date' => $this->checkDate,
-            'reference_number' => $this->referenceNumber,
-            'transaction_date' => $this->transactionDate,
+        $totalPayment = $this->amount + $this->deduction + $this->ewt_amount;
+        $remainingAmount = $totalPayment;
+
+        $invoiceIds = collect($this->selectedInvoices)
+            ->filter(fn($invoice) => in_array($invoice['id'], $this->selectedInvoiceIds))
+            ->pluck('id')
+            ->unique();
+
+        $groupedInvoices = SalesRelease::with('releasedItems')
+            ->whereIn('id', $invoiceIds)
+            ->get();
+
+        foreach ($groupedInvoices as $salesRelease) {
+            if ($remainingAmount <= 0) break;
+
+            $items = $salesRelease->releasedItems;
+            $itemCount = $items->count();
+
+            if ($itemCount === 0) continue;
+
+            // All items have the same total_amount (as per your rule)
+            $itemTotalAmount = $items->first()->total_amount;
+            $invoiceTotalAmount = $itemTotalAmount; // NOT SUM
+            $totalThisInvoice = $invoiceTotalAmount; // We treat invoice as ONE BLOCK
+
+            if ($remainingAmount >= $totalThisInvoice) {
+                // Full payment → Set ALL items to 0
+                foreach ($items as $item) {
+                    $item->total_amount = 0;
+                    $item->save();
+                }
+
+                $paidAmount = $totalThisInvoice;
+            } else {
+                // Partial payment → Calculate new equal value
+                $newAmount = $itemTotalAmount - $remainingAmount;
+                foreach ($items as $item) {
+                    $item->total_amount = round($newAmount, 2);
+                    $item->save();
+                }
+
+                $paidAmount = $remainingAmount;
+            }
+
+            // Create payment invoice
+            PaymentInvoice::create([
+                'customer_id' => $this->filterCustomer,
+                'sales_release_id' => $salesRelease->id,
+                'invoice_number' => $salesRelease->id,
+                'invoice_date' => $salesRelease->release_date,
+                'invoice_amount' => $itemTotalAmount,
+                'amount' => $paidAmount,
+                'deduction' => $this->deduction,
+                'ewt_amount' => $this->ewt_amount,
+                'remarks' => $this->remarks,
+                'payment_method' => $this->paymentMethod,
+                'bank' => $this->checkBank ?? $this->transferBank,
+                'cheque_number' => $this->chequeNumber,
+                'check_date' => $this->checkDate,
+                'reference_number' => $this->referenceNumber,
+                'transaction_date' => $this->transactionDate,
+            ]);
+
+            $remainingAmount -= $paidAmount;
+        }
+
+        $this->reset([
+            'date', 'amount', 'deduction', 'remarks', 'paymentMethod',
+            'checkBank', 'chequeNumber', 'checkDate',
+            'transferBank', 'referenceNumber', 'transactionDate',
+            'selectedInvoices', 'selectedInvoiceIds'
         ]);
 
-        $remainingAmount -= $paidAmount;
+        session()->flash('message', 'Payment applied successfully. Items with same invoice share exact same value.');
     }
-
-    $this->reset([
-        'date', 'amount', 'deduction', 'remarks', 'paymentMethod',
-        'checkBank', 'chequeNumber', 'checkDate',
-        'transferBank', 'referenceNumber', 'transactionDate',
-        'selectedInvoices', 'selectedInvoiceIds'
-    ]);
-
-    session()->flash('message', 'Payment applied successfully. Items with same invoice share exact same value.');
-}
 
     
 

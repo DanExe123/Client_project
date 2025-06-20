@@ -20,6 +20,7 @@
         <option value="{{ $id }}">{{ $name }}</option>
       @endforeach
         </select>
+        @error('filterSupplier') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
       </div>
       <div class="overflow-auto rounded border border-gray-300 mt-3">
         <table class="w-full text-left text-sm text-gray-700">
@@ -63,14 +64,14 @@
           </tbody>
           <tfoot class="bg-gray-100 font-semibold">
           <tr>
-            <td colspan="3" class="px-4 py-2 text-right">Total Amount:</td>
-            <td colspan="3" class="px-4 py-2">₱{{ number_format($totalAmount, 2) }}</td>
+            <td colspan="4" class="px-4 py-2 text-right">Total Amount:</td>
+            <td colspan="4" class="px-4 py-2">₱{{ number_format($totalAmount, 2) }}</td>
           </tr>
           </tfoot>
       @else
         <tbody>
         <tr>
-          <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+          <td colspan="5" class="px-6 py-4 text-center text-gray-500">
           No data found. Please select a supplier.
           </td>
         </tr>
@@ -78,6 +79,10 @@
       @endif
         </table>
       </div>
+      @if ($errors->has('selectedReceivedIds'))
+        <p class="text-red-600 text-sm mt-1">{{ $errors->first('selectedReceivedIds') }}</p>
+      @endif
+  
       <div class="overflow-auto rounded border border-gray-300 mt-6">
         <h2 class="text-lg font-semibold mb-2">Returns from Supplier</h2>
         <table class="w-full text-left text-sm text-gray-700">
@@ -119,8 +124,8 @@
           </tbody>
           <tfoot class="bg-gray-100 font-semibold">
           <tr>
-            <td colspan="3" class="px-4 py-2 text-right">Total Returns Amount:</td>
-            <td colspan="3" class="px-4 py-2">₱{{ number_format($totalReturnsAmount, 2) }}</td>
+            <td colspan="4" class="px-4 py-2 text-right">Total Returns Amount:</td>
+            <td colspan="4" class="px-4 py-2">₱{{ number_format($totalReturnsAmount, 2) }}</td>
           </tr>
           </tfoot>
       @else
@@ -140,76 +145,91 @@
           ₱{{ number_format($this->payableAmount, 2) }}
         </div>
       </div>
-      <div x-data="{ method: '' }" class="space-y-4">
-        <div>
-          <label for="PaymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
-          <select id="PaymentMethod" x-model="method" @change="$dispatch('input', $event.target.value)"
-            wire:model="PaymentMethod" class="w-full border rounded px-3 py-2">
-            <option value="" disabled>Select Method</option>
-            <option value="Cash">Cash</option>
-            <option value="Check">Check</option>
-            <option value="Bank Transfer">Bank Transfer</option>
-          </select>
+
+      <div class="space-y-4">
+        <!-- Payment Method Select -->
+        <div wire:poll>
+            <label for="paymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
+            <select id="paymentMethod" wire:model="paymentMethod" class="w-full border rounded px-3 py-2">
+                <option value="" disabled>Select Method</option>
+                <option value="Cash">Cash</option>
+                <option value="Check">Check</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+            @error('paymentMethod')
+              <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+          @enderror
+
         </div>
-        <div x-show="method === 'Check'" x-transition>
+    
+        <!-- Show Check Fields -->
+        @if ($paymentMethod === 'Check')
           <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
-            <div>
-              <label class="block mb-1 font-semibold">Select Bank</label>
-              <select wire:model="checkBank" class="w-full border rounded px-3 py-2">
-                <option value="" disabled>Select Bank</option>
-                <option>BDO Unibank</option>
-                <option>Bank of the Philippine Islands (BPI)</option>
-                <option>Metrobank</option>
-                <option>Philippine National Bank (PNB)</option>
-                <option>Land Bank of the Philippines (LANDBANK)</option>
-                <option>China Banking Corporation (China Bank)</option>
-                <option>Rizal Commercial Banking Corporation (RCBC)</option>
-                <option>EastWest Bank</option>
-                <option>Security Bank Corporation</option>
-              </select>
-            </div>
-            <div>
-              <label class="block mb-1 font-semibold">Cheque Number</label>
-              <input type="text" wire:model="chequeNumber" class="w-full border rounded px-3 py-2" />
-            </div>
-            <div>
-              <label class="block mb-1 font-semibold">Check Date</label>
-              <input type="date" wire:model="checkDate" class="w-full border rounded px-3 py-2" />
-            </div>
+              <div>
+                  <label class="block mb-1 font-semibold">Select Bank</label>
+                  <select wire:model="checkBank" class="w-full border rounded px-3 py-2">
+                      <option value="" disabled>Select Bank</option>
+                      <!-- bank options -->
+                  </select>
+                  @error('checkBank')
+                      <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                  @enderror
+              </div>
+              <div>
+                  <label class="block mb-1 font-semibold">Cheque Number</label>
+                  <input type="text" wire:model="chequeNumber" class="w-full border rounded px-3 py-2" />
+                  @error('chequeNumber')
+                      <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                  @enderror
+              </div>
+              <div>
+                  <label class="block mb-1 font-semibold">Check Date</label>
+                  <input type="date" wire:model="checkDate" class="w-full border rounded px-3 py-2" />
+                  @error('checkDate')
+                      <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                  @enderror
+              </div>
           </div>
-        </div>
-        <div x-show="method === 'Bank Transfer'" x-transition>
+        @endif
+
+        <!-- Show Bank Transfer Fields -->
+        @if ($paymentMethod === 'Bank Transfer')
           <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
-            <div>
-              <label class="block mb-1 font-semibold">Select Bank</label>
-              <select wire:model="transferBank" class="w-full border rounded px-3 py-2">
-                <option value="" disabled>Select Bank</option>
-                <option>Gcash</option>
-                <option>BDO Unibank</option>
-                <option>Bank of the Philippine Islands (BPI)</option>
-                <option>Metrobank</option>
-                <option>Philippine National Bank (PNB)</option>
-                <option>Land Bank of the Philippines (LANDBANK)</option>
-                <option>China Banking Corporation (China Bank)</option>
-                <option>Rizal Commercial Banking Corporation (RCBC)</option>
-                <option>EastWest Bank</option>
-                <option>Security Bank Corporation</option>
-              </select>
-            </div>
-            <div>
-              <label class="block mb-1 font-semibold">Reference Number</label>
-              <input type="text" wire:model="referenceNumber" class="w-full border rounded px-3 py-2" />
-            </div>
-            <div>
-              <label class="block mb-1 font-semibold">Transaction Date</label>
-              <input type="date" wire:model="transactionDate" class="w-full border rounded px-3 py-2" />
-            </div>
+              <div>
+                  <label class="block mb-1 font-semibold">Select Bank</label>
+                  <select wire:model="transferBank" class="w-full border rounded px-3 py-2">
+                      <option value="" disabled>Select Bank</option>
+                      <!-- bank options -->
+                  </select>
+                  @error('transferBank')
+                      <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                  @enderror
+              </div>
+              <div>
+                  <label class="block mb-1 font-semibold">Reference Number</label>
+                  <input type="text" wire:model="referenceNumber" class="w-full border rounded px-3 py-2" />
+                  @error('referenceNumber')
+                      <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                  @enderror
+              </div>
+              <div>
+                  <label class="block mb-1 font-semibold">Transaction Date</label>
+                  <input type="date" wire:model="transactionDate" class="w-full border rounded px-3 py-2" />
+                  @error('transactionDate')
+                      <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                  @enderror
+              </div>
           </div>
-        </div>
+        @endif
+    </div>
+    
+        
         <div>
           <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
           <input id="amount" type="number" wire:model.lazy="amount" class="w-full border rounded px-3 py-2" />
+          @error('amount') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
         </div>
+
         <div>
           <label for="deduction" class="block mb-1 font-semibold">Other Deduction</label>
           <input id="deduction" type="number" wire:model.lazy="deduction" class="w-full border rounded px-3 py-2"
@@ -225,48 +245,23 @@
           <textarea id="remarks" wire:model.lazy="remarks" rows="3" class="w-full border rounded px-3 py-2"
             placeholder="Add notes..."></textarea>
         </div>
-      </div>
+
       <div class="flex justify-end mt-6">
-        <x-button type="submit" wire:loading.attr="disabled" wire:target="savePayments" blue label="Save as Payment">
-          <span wire:loading wire:target="savePayments" class="animate-spin mr-2 text-white">
-            <svg class="w-4 h-4 inline-block" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-            </svg>
-          </span>
-        </x-button>
+        <button type="submit"
+            wire:loading.attr="disabled"
+            wire:target="savePayments"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+            <span wire:loading wire:target="savePayments" class="animate-spin mr-2">
+              <svg class="w-4 h-4 inline-block" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+            </span>
+            Save as Payment
+        </button>
+
       </div>
     </form>
   </div>
 </div>
-<script>
-  function toggleFields(method) {
-    const checkFields = document.getElementById('checkFields');
-    const bankTransferFields = document.getElementById('bankTransferFields');
-    if (method === 'Check') {
-      checkFields.style.display = 'block';
-      bankTransferFields.style.display = 'none';
-    } else if (method === 'Bank Transfer') {
-      checkFields.style.display = 'none';
-      bankTransferFields.style.display = 'block';
-    } else {
-      checkFields.style.display = 'none';
-      bankTransferFields.style.display = 'none';
-    }
-  }
-  document.addEventListener("livewire:load", function () {
-    const paymentMethodSelect = document.getElementById('PaymentMethod');
-    if (!paymentMethodSelect) return;
-    // Run on initial load
-    toggleFields(paymentMethodSelect.value);
-    // Listen for manual change (user-initiated)
-    paymentMethodSelect.addEventListener('change', function () {
-      toggleFields(this.value);
-    });
-    // Listen for Livewire DOM updates
-    Livewire.hook('message.processed', (message, component) => {
-      const updatedSelect = document.getElementById('PaymentMethod');
-      if (updatedSelect) toggleFields(updatedSelect.value);
-    });
-  });
-</script>

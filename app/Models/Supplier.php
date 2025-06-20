@@ -23,5 +23,9 @@ class Supplier extends Model
     {
         return $this->hasMany(\App\Models\ReceivedItem::class);
     }
+    public function receivings()
+    {
+        return $this->hasMany(Receiving::class);
+    }
 }
 

@@ -5,9 +5,12 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\PurchaseOrder;
 use App\Models\Receiving;
+use App\Models\Supplier;
+use Livewire\Attributes\Url;
 
 class Recieving extends Component
 {
+    #[Url(as: 'search', history: true)]
     public $search = '';
     public $purchaseOrders;
     public $selectedpoId = [];
@@ -104,17 +107,24 @@ class Recieving extends Component
         session()->flash('message', 'Purchase order cancelled successfully.');
     }
 
-
-    public function render()
-    {
-        return view('livewire.recieving', [
-            'tabs' => [
-                'For Approval' => $this->forApprovalOrders,
-                'Approved' => $this->approvedOrders,
-                'Cancelled' => $this->cancelledOrders,
-            ],
-            'selectedpoId' => $this->selectedpoId,
-            'statusTab' => $this->statusTab,
-        ]);
-    }
+    public function updatingSearch()
+{
+    // Reset pagination or other states if needed
 }
+
+
+public function render()
+{
+    $this->forApprovalOrders = PurchaseOrder::with('supplier')
+        ->where('status', 'Pending')
+        ->when($this->search, function ($query) {
+            $query->whereHas('supplier', function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%');
+            });
+        })
+        ->get();
+
+    return view('livewire.recieving');
+}
+
+}    

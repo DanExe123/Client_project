@@ -27,67 +27,57 @@
                   <option value="{{ $id }}">{{ $name }}</option>
               @endforeach
           </select>
-      </div>
-  
-      <!-- Invoice Filter -->
-      <div class="mb-2">
-          <label class="text-sm text-gray-700 font-medium mb-1 block">Invoice/DR</label>
-          <select wire:model="filterInvoice" class="rounded border px-3 py-2 text-sm w-full mt-2" required>
-              <option value="">All Invoices/DR</option>
-              @foreach ($invoiceOptions as $type)
-                  <option value="{{ $type }}">{{ $type }}</option>
-              @endforeach
-          </select>
+          @error('filterCustomer') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
       </div>
   
     <!-- Invoice Table -->
-  <div class="overflow-auto rounded border border-gray-300 mt-3">
-      <table class="w-full text-left text-sm text-gray-700">
-          <thead class="bg-gray-100">
-              <tr>
-                  <th class="px-4 py-2">Invoice Number</th>
-                  <th class="px-4 py-2">Invoice Date</th>
-                  <th class="px-4 py-2">Invoice Amount</th>
-                  <th class="px-4 py-2">Action</th>
-              </tr>
-          </thead>
-  
-          @if ($filterCustomer)
-              <tbody>
-                  @foreach ($selectedInvoices as $index => $inv)
-      <tr class="border-t">
-          <td class="px-4 py-2">{{ $inv['number'] }}</td>
-          <td class="px-4 py-2">{{ \Carbon\Carbon::parse($inv['date'])->format('F d, Y') }}</td>
-          <td class="px-4 py-2">₱{{ number_format($inv['amount'], 2) }}</td>
-          <td class="text-center flex justify-center gap-2 my-2">
-              <button
-              wire:click.prevent="addToTotal({{ $inv['id'] }})"
-              wire:loading.attr="disabled"
-              wire:target="addToTotal({{ $inv['id'] }})"
-              class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50"
-              wire:key="add-btn-{{ $inv['id'] }}"
-          >
-              <span wire:loading.remove wire:target="addToTotal({{ $inv['id'] }})">Add to Total</span>
-              <span wire:loading wire:target="addToTotal({{ $inv['id'] }})">Loading...</span>
-          </button>
-          
-          
-          <button
-          
-          wire:click.prevent="removeFromTotal({{ $inv['id'] }})"
-          wire:loading.attr="disabled"
-          wire:target="removeFromTotal({{ $inv['id'] }})"
-          class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50"
-          wire:key="remove-btn-{{ $inv['id'] }}"
-      >
-          <span wire:loading.remove wire:target="removeFromTotal({{ $inv['id'] }})">Remove</span>
-          <span wire:loading wire:target="removeFromTotal({{ $inv['id'] }})">Removing...</span>
-      </button>
-       
-              
-          </td>
-      </tr>
-  @endforeach
+        <div class="overflow-auto rounded border border-gray-300 mt-3">
+            <table class="w-full text-left text-sm text-gray-700">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2">Invoice Number</th>
+                        <th class="px-4 py-2">Invoice Date</th>
+                        <th class="px-4 py-2">Invoice Amount</th>
+                        <th class="px-4 py-2">Action</th>
+                    </tr>
+                </thead>
+        
+                @if ($filterCustomer)
+                    <tbody>
+                        @foreach ($selectedInvoices as $index => $inv)
+            <tr class="border-t">
+                <td class="px-4 py-2">{{ $inv['number'] }}</td>
+                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($inv['date'])->format('F d, Y') }}</td>
+                <td class="px-4 py-2">₱{{ number_format($inv['amount'], 2) }}</td>
+                <td class="text-center flex justify-center gap-2 my-2">
+                    <button
+                    wire:click.prevent="addToTotal({{ $inv['id'] }})"
+                    wire:loading.attr="disabled"
+                    wire:target="addToTotal({{ $inv['id'] }})"
+                    class="!h-6 px-3 border rounded text-green-600 border-green-600 hover:bg-green-50"
+                    wire:key="add-btn-{{ $inv['id'] }}"
+                >
+                    <span wire:loading.remove wire:target="addToTotal({{ $inv['id'] }})">Add to Total</span>
+                    <span wire:loading wire:target="addToTotal({{ $inv['id'] }})">Loading...</span>
+                </button>
+                
+                
+                <button
+                
+                wire:click.prevent="removeFromTotal({{ $inv['id'] }})"
+                wire:loading.attr="disabled"
+                wire:target="removeFromTotal({{ $inv['id'] }})"
+                class="!h-6 px-3 border rounded text-red-600 border-red-600 hover:bg-red-50"
+                wire:key="remove-btn-{{ $inv['id'] }}"
+            >
+                <span wire:loading.remove wire:target="removeFromTotal({{ $inv['id'] }})">Remove</span>
+                <span wire:loading wire:target="removeFromTotal({{ $inv['id'] }})">Removing...</span>
+            </button>
+            
+                    
+                </td>
+            </tr>
+        @endforeach
   
               </tbody>
   
@@ -109,6 +99,13 @@
           @endif
       </table>
   </div>
+
+    @if ($errors->has('selectedInvoiceIds'))
+        <p class="text-red-600 text-sm mt-2 text-center">
+            {{ $errors->first('selectedInvoiceIds') }}
+        </p>
+    @endif
+
 
   <!-- Amount Receivable -->
     <div wire:poll class="mt-4 p-4 bg-gray-50 border border-gray-300 rounded">
@@ -201,6 +198,7 @@
             inputmode="numeric"
             class="w-full border rounded px-3 py-2"
         />
+        @error('amount') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
     </div>
 
     

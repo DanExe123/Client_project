@@ -13,7 +13,7 @@
         @endif
 
         <!-- Search and Buttons -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
             <!-- Search Bar -->
             <div class="w-full sm:max-w-xs flex justify-start relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">

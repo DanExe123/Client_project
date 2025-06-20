@@ -6,7 +6,7 @@ use Livewire\Component;
 use App\Models\ExpenseTable;
 use Carbon\Carbon;
 
-class Editexpenses extends Component
+class EditExpenses extends Component
 {
     public $expenseId;
     public $expenses = [];

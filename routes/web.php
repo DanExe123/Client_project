@@ -40,7 +40,7 @@ use App\Livewire\Editproduct;
 use App\Livewire\Editsupplier;
 use App\Livewire\AdjustmentStockcard;
 use App\Livewire\Expenses;
-use App\Livewire\EditExpenses;
+use App\Livewire\Editexpenses;
 use App\Livewire\Recievingapproval;
 use App\Livewire\ViewDetailRecieving;
 use App\Livewire\Editrecieving;
