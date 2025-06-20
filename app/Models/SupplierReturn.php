@@ -19,6 +19,7 @@ class SupplierReturn extends Model
 
     protected $casts = [
         'order_date' => 'date',
+        'approved_at' => 'datetime',
     ];
 
     /**

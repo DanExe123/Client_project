@@ -30,6 +30,7 @@ class Payment extends Model
         'check_date' => 'date',
         'transaction_date' => 'date',
         'date' => 'date',
+        'approved_at' => 'datetime',
     ];
 
     public function supplier()

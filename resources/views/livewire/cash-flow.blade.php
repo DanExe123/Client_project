@@ -1,8 +1,10 @@
 <div>
-   <!-- Cash Flow Table -->
-<div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full mx-auto p-4" x-data="cashFlow()">
-    <h2 class="text-xl font-semibold mb-4">Cash Flow</h2>
-    
+  <!-- Cash Flow Table -->
+  <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full mx-auto p-4"
+    x-data="cashFlowComponent(@js($cashFlowEntries))">
+
+    <h2 class="text-xl font-semibold mb-4">Cash Flow Summary</h2>
+
     <table class="min-w-full border-collapse bg-white text-left text-sm text-gray-500">
       <thead class="bg-gray-50 sticky top-0 z-10">
         <tr>
@@ -15,9 +17,9 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-        <template x-for="entry in cashFlowEntries" :key="entry.date">
+        <template x-for="(entry, index) in cashFlowEntries" :key="index">
           <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4" x-text="entry.date"></td>
+            <td class="px-6 py-4" x-text="formatDate(entry.date)"></td>
             <td class="px-6 py-4" x-text="formatCurrency(entry.beginning_balance)"></td>
             <td class="px-6 py-4" x-text="formatCurrency(entry.customer_payments)"></td>
             <td class="px-6 py-4" x-text="formatCurrency(entry.payment_to_supplier)"></td>
@@ -26,39 +28,28 @@
           </tr>
         </template>
         <tr x-show="cashFlowEntries.length === 0">
-          <td colspan="6" class="px-6 py-4 text-center text-gray-500">No cash flow data available.</td>
+          <td colspan="5" class="px-6 py-4 text-center text-gray-500">No cash flow data available.</td>
         </tr>
       </tbody>
     </table>
   </div>
-  
-  <script>
-    function cashFlow() {
-      return {
-        cashFlowEntries: [
-          {
-            date: '2025-06-01',
-            beginning_balance: 5000,
-            customer_payments: 1500,
-            payment_to_supplier: 700,
-            expenses: 300,
-            ending_balance: 5500,
-          },
-          {
-            date: '2025-06-02',
-            beginning_balance: 5500,
-            customer_payments: 1200,
-            payment_to_supplier: 900,
-            expenses: 400,
-            ending_balance: 5400,
-          },
-          // Add more rows as needed
-        ],
-        formatCurrency(value) {
-          return '₱' + value.toFixed(2);
-        },
-      }
-    }
-  </script>
-  
 </div>
+
+<script>
+  function cashFlowComponent(data) {
+    return {
+      cashFlowEntries: data,
+      formatCurrency(value) {
+        return '₱' + parseFloat(value).toFixed(2);
+      },
+      formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+      }
+    };
+  }
+</script>

@@ -23,7 +23,7 @@ class UnserveredLacking extends Component
             }
 
             $servedQty = $item->purchaseOrder->salesReleases
-                ->flatMap(fn ($release) => $release->items)
+                ->flatMap(fn($release) => $release->items)
                 ->where('product_id', $item->product_id)
                 ->sum('quantity');
 
@@ -36,11 +36,11 @@ class UnserveredLacking extends Component
                 'difference' => $item->quantity - $servedQty,
             ];
         })
-        ->filter(fn ($row) => $row !== null && $row['difference'] > 0) // skip null and fully served
-        ->values();
+            ->filter(fn($row) => $row !== null && $row['difference'] > 0) // skip null and fully served
+            ->values();
     }
 
-    
+
 
 
     public function render()

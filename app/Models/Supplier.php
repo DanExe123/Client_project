@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Supplier extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'name',
         'email',
@@ -19,5 +19,9 @@ class Supplier extends Model
         'contact_person',
         'status',
     ];
+    public function receiveditem()
+    {
+        return $this->hasMany(\App\Models\ReceivedItem::class);
+    }
 }
 
