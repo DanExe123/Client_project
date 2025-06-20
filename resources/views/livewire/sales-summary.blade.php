@@ -1,9 +1,10 @@
 <div class="overflow-auto rounded-lg border border-gray-200 shadow-md w-full mx-auto p-4">
-  <div class="mb-6">
-    <h2 class="text-xl font-semibold mb-4">Chart Compare Monthly Sales</h2>
-    <div class="flex flex-wrap gap-4 items-center mb-4">
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold mb-4">Compare Monthly Sales</h2>
+
+    <div class="flex gap-4 flex-wrap items-end mb-6">
       <div>
-        <label class="block text-sm font-medium text-gray-700">Month 1</label>
+        <label class="text-sm font-medium text-gray-700">Month 1</label>
         <select id="month1" class="border-gray-300 rounded-md shadow-sm mt-1">
           @foreach ($monthlySales as $month)
         <option value="{{ $month['month'] }}">{{ \Carbon\Carbon::parse($month['month'])->format('F Y') }}</option>
@@ -11,7 +12,7 @@
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700">Month 2</label>
+        <label class="text-sm font-medium text-gray-700">Month 2</label>
         <select id="month2" class="border-gray-300 rounded-md shadow-sm mt-1">
           @foreach ($monthlySales as $month)
         <option value="{{ $month['month'] }}">{{ \Carbon\Carbon::parse($month['month'])->format('F Y') }}</option>
@@ -20,7 +21,20 @@
       </div>
     </div>
 
-    <canvas id="salesComparisonChart" class="w-full max-w-4xl mx-auto" height="200"></canvas>
+    <!-- Two-Column Chart Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <!-- Gross Sales Chart -->
+      <div class="bg-white border rounded p-4 shadow-sm">
+        <h3 class="text-md font-semibold mb-2 text-center">Gross Sales</h3>
+        <canvas id="grossChart" height="100"></canvas>
+      </div>
+
+      <!-- Net Sales Chart -->
+      <div class="bg-white border rounded p-4 shadow-sm">
+        <h3 class="text-md font-semibold mb-2 text-center">Net Sales</h3>
+        <canvas id="netChart" height="100"></canvas>
+      </div>
+    </div>
   </div>
   <h2 class="text-xl font-semibold mb-4">Sales Summary</h2>
   <div class="mt-8 overflow-auto rounded-lg border border-gray-200 shadow-md w-full mx-auto p-4">
@@ -119,3 +133,95 @@
   <hr>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const monthlySales = @json($monthlySales);
+
+    const grossCtx = document.getElementById('grossChart').getContext('2d');
+    const netCtx = document.getElementById('netChart').getContext('2d');
+
+    let grossChart, netChart;
+
+    function formatMonth(month) {
+      const [year, monthNum] = month.split('-');
+      return new Date(year, monthNum - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+    }
+
+    function updateCharts(month1, month2) {
+      const data1 = monthlySales.find(m => m.month === month1);
+      const data2 = monthlySales.find(m => m.month === month2);
+
+      // Even if same month, still render chart
+      const labels = [formatMonth(month1), formatMonth(month2)];
+
+      const grossValues = [
+        data1 ? data1.gross_sales : 0,
+        data2 ? data2.gross_sales : 0
+      ];
+
+      const netValues = [
+        data1 ? data1.net_sales : 0,
+        data2 ? data2.net_sales : 0
+      ];
+
+      const grossData = {
+        labels,
+        datasets: [{
+          label: 'Gross Sales',
+          data: grossValues,
+          backgroundColor: ['rgba(59,130,246,0.2)', 'rgba(16,185,129,0.2)'],
+          borderColor: ['rgba(59,130,246,1)', 'rgba(16,185,129,1)'],
+          borderWidth: 2,
+          fill: false,
+          tension: 0.3
+        }]
+      };
+
+      const netData = {
+        labels,
+        datasets: [{
+          label: 'Net Sales',
+          data: netValues,
+          backgroundColor: ['rgba(245,158,11,0.2)', 'rgba(239,68,68,0.2)'],
+          borderColor: ['rgba(245,158,11,1)', 'rgba(239,68,68,1)'],
+          borderWidth: 2,
+          fill: false,
+          tension: 0.3
+        }]
+      };
+
+      const options = {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => '₱' + value.toLocaleString()
+            }
+          }
+        }
+      };
+
+      if (grossChart) grossChart.destroy();
+      if (netChart) netChart.destroy();
+
+      grossChart = new Chart(grossCtx, { type: 'line', data: grossData, options });
+      netChart = new Chart(netCtx, { type: 'line', data: netData, options });
+    }
+
+    const month1Select = document.getElementById('month1');
+    const month2Select = document.getElementById('month2');
+
+    month1Select.addEventListener('change', () => {
+      updateCharts(month1Select.value, month2Select.value);
+    });
+
+    month2Select.addEventListener('change', () => {
+      updateCharts(month1Select.value, month2Select.value);
+    });
+
+    // Initial render
+    updateCharts(month1Select.value, month2Select.value);
+  });
+</script>
