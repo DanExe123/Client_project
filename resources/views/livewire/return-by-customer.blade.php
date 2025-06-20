@@ -236,7 +236,7 @@
                     <div class="pt-4">
                         <x-textarea wire:model="remarks" name="remarks" label="Remarks"
                             placeholder="Write your remarks" />
-                        <div class="flex justify-end pt-2">
+                        <div class="flex justify-end pt-2 mr-2 mb-1">
                             <x-button blue label="Submit" wire:click="submitReturn" />
                         </div>
                     </div>

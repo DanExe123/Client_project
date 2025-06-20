@@ -16,8 +16,8 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
                 </span>
-                <input type="text" x-model="search" placeholder="Search by barcode or name..."
-                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <input type="text" wire:model.live.300ms="search" placeholder="Search product name..."
+                class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />            
             </div>
 
 

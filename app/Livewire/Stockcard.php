@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Product;
-
+use Livewire\Attributes\Url;
 class Stockcard extends Component
 {
     public $products;
     public $product;
-
+    #[Url(as: 'search', history: true)]
+    public $search = '';
     public $selectedProductId = [];
 
     public $barcode;
@@ -75,9 +76,17 @@ class Stockcard extends Component
 
     public function render()
     {
-        $this->products = Product::all(); // Ensure products are always up-to-date
+        $query = Product::query();
+    
+        if ($this->search) {
+            $query->where('description', 'like', '%' . $this->search . '%');
+        }
+    
+        $this->products = $query->get();
+    
         return view('livewire.stockcard', [
             'products' => $this->products,
         ]);
     }
+    
 }
