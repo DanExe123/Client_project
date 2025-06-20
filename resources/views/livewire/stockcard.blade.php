@@ -9,7 +9,7 @@
                     class="!bg-green-300 !w-full" />
             </div>
         @endif
-        <!-- Action Buttons -->
+        <!-- Action Buttons -->  
         <div class="flex gap-2 justify-between flex-wrap">
             <!-- Search Bar -->
             <div class="w-full sm:max-w-xs relative">

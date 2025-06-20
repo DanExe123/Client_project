@@ -74,7 +74,7 @@ class Stockcard extends Component
 
 
 
-    public function render()
+    public function render() 
     {
         $query = Product::query();
     
