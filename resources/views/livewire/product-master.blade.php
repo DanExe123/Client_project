@@ -80,7 +80,7 @@
       </tr>
     @empty
       <tr>
-        <td colspan="7" class="text-center py-6 text-gray-500">No products found.</td>
+        <td colspan="9" class="text-center py-6 text-gray-500">No products found.</td>
       </tr>
     @endforelse
       </tbody>

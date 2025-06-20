@@ -41,23 +41,22 @@
     <div class="overflow-auto rounded-lg border border-gray-200 mt-2">
         <table class="min-w-[1000px] w-full border-collapse bg-white text-left text-sm text-gray-500">
             <thead class="bg-gray-50 sticky top-0 z-10">
-                    <tr>
-                        <th class="px-4 py-4 font-medium text-gray-900">
-                            <input type="checkbox" wire:click="toggleSelectAll"
-                                @if($product->pluck('id')->diff($selectedProductId)->isEmpty()) checked @endif />
-                        </th>
-                        <th class="px-4 py-4 font-medium text-gray-900">Barcode</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">Product Name</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">Bag (Highest UoM)</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">Bag Quantity</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">PC (lowest UoM)</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">PC Quantity</th>
-                        <th class="px-4 py-4 font-medium text-gray-900">Damages</th>
-
-                    </tr>
+                <tr>
+                    <th class="px-4 py-4 font-medium text-gray-900">
+                        <input type="checkbox" wire:click="toggleSelectAll"
+                            @if($products->pluck('id')->diff($selectedProductId)->isEmpty()) checked @endif />
+                    </th>
+                    <th class="px-4 py-4 font-medium text-gray-900">Barcode</th>
+                    <th class="px-4 py-4 font-medium text-gray-900">Product Name</th>
+                    <th class="px-4 py-4 font-medium text-gray-900">Bag (Highest UoM)</th>
+                    <th class="px-4 py-4 font-medium text-gray-900">Bag Quantity</th>
+                    <th class="px-4 py-4 font-medium text-gray-900">PC (lowest UoM)</th>
+                    <th class="px-4 py-4 font-medium text-gray-900">PC Quantity</th>
+                    <th class="px-4 py-4 font-medium text-gray-900">Damages</th>
+                </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                @foreach($products as $product)
+                @forelse($products as $product)
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-4">
                             <input type="checkbox" wire:click="selectedProduct({{ $product->id }})"
@@ -70,15 +69,13 @@
                         <td class="px-4 py-4">{{ $product->lowest_uom }}</td>
                         <td class="px-4 py-4">{{ $product->quantity_lowest }}</td>
                         <td class="px-4 py-4">{{ $product->damages }}</td>
-
                     </tr>
-                @endforeach
-                @if ($products->isEmpty())
+                @empty
                     <tr>
-                        <td colspan="5" class="text-center p-4 text-gray-500">No stock records found.</td>
+                        <td colspan="8" class="text-center p-4 text-gray-500">No stock records found.</td>
                     </tr>
-                @endif
-            </tbody>
+                @endforelse
+            </tbody>            
         </table>
     </div>
 
