@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Supplier;
+use Illuminate\Validation\ValidationException;
 
 class AddSupplier extends Component
 {
@@ -11,7 +12,7 @@ class AddSupplier extends Component
     public $email;
     public $address;
     public $term;
-    public $tin_number; // Assuming TIN is a field in the Supplier model
+    public $tin_number;
     public $contact;
     public $contact_person;
 
@@ -20,31 +21,38 @@ class AddSupplier extends Component
         'email' => 'required|email|unique:suppliers,email',
         'address' => 'nullable|string',
         'term' => 'nullable|string',
-        'tin_number' => 'nullable|string', // Assuming TIN is optional
-        'contact' => 'required|numeric|min:0',
+        'tin_number' => 'nullable|string',
+        'contact' => 'required|digits:11', // Must be exactly 11 digits
         'contact_person' => 'nullable|string',
     ];
+
     public function submit()
     {
-        $this->validate();
+        try {
+            $this->validate();
 
-        Supplier::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'address' => $this->address,
-            'term' => $this->term,
-            'tin_number' => $this->tin_number, // Assuming TIN is a field in the Supplier model
-            'contact' => $this->contact,
-            'contact_person' => $this->contact_person,
-            'status' => true,
-        ]);
+            Supplier::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'address' => $this->address,
+                'term' => $this->term,
+                'tin_number' => $this->tin_number,
+                'contact' => $this->contact,
+                'contact_person' => $this->contact_person,
+                'status' => true,
+            ]);
 
-        session()->flash('message', 'Successfully Added New Supplier');
+            session()->flash('message', 'Successfully Added New Supplier');
+            $this->reset();
 
-        $this->reset();
-        return redirect()->route('supplier-master');
+            return redirect()->route('supplier-master');
+
+        } catch (ValidationException $e) {
+            session()->flash('error', 'Validation failed: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
     }
-
     public function render()
     {
         return view('livewire.addsupplier');

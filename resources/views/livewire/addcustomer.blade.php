@@ -15,6 +15,13 @@
                         class="!bg-green-300 !w-full" />
                 </div>
         @endif
+        @if (session()->has('error'))
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+            class="mt-2">
+            <x-alert :title="session('error')" icon="check-circle" color="success" positive flat
+                class="!bg-red-300 !w-full" />
+        </div>
+    @endif
         </div>
         <div class="text-gray-500 flex text-start gap-3">
             <a class="text-gray-500 font-medium" wire:navigate href="{{ route('customer-master') }}">Customer

@@ -20,7 +20,7 @@ class Addcustomer extends Component
         'name' => 'required|string|min:3|unique:suppliers,name',
         'email' => 'required|email|unique:customers,email',
         'address' => 'nullable|string|regex:/^[a-zA-Z0-9\s,.#-]+$/',
-        'contact' => 'required|regex:/^[0-9]+$/',
+        'contact' => 'required|digits:11',
         'contact_person' => 'nullable|string|regex:/^[a-zA-Z\s]+$/',
         'term' => 'nullable|regex:/^[0-9]+$/',
         'cust_tin_number' => 'nullable|regex:/^[0-9-]+$/',
@@ -28,7 +28,8 @@ class Addcustomer extends Component
 
     public function submit()
     {
-        $this->validate();
+        try {
+            $this->validate();
 
         Customer::create([
             'name' => $this->name,
@@ -45,7 +46,12 @@ class Addcustomer extends Component
         $this->reset();
 
         return redirect()->route('customer-master');
+    } catch (ValidationException $e) {
+        session()->flash('error', 'Validation failed: ' . $e->getMessage());
+    } catch (\Exception $e) {
+        session()->flash('error', 'An error occurred: ' . $e->getMessage());
     }
+}
 
     public function render()
     {

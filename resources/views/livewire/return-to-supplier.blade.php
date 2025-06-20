@@ -61,9 +61,12 @@
                     @endforelse
                 </tbody>
             </table>
+            <hr>
+            <div class="mt-4 px-4 mb-2">
+                {{ $returnOrders->links() }}
+            </div> 
         </div>
 
-        <hr>
         <!-- RIGHT SIDE: Add PO Form (1/3 width) -->
         <div wire:key="po-form-{{ $formKey }}"
             class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
@@ -129,20 +132,29 @@
                                         @enderror
                                     </td>
                                     {{-- //HOYY!! DRI KA NAG UNTAT --}}
-                                    <td wire:ignore.self class="border px-2 py-2">
-                                        <input type="text" wire:model.lazy="products.{{ $index }}.product_description"
-                                            list="product_descriptions" placeholder="enter and select description"
-                                            class="w-full border-gray-300 rounded-md px-2 py-1 text-sm"
-                                            wire:change="fillProductByDescription({{ $index }})" />
-                                        <datalist id="product_descriptions">
-                                            @foreach($allProducts as $product)
-                                                <option value="{{ $product['description'] }}">{{ $product['barcode'] }}</option>
-                                            @endforeach
-                                        </datalist>
-                                        @error('products')
-                                            <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
-                                        @enderror
-                                    </td>
+                                <td wire:ignore.self class="border px-2 py-2">
+                                    @if(!empty($products[$index]['product_description']))
+                                        {{-- Show auto-filled description when barcode is selected --}}
+                                        <input
+                                            type="text"
+                                            value="{{ $products[$index]['product_description'] }}"
+                                            class="w-full border-gray-100 bg-gray-100 rounded-md px-2 py-1 text-sm text-gray-600"
+                                            readonly
+                                        />
+                                    @else
+                                        {{-- Show default input if no product_description yet --}}
+                                        <input
+                                            type="text"
+                                            value="No Barcode selected"
+                                            class="w-full border-gray-200 bg-white rounded-md px-2 py-1 text-sm text-gray-400 italic"
+                                            readonly
+                                        />
+                                    @endif
+                                
+                                    @error("products.$index.barcode")
+                                        <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
+                                    @enderror
+                                </td>
                                     <td class="border px-2 py-2">
                                         <input type="number" wire:model.lazy="products.{{ $index }}.quantity"
                                             wire:input="updateTotal({{ $index }})" min="1"

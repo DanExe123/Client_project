@@ -9,9 +9,14 @@ use App\Models\SupplierReturn;
 use App\Models\SupplierReturnItem;
 use App\Models\PurchaseOrderItem;
 use App\Models\PurchaseOrder;
+use Livewire\WithPagination;
 
 class ReturnToSupplier extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'tailwind';
+
     public $search = '';
 
     public $selectedSupplierId;

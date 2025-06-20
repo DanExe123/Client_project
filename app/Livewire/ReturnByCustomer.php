@@ -9,9 +9,13 @@ use App\Models\CustomerReturn;
 use App\Models\CustomerReturnItem;
 use App\Models\SalesRelease;
 use App\Models\SalesReleaseItem;
+use Livewire\WithPagination;
 
 class ReturnByCustomer extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'tailwind';
     public $search = '';
     public $returnType;
     public $selectedCustomerId;

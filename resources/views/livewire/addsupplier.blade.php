@@ -10,6 +10,16 @@
                     class="!bg-green-300 !w-full" />
             </div>
         @endif
+        @if (session()->has('error'))
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition
+            class="mt-2">
+            <x-alert :title="session('error')" icon="check-circle" color="success" positive flat
+                class="!bg-red-300 !w-full" />
+        </div>
+    @endif
+
+
+
     </div>
     <div class="text-gray-500 flex text-start gap-3">
         <span class="text-gray-500 font-medium">Suppliers</span>
@@ -37,9 +47,20 @@
             <x-input label="Tin Number" wire:model="tin_number" id="tin_number" placeholder="Enter Tin number"
                 x-on:input="$el.value = $el.value.replace(/[^0-9-]/g, '')" :error="$errors->first('tin_number')" />
 
-            <x-input label="Contact Number" wire:model="contact" id="contact" placeholder="Enter contact number"
-                x-on:input="$el.value = $el.value.replace(/[^0-9]/g, '')" :error="$errors->first('contact')" />
-
+                <x-input
+                label="Contact Number"
+                wire:model="contact"
+                id="contact"
+                placeholder="Enter contact number"
+                x-on:input="$el.value = $el.value.replace(/[^0-9]/g, '')"
+                :error="$errors->first('contact')"
+            />
+            
+            @error('contact')
+                <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+            @enderror
+            
+            
             <x-input label="Contact Person" wire:model="contact_person" id="contact_person"
                 placeholder="Enter contact person" x-on:input="$el.value = $el.value.replace(/[^a-zA-Z\s]/g, '')"
                 :error="$errors->first('contact_person')" />
