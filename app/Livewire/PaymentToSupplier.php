@@ -25,7 +25,7 @@ class PaymentToSupplier extends Component
     public $addedReceivings = [];
     public $amount, $deduction = 0, $ewt_amount = 0, $remarks;
 
-    public $paymentMethod = '' ;
+    public $paymentMethod = '';
     public $checkBank, $chequeNumber, $checkDate;
     public $transferBank, $referenceNumber, $transactionDate;
 
@@ -92,26 +92,26 @@ class PaymentToSupplier extends Component
             ->get()
             ->groupBy('receiving_id');
 
-            $this->selectedReceived = [];
+        $this->selectedReceived = [];
 
-            foreach ($receivedItems as $receivingId => $items) {
-                $firstItem = $items->first();
-        
-                // ✅ Get actual grand_total from DB
-                $grandTotal = $firstItem->grand_total ?? 0;
-        
-                // ✅ Skip display if grand_total is zero
-                if ($grandTotal <= 0) {
-                    continue;
-                }
-        
-                $this->selectedReceived[] = [
-                    'id' => $receivingId,
-                    'created_at' => $firstItem->created_at,
-                    'receipt_type' => $firstItem->receipt_type ?? 'N/A',
-                    'grand_total' => $grandTotal,
-                ];
+        foreach ($receivedItems as $receivingId => $items) {
+            $firstItem = $items->first();
+
+            // ✅ Get actual grand_total from DB
+            $grandTotal = $firstItem->grand_total ?? 0;
+
+            // ✅ Skip display if grand_total is zero
+            if ($grandTotal <= 0) {
+                continue;
             }
+
+            $this->selectedReceived[] = [
+                'id' => $receivingId,
+                'created_at' => $firstItem->created_at,
+                'receipt_type' => $firstItem->receipt_type ?? 'N/A',
+                'grand_total' => $grandTotal,
+            ];
+        }
 
         // Returns untouched
         $this->selectedReturns = SupplierReturn::with('items')
@@ -135,7 +135,7 @@ class PaymentToSupplier extends Component
         $this->totalReturnsAmount = 0;
     }
 
-    
+
 
     public function addToTotal($receivingId)
     {
@@ -172,15 +172,15 @@ class PaymentToSupplier extends Component
             'filterSupplier' => 'required|exists:suppliers,id',
             'paymentMethod' => 'required|string|in:Cash,Check,Bank Transfer',
             'amount' => 'required|numeric|min:0.01',
-    
+
             'checkBank' => 'required_if:paymentMethod,Check',
             'chequeNumber' => 'required_if:paymentMethod,Check',
             'checkDate' => 'required_if:paymentMethod,Check|date',
-    
+
             'transferBank' => 'required_if:paymentMethod,Bank Transfer',
             'referenceNumber' => 'required_if:paymentMethod,Bank Transfer',
             'transactionDate' => 'required_if:paymentMethod,Bank Transfer|date',
-    
+
             'deduction' => 'nullable|numeric|min:0',
             'ewt_amount' => 'nullable|numeric|min:0',
             'remarks' => 'nullable|string|max:500',
@@ -231,41 +231,44 @@ class PaymentToSupplier extends Component
             ->orderByRaw("FIELD(receiving_id, " . implode(',', $this->selectedReceivedIds) . ")")
             ->get()
             ->groupBy('receiving_id');
-        
-            foreach ($this->selectedReceivedIds as $receivingId) {
-                if ($remainingAmount <= 0) break;
-            
-                $items = $receivedGroups[$receivingId] ?? collect();
-                if ($items->isEmpty()) continue;
-            
-                // Use first item to get shared grand_total
-                $firstItem = $items->first();
-                $grandTotal = $firstItem->grand_total;
-            
-                if ($grandTotal <= 0) continue;
-            
-                if ($remainingAmount >= $grandTotal) {
-                    // Enough to pay full grand_total
-                    $remainingAmount -= $grandTotal;
-            
-                    foreach ($items as $item) {
-                        $item->grand_total = 0;
-                        $item->save();
-                    }
-            
-                } else {
-                    // Partial payment, reduce grand_total
-                    $updatedTotal = round($grandTotal - $remainingAmount, 2);
-                    $remainingAmount = 0;
-            
-                    foreach ($items as $item) {
-                        $item->grand_total = $updatedTotal;
-                        $item->save();
-                    }
+
+        foreach ($this->selectedReceivedIds as $receivingId) {
+            if ($remainingAmount <= 0)
+                break;
+
+            $items = $receivedGroups[$receivingId] ?? collect();
+            if ($items->isEmpty())
+                continue;
+
+            // Use first item to get shared grand_total
+            $firstItem = $items->first();
+            $grandTotal = $firstItem->grand_total;
+
+            if ($grandTotal <= 0)
+                continue;
+
+            if ($remainingAmount >= $grandTotal) {
+                // Enough to pay full grand_total
+                $remainingAmount -= $grandTotal;
+
+                foreach ($items as $item) {
+                    $item->grand_total = 0;
+                    $item->save();
+                }
+
+            } else {
+                // Partial payment, reduce grand_total
+                $updatedTotal = round($grandTotal - $remainingAmount, 2);
+                $remainingAmount = 0;
+
+                foreach ($items as $item) {
+                    $item->grand_total = $updatedTotal;
+                    $item->save();
                 }
             }
-            
-        
+        }
+
+
 
         // Finish
         session()->flash('message', 'Payment saved and grand totals updated!');
@@ -298,14 +301,14 @@ class PaymentToSupplier extends Component
         $this->loadReceivedItems();
     }
 
-    
-    
+
+
     public function render()
     {
         return view('livewire.payment-to-supplier', [
             'totalAmount' => $this->totalAmount,
-        'totalReturnsAmount' => $this->totalReturnsAmount,
-        'payableAmount' => $this->payableAmount,
+            'totalReturnsAmount' => $this->totalReturnsAmount,
+            'payableAmount' => $this->payableAmount,
         ]);
     }
 }

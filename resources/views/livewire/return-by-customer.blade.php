@@ -2,66 +2,6 @@
     <div x-cloak class="space-y-2">
         <h2 class="text-2xl font-semibold text-gray-900">Return by customer</h2>
         {{-- Success Alert --}}
-
-        <div class="flex gap-2 justify-end">
-            <div class="w-full sm:max-w-xs flex justify-start relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
-                </span>
-                <input type="text" wire:model.debounce.300ms="search" placeholder="Search..."
-                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-            </div>
-            <x-button right-icon="pencil" interaction="positive" x-bind:class="selectedReturns.length === 0
-                ? 'bg-gray-300 text-white cursor-not-allowed'
-                : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selectedReturns.length === 0"
-                x-on:click="$openModal('Edit')">
-            </x-button>
-
-            <x-button right-icon="trash" interaction="negative" x-bind:class="selectedReturns.length === 0
-                ? 'bg-red-300 text-white cursor-not-allowed'
-                : 'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selectedReturns.length === 0"
-                x-on:click="$openModal('Delete')">
-            </x-button>
-        </div>
-        <div class="overflow-auto rounded-lg border border-gray-200">
-            <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
-                <thead class="bg-gray-50 sticky top-0 z-10">
-                    <tr>
-                        <th class="px-4 py-4">
-                            <input type="checkbox" @change="toggleAllReturns" :checked="areAllReturnsSelected"
-                                class="h-4 w-4 text-blue-600" />
-                        </th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Return Type</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Date</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Total</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                    @forelse ($returnOrders as $returnOrder)
-                        <tr>
-                            <td class="px-6 py-4">
-                                <input type="checkbox" class="h-4 w-4 text-blue-600" />
-                            </td>
-                            <td class="px-6 py-4">{{ $returnOrder->return_type }}</td>
-                            <td class="px-6 py-4">{{ \Carbon\Carbon::parse($returnOrder->order_date)->format('Y-m-d') }}
-                            </td>
-                            <td class="px-6 py-4">{{ $returnOrder->customer->name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4">₱{{ number_format($returnOrder->total_amount, 2) }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-6 text-gray-500">No return orders found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            <hr>
-            <div class="mt-4 px-4 mb-2">
-                {{ $returnOrders->links() }}
-            </div> 
-        </div>
-
         <div wire:key="po-form-{{ $formKey }}"
             class="col-span-1 w-full md:w-full bg-white rounded-lg border shadow-md p-5 space-y-4 mt-5 mx-auto ml-1">
             <h3 class="text-lg font-bold text-gray-800">
@@ -242,6 +182,68 @@
                     </div>
                 </div>
             </div>
+            <hr>
+            <br>
+                    <h2 class="text-2xl font-semibold text-gray-900">Customer Return Table</h2>
+
+                    <div class="flex gap-2 justify-end">
+            <div class="w-full sm:max-w-xs flex justify-start relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
+                </span>
+                <input type="text" wire:model.debounce.300ms="search" placeholder="Search..."
+                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+            <x-button right-icon="pencil" interaction="positive" x-bind:class="selectedReturns.length === 0
+                ? 'bg-gray-300 text-white cursor-not-allowed'
+                : 'bg-[#12ffac] hover:bg-[#13eda1] text-white'" x-bind:disabled="selectedReturns.length === 0"
+                x-on:click="$openModal('Edit')">
+            </x-button>
+
+            <x-button right-icon="trash" interaction="negative" x-bind:class="selectedReturns.length === 0
+                ? 'bg-red-300 text-white cursor-not-allowed'
+                : 'bg-red-600 hover:bg-red-700 text-white'" x-bind:disabled="selectedReturns.length === 0"
+                x-on:click="$openModal('Delete')">
+            </x-button>
+        </div>
+        <div class="overflow-auto rounded-lg border border-gray-200">
+            <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-4 py-4">
+                            <input type="checkbox" @change="toggleAllReturns" :checked="areAllReturnsSelected"
+                                class="h-4 w-4 text-blue-600" />
+                        </th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Return Type</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Date</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Customer</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 border-t border-gray-100">
+                    @forelse ($returnOrders as $returnOrder)
+                        <tr>
+                            <td class="px-6 py-4">
+                                <input type="checkbox" class="h-4 w-4 text-blue-600" />
+                            </td>
+                            <td class="px-6 py-4">{{ $returnOrder->return_type }}</td>
+                            <td class="px-6 py-4">{{ \Carbon\Carbon::parse($returnOrder->order_date)->format('Y-m-d') }}
+                            </td>
+                            <td class="px-6 py-4">{{ $returnOrder->customer->name ?? 'N/A' }}</td>
+                            <td class="px-6 py-4">₱{{ number_format($returnOrder->total_amount, 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center py-6 text-gray-500">No return orders found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            <hr>
+            <div class="mt-4 px-4 mb-2">
+                {{ $returnOrders->links() }}
+            </div> 
+        </div>
         </div>
     </div>
 </div>

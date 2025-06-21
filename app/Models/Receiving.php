@@ -41,9 +41,9 @@ class Receiving extends Model
         return $this->hasMany(ReceivingItem::class, 'receiving_id');
     }
     public function receivedItems()
-        {
-            return $this->hasMany(ReceivedItem::class);
-        }
+    {
+        return $this->hasMany(ReceivedItem::class);
+    }
 
 
 }

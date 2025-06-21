@@ -261,7 +261,7 @@ class PoToSupplier extends Component
             ]);
         }
         $purchaseOrder->update([
-            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 4, '0', STR_PAD_LEFT),
+            'po_number' => 'PO-' . str_pad($purchaseOrder->id, 7, '0', STR_PAD_LEFT),
         ]);
 
         $this->resetForm(); // or $this->reset(...)

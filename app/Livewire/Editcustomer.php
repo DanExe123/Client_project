@@ -31,7 +31,7 @@ class Editcustomer extends Component
     public function updateCustomer()
     {
         $this->validate([
-            'name' => 'required|string|regex:/^[a-zA-Z0-9\s]+$/|min:3|unique:customers,name',
+            'name' => 'required|string|regex:/^[a-zA-Z0-9\s]+$/|min:3|unique:customers,name,' . $this->customerId,
             'email' => 'required|email|unique:customers,email,' . $this->customerId,
             'address' => 'nullable|string|regex:/^[a-zA-Z0-9\s,.#-]+$/',
             'contact' => 'required|regex:/^[0-9]+$/',
@@ -42,14 +42,20 @@ class Editcustomer extends Component
         ]);
 
         Customer::where('id', $this->customerId)->update([
-            e
+            'name' => $this->name,
+            'email' => $this->email,
+            'address' => $this->address,
+            'contact' => $this->contact,
+            'contact_person' => $this->contact_person,
+            'term' => $this->term,
+            'cust_tin_number' => $this->cust_tin_number,
+            'status' => $this->status,
         ]);
 
         session()->flash('message', 'Customer updated successfully.');
 
         return redirect()->route('customer-master');
     }
-
     public function render()
     {
         return view('livewire.editcustomer');

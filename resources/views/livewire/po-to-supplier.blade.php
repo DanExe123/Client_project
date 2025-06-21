@@ -11,60 +11,6 @@
                     class="!bg-green-300 !w-full" />
             </div>
         @endif
-
-        <!-- Search and Buttons -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-            <!-- Search Bar -->
-            <div class="w-full sm:max-w-xs flex justify-start relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
-                </span>
-                <input type="text" wire:model.live.debounce.100ms="search" placeholder="Search..."
-                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
-            </div>
-        </div>
-
-        <!-- Po to Supplier Table -->
-        <div class="overflow-auto rounded-lg border border-gray-200 shadow-md">
-            <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
-                <thead class="bg-gray-50 sticky top-0 z-10">
-                    <tr>
-                        <th class="px-4 py-4">
-                            <input type="checkbox" @change="toggleAll" :checked="isAllSelected"
-                                class="h-4 w-4 text-blue-600" />
-                        </th>
-                        <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Supplier</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Receipt Type</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Date</th>
-                        <th class="px-6 py-4 font-medium text-gray-900">Total</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 border-t border-gray-100">
-                    @forelse ($purchaseOrders as $purchaseOrder)
-                        <tr>
-                            <td class="px-6 py-4">
-                                <input type="checkbox" class="h-4 w-4 text-blue-600" />
-                            </td>
-                            <td class="px-6 py-4">{{ $purchaseOrder->po_number }}</td>
-                            <td class="px-6 py-4">{{ $purchaseOrder->supplier->name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4">{{ $purchaseOrder->receipt_type }}</td>
-                            <td class="px-6 py-4">{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('Y-m-d') }}
-                            </td>
-                            <td class="px-6 py-4">₱{{ number_format($purchaseOrder->total_amount, 2) }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-6 text-gray-500">No purchase orders found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            <hr>
-            <div class="mt-4 px-4 mb-2">
-                {{ $purchaseOrders->links() }}
-            </div>            
-        </div>
     </div>
 
     <div wire:key="po-form-{{ $formKey }}"
@@ -153,27 +99,21 @@
                                 <td wire:ignore.self class="border px-2 py-2">
                                     @if(!empty($products[$index]['product_description']))
                                         {{-- Show auto-filled description when barcode is selected --}}
-                                        <input
-                                            type="text"
-                                            value="{{ $products[$index]['product_description'] }}"
+                                        <input type="text" value="{{ $products[$index]['product_description'] }}"
                                             class="w-full border-gray-100 bg-gray-100 rounded-md px-2 py-1 text-sm text-gray-600"
-                                            readonly
-                                        />
+                                            readonly />
                                     @else
                                         {{-- Show default input if no product_description yet --}}
-                                        <input
-                                            type="text"
-                                            value="No Barcode selected"
+                                        <input type="text" value="No Barcode selected"
                                             class="w-full border-gray-200 bg-white rounded-md px-2 py-1 text-sm text-gray-400 italic"
-                                            readonly
-                                        />
+                                            readonly />
                                     @endif
-                                
+
                                     @error("products.$index.barcode")
                                         <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
                                     @enderror
                                 </td>
-                                                                
+
                                 <td class="border px-2 py-2">
                                     <input type="number" wire:model.lazy="products.{{ $index }}.quantity"
                                         wire:input="updateTotal({{ $index }})" min="1"
@@ -259,6 +199,61 @@
                         <x-button blue label="Submit" wire:click="submitPO" />
                     </div>
                 </div>
+            </div>
+        </div>
+        <hr>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-2">PO TO SUPPLIER TABLE</h2>
+        <!-- Search and Buttons -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+            <!-- Search Bar -->
+            <div class="w-full sm:max-w-xs flex justify-start relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <x-phosphor.icons::bold.magnifying-glass class="w-4 h-4 text-gray-500" />
+                </span>
+                <input type="text" wire:model.live.debounce.100ms="search" placeholder="Search..."
+                    class="w-full pl-10 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+        </div>
+        <br>
+        <!-- Po to Supplier Table -->
+        <div class="overflow-auto rounded-lg border border-gray-200 shadow-md">
+            <table class="min-w-[800px] w-full border-collapse bg-white text-left text-sm text-gray-500">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-4 py-4">
+                            <input type="checkbox" @change="toggleAll" :checked="isAllSelected"
+                                class="h-4 w-4 text-blue-600" />
+                        </th>
+                        <th class="px-6 py-4 font-medium text-gray-900">PO #</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Supplier</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Receipt Type</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Date</th>
+                        <th class="px-6 py-4 font-medium text-gray-900">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 border-t border-gray-100">
+                    @forelse ($purchaseOrders as $purchaseOrder)
+                        <tr>
+                            <td class="px-6 py-4">
+                                <input type="checkbox" class="h-4 w-4 text-blue-600" />
+                            </td>
+                            <td class="px-6 py-4">{{ $purchaseOrder->po_number }}</td>
+                            <td class="px-6 py-4">{{ $purchaseOrder->supplier->name ?? 'N/A' }}</td>
+                            <td class="px-6 py-4">{{ $purchaseOrder->receipt_type }}</td>
+                            <td class="px-6 py-4">{{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('Y-m-d') }}
+                            </td>
+                            <td class="px-6 py-4">₱{{ number_format($purchaseOrder->total_amount, 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-6 text-gray-500">No purchase orders found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            <hr>
+            <div class="mt-4 px-4 mb-2">
+                {{ $purchaseOrders->links() }}
             </div>
         </div>
     </div>
