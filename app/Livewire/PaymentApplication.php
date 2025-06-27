@@ -39,15 +39,13 @@ class PaymentApplication extends Component
             'date' => 'required|date',
             'filterCustomer' => 'required|exists:customers,id',
             'amount' => 'required|numeric|min:0.01',
-            'paymentMethod' => 'required|string|in:Cash,Check,Bank Transfer',
+            'paymentMethod' => 'required|string|in:Cash,Check,BankTransfer',
 
             'checkBank' => 'required_if:paymentMethod,Check',
             'chequeNumber' => 'required_if:paymentMethod,Check',
-            'checkDate' => 'required_if:paymentMethod,Check|nullable|date',
-
-            'transferBank' => 'required_if:paymentMethod,Bank Transfer',
-            'referenceNumber' => 'required_if:paymentMethod,Bank Transfer',
-            'transactionDate' => 'required_if:paymentMethod,Bank Transfer|nullable|date',
+         
+            'transferBank' => 'required_if:paymentMethod,BankTransfer',
+            'referenceNumber' => 'required_if:paymentMethod,BankTransfer',
 
             'deduction' => 'nullable|numeric|min:0',
             'ewt_amount' => 'nullable|numeric|min:0',
@@ -63,7 +61,7 @@ class PaymentApplication extends Component
             $this->chequeNumber = null;
             $this->checkDate = null;
         }
-        if ($value !== 'Bank Transfer') {
+        if ($value !== 'BankTransfer') {
             $this->transferBank = null;
             $this->referenceNumber = null;
             $this->transactionDate = null;
@@ -161,6 +159,7 @@ class PaymentApplication extends Component
     public function mount()
     {
         $this->checkDate = now()->toDateString();
+        $this->transactionDate = now()->toDateString();
         $this->date = now()->toDateString();
         $this->customerOptions = Customer::pluck('name', 'id')->toArray();
         $this->invoiceOptions = SalesRelease::distinct()->pluck('receipt_type')->toArray();

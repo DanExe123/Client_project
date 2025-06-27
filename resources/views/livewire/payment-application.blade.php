@@ -127,7 +127,7 @@
                 <option value="" disabled>Select Method</option>
                 <option value="Cash">Cash</option>
                 <option value="Check">Check</option>
-                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="BankTransfer">Bank Transfer</option>
             </select>
             @error('paymentMethod') <span class="text-red-600">{{ $message }}</span> @enderror
         </div>
@@ -139,9 +139,16 @@
                     <label class="block mb-1 font-semibold">Select Bank</label>
                     <select wire:model="checkBank" class="w-full border rounded px-3 py-2" required>
                         <option value="" disabled>Select Bank</option>
-                        <option>Bank A</option>
-                        <option>Bank B</option>
-                        <option>Bank C</option>
+                    <option value="Gcash">Gcash</option>
+                    <option value="BDO Unibank">BDO Unibank</option>
+                    <option value="Bank of the Philippine Islands (BPI)">Bank of the Philippine Islands (BPI)</option>
+                    <option value="Metrobank">Metrobank</option>
+                    <option value="Philippine National Bank (PNB)">Philippine National Bank (PNB)</option>
+                    <option value="Land Bank of the Philippines (LANDBANK)">Land Bank of the Philippines (LANDBANK)</option>
+                    <option value="China Banking Corporation (China Bank)">China Banking Corporation (China Bank)</option>
+                    <option value="Rizal Commercial Banking Corporation (RCBC)">Rizal Commercial Banking Corporation (RCBC)</option>
+                    <option value="EastWest Bank">EastWest Bank</option>
+                    <option value="Security Bank Corporation">Security Bank Corporation</option>
                     </select>
                     @error('checkBank') <span class="text-red-600">{{ $message }}</span> @enderror
                 </div>
@@ -159,15 +166,22 @@
         @endif
     
         <!-- Bank Transfer Fields -->
-        @if($paymentMethod === 'Bank Transfer')
+        @if($paymentMethod === 'BankTransfer')
             <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
                 <div>
                     <label class="block mb-1 font-semibold">Select Bank</label>
                     <select wire:model="transferBank" class="w-full border rounded px-3 py-2" required>
                         <option value="" disabled>Select Bank</option>
-                        <option>Bank A</option>
-                        <option>Bank B</option>
-                        <option>Bank C</option>
+                    <option value="Gcash">Gcash</option>
+                    <option value="BDO Unibank">BDO Unibank</option>
+                    <option value="Bank of the Philippine Islands (BPI)">Bank of the Philippine Islands (BPI)</option>
+                    <option value="Metrobank">Metrobank</option>
+                    <option value="Philippine National Bank (PNB)">Philippine National Bank (PNB)</option>
+                    <option value="Land Bank of the Philippines (LANDBANK)">Land Bank of the Philippines (LANDBANK)</option>
+                    <option value="China Banking Corporation (China Bank)">China Banking Corporation (China Bank)</option>
+                    <option value="Rizal Commercial Banking Corporation (RCBC)">Rizal Commercial Banking Corporation (RCBC)</option>
+                    <option value="EastWest Bank">EastWest Bank</option>
+                    <option value="Security Bank Corporation">Security Bank Corporation</option>
                     </select>
                     @error('transferBank') <span class="text-red-600">{{ $message }}</span> @enderror
                 </div>
@@ -192,12 +206,14 @@
         <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
 
         <input
-            type="text"
+            type="number"
             id="amount"
             wire:model.lazy="amount"
-            inputmode="numeric"
+            step="0.01"
             class="w-full border rounded px-3 py-2"
+            placeholder="₱0.00"
         />
+
         @error('amount') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
     </div>
 
@@ -206,13 +222,13 @@
       <!-- Other Deduction -->
       <div>
           <label for="deduction" class="block mb-1 font-semibold">Other Deduction</label>
-          <input id="deduction" type="number" wire:model.lazy="deduction" class="w-full border rounded px-3 py-2" placeholder="₱0.00" />
+          <input id="deduction" type="number" wire:model.lazy="deduction" step="0.01" class="w-full border rounded px-3 py-2" placeholder="₱0.00" />
       </div>
   
       <!-- EWT -->
       <div>
           <label for="ewt_amount" class="block mb-1 font-semibold">EWT Amount</label>
-          <input id="ewt_amount" type="number" wire:model.lazy="ewt_amount" class="w-full border rounded px-3 py-2" placeholder="₱0.00" />
+          <input id="ewt_amount" type="number" wire:model.lazy="ewt_amount" step="0.01" class="w-full border rounded px-3 py-2" placeholder="₱0.00" />
       </div>
   
       <!-- Remarks -->

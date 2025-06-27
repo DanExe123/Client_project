@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\SupplierReturn;
 use App\Models\SupplierReturnItem;
 use App\Models\ReceivedItem;
+use Illuminate\Support\Facades\Validator;
 
 
 class PaymentToSupplier extends Component
@@ -23,19 +24,41 @@ class PaymentToSupplier extends Component
     public $selectedReceivedIds = [];
     public $totalAmount = 0;
     public $addedReceivings = [];
-    public $amount, $deduction = 0, $ewt_amount = 0, $remarks;
+    public $amount, $deduction, $ewt_amount, $remarks;
 
     public $paymentMethod = '';
     public $checkBank, $chequeNumber, $checkDate;
     public $transferBank, $referenceNumber, $transactionDate;
 
-    public function updatedpaymentMethod($value)
+    protected function rules()
     {
-        if ($value !== 'Check') {
+        return [
+            'date' => 'required|date',
+            'filterSupplier' => 'required|exists:suppliers,id',
+            'paymentMethod' => 'required|string|in:Cash,Check,bank_transfer',
+            'amount' => 'required|numeric|min:0.01',
+
+            'checkBank' => 'required_if:paymentMethod,Check',
+            'chequeNumber' => 'required_if:paymentMethod,Check',
+
+            'transferBank' => 'required_if:paymentMethod,bank_transfer',
+            'referenceNumber' => 'required_if:paymentMethod,bank_transfer',       
+
+            'deduction' => 'nullable|numeric|min:0',
+            'ewt_amount' => 'nullable|numeric|min:0',
+            'remarks' => 'nullable|string|max:500',
+        ];
+    }
+
+    public function updatedPaymentMethod($value)
+    {
+        $this->resetValidation(['checkBank', 'chequeNumber', 'checkDate', 'transferBank', 'referenceNumber', 'transactionDate']);
+    
+        if ($value === 'Check') {
             $this->transferBank = null;
             $this->referenceNumber = null;
             $this->transactionDate = null;
-        } elseif ($value !== 'Bank Transfer') {
+        } elseif ($value === 'bank_transfer') {
             $this->checkBank = null;
             $this->chequeNumber = null;
             $this->checkDate = null;
@@ -48,10 +71,14 @@ class PaymentToSupplier extends Component
             $this->transactionDate = null;
         }
     }
+    
+
 
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
+        $this->transactionDate = now()->format('Y-m-d');
+        $this->checkDate = now()->format('Y-m-d');
         $this->supplierOptions = Supplier::pluck('name', 'id')->toArray();
     }
 
@@ -82,8 +109,10 @@ class PaymentToSupplier extends Component
     }
     public function getPayableAmountProperty()
     {
-        return ($this->totalAmount - $this->totalReturnsAmount) - ($this->deduction + $this->ewt_amount);
+        return ($this->totalAmount - $this->totalReturnsAmount) 
+            - ((float) $this->deduction + (float) $this->ewt_amount);
     }
+
 
     public function loadReceivedItems()
     {
@@ -165,30 +194,11 @@ class PaymentToSupplier extends Component
         }
     }
 
-    protected function rules()
-    {
-        return [
-            'date' => 'required|date',
-            'filterSupplier' => 'required|exists:suppliers,id',
-            'paymentMethod' => 'required|string|in:Cash,Check,Bank Transfer',
-            'amount' => 'required|numeric|min:0.01',
-
-            'checkBank' => 'required_if:paymentMethod,Check',
-            'chequeNumber' => 'required_if:paymentMethod,Check',
-            'checkDate' => 'required_if:paymentMethod,Check|date',
-
-            'transferBank' => 'required_if:paymentMethod,Bank Transfer',
-            'referenceNumber' => 'required_if:paymentMethod,Bank Transfer',
-            'transactionDate' => 'required_if:paymentMethod,Bank Transfer|date',
-
-            'deduction' => 'nullable|numeric|min:0',
-            'ewt_amount' => 'nullable|numeric|min:0',
-            'remarks' => 'nullable|string|max:500',
-        ];
-    }
+   
 
     public function savePayments()
     {
+         
         $this->validate();
 
         if (empty($this->selectedReceivedIds)) {
@@ -203,11 +213,11 @@ class PaymentToSupplier extends Component
             'date' => $this->date,
             'supplier_id' => $this->filterSupplier,
             'payment_method' => $this->paymentMethod,
-            'bank' => $this->paymentMethod === 'Check' ? $this->checkBank : ($this->paymentMethod === 'Bank Transfer' ? $this->transferBank : null),
+            'bank' => $this->paymentMethod === 'Check' ? $this->checkBank : ($this->paymentMethod === 'bank_transfer' ? $this->transferBank : null),
             'cheque_number' => $this->paymentMethod === 'Check' ? $this->chequeNumber : null,
             'check_date' => $this->paymentMethod === 'Check' ? $this->checkDate : null,
-            'reference_number' => $this->paymentMethod === 'Bank Transfer' ? $this->referenceNumber : null,
-            'transaction_date' => $this->paymentMethod === 'Bank Transfer' ? $this->transactionDate : null,
+            'reference_number' => $this->paymentMethod === 'bank_transfer' ? $this->referenceNumber : null,
+            'transaction_date' => $this->paymentMethod === 'bank_transfer' ? $this->transactionDate : null,
             'total_amount' => $this->totalAmount,
             'amount_paid' => $this->amount,
             'ewt_amount' => $this->ewt_amount,

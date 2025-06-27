@@ -2,7 +2,7 @@
   <h2 class="text-xl font-semibold">Payment To Supplier</h2>
   @if (session()->has('message'))
     <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show" x-transition class="mt-2">
-    <x-alert :title="session('message')" icon="check-circle" color="success" positive flat
+    <x-alert :title="session('message')" icon="Check-circle" color="success" positive flat
       class="!bg-green-300 !w-full" />
     </div>
   @endif
@@ -146,99 +146,136 @@
         </div>
       </div>
 
-      <div class="space-y-4">
+      <div wire:poll class="space-y-4">
         <!-- Payment Method Select -->
-        <div wire:poll>
+        <div>
           <label for="paymentMethod" class="block mb-1 font-semibold">Select Payment Method</label>
           <select id="paymentMethod" wire:model="paymentMethod" class="w-full border rounded px-3 py-2">
             <option value="" disabled>Select Method</option>
             <option value="Cash">Cash</option>
             <option value="Check">Check</option>
-            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="bank_transfer">Bank Transfer</option>
           </select>
           @error('paymentMethod')
-        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-      @enderror
-
+            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+          @enderror
         </div>
-
-        <!-- Show Check Fields -->
+      
+        <!-- Check Fields -->
         @if ($paymentMethod === 'Check')
-        <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
-          <div>
-          <label class="block mb-1 font-semibold">Select Bank</label>
-          <select wire:model="checkBank" class="w-full border rounded px-3 py-2">
-            <option value="" disabled>Select Bank</option>
-            <!-- bank options -->
-          </select>
-          @error('checkBank')
-        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-        @enderror
+          <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
+            <div>
+              <label class="block mb-1 font-semibold">Select Bank</label>
+              <select wire:model="CheckBank" class="w-full border rounded px-3 py-2">
+                <option value="" disabled>Select Bank</option>
+                <option value="GCash">GCash</option>
+                <option value="BDO Unibank">BDO Unibank</option>
+                <option value="Bank of the Philippine Islands (BPI)">Bank of the Philippine Islands (BPI)</option>
+                <option value="Metrobank">Metrobank</option>
+                <option value="Philippine National Bank (PNB)">Philippine National Bank (PNB)</option>
+                <option value="Land Bank of the Philippines (LANDBANK)">Land Bank of the Philippines (LANDBANK)</option>
+                <option value="China Banking Corporation (China Bank)">China Banking Corporation (China Bank)</option>
+                <option value="Rizal Commercial Banking Corporation (RCBC)">Rizal Commercial Banking Corporation (RCBC)</option>
+                <option value="EastWest Bank">EastWest Bank</option>
+                <option value="Security Bank Corporation">Security Bank Corporation</option>
+              </select>
+              @error('CheckBank')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+            <div>
+              <label class="block mb-1 font-semibold">Cheque Number</label>
+              <input type="text" wire:model="chequeNumber" class="w-full border rounded px-3 py-2" />
+              @error('chequeNumber')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+            <div>
+              <label class="block mb-1 font-semibold">Check Date</label>
+              <input type="date" wire:model="CheckDate" class="w-full border rounded px-3 py-2" />
+              @error('CheckDate')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
           </div>
-          <div>
-          <label class="block mb-1 font-semibold">Cheque Number</label>
-          <input type="text" wire:model="chequeNumber" class="w-full border rounded px-3 py-2" />
-          @error('chequeNumber')
-        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-        @enderror
+        @endif
+      
+        <!-- Bank Transfer Fields -->
+        @if ($paymentMethod === 'bank_transfer')
+          <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
+            <div>
+              <label class="block mb-1 font-semibold">Select Bank</label>
+              <select wire:model="transferBank" class="w-full border rounded px-3 py-2">
+                <option value="" disabled>Select Bank</option>
+                <option value="GCash">GCash</option>
+                <option value="BDO Unibank">BDO Unibank</option>
+                <option value="Bank of the Philippine Islands (BPI)">Bank of the Philippine Islands (BPI)</option>
+                <option value="Metrobank">Metrobank</option>
+                <option value="Philippine National Bank (PNB)">Philippine National Bank (PNB)</option>
+                <option value="Land Bank of the Philippines (LANDBANK)">Land Bank of the Philippines (LANDBANK)</option>
+                <option value="China Banking Corporation (China Bank)">China Banking Corporation (China Bank)</option>
+                <option value="Rizal Commercial Banking Corporation (RCBC)">Rizal Commercial Banking Corporation (RCBC)</option>
+                <option value="EastWest Bank">EastWest Bank</option>
+                <option value="Security Bank Corporation">Security Bank Corporation</option>
+              </select>
+              @error('transferBank')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+            <div>
+              <label class="block mb-1 font-semibold">Reference Number</label>
+              <input type="text" wire:model="referenceNumber" class="w-full border rounded px-3 py-2" />
+              @error('referenceNumber')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
+            <div>
+              <label class="block mb-1 font-semibold">Transaction Date</label>
+              <input type="date" wire:model="transactionDate" class="w-full border rounded px-3 py-2" />
+              @error('transactionDate')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+              @enderror
+            </div>
           </div>
-          <div>
-          <label class="block mb-1 font-semibold">Check Date</label>
-          <input type="date" wire:model="checkDate" class="w-full border rounded px-3 py-2" />
-          @error('checkDate')
-        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-        @enderror
-          </div>
-        </div>
-    @endif
-
-        <!-- Show Bank Transfer Fields -->
-        @if ($paymentMethod === 'Bank Transfer')
-        <div class="space-y-3 border rounded-lg p-4 bg-gray-50">
-          <div>
-          <label class="block mb-1 font-semibold">Select Bank</label>
-          <select wire:model="transferBank" class="w-full border rounded px-3 py-2">
-            <option value="" disabled>Select Bank</option>
-            <!-- bank options -->
-          </select>
-          @error('transferBank')
-        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-        @enderror
-          </div>
-          <div>
-          <label class="block mb-1 font-semibold">Reference Number</label>
-          <input type="text" wire:model="referenceNumber" class="w-full border rounded px-3 py-2" />
-          @error('referenceNumber')
-        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-        @enderror
-          </div>
-          <div>
-          <label class="block mb-1 font-semibold">Transaction Date</label>
-          <input type="date" wire:model="transactionDate" class="w-full border rounded px-3 py-2" />
-          @error('transactionDate')
-        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-        @enderror
-          </div>
-        </div>
-    @endif
+        @endif
       </div>
+      
 
 
       <div>
         <label for="amount" class="block mb-1 font-semibold">Enter Amount</label>
-        <input id="amount" type="number" wire:model.lazy="amount" class="w-full border rounded px-3 py-2" />
+        <input
+          type="number"
+          id="amount"
+          wire:model.lazy="amount"
+          step="0.01"
+          class="w-full border rounded px-3 py-2"
+          placeholder="₱0.00"
+      />
         @error('amount') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
       </div>
 
       <div>
         <label for="deduction" class="block mb-1 font-semibold">Other Deduction</label>
-        <input id="deduction" type="number" wire:model.lazy="deduction" class="w-full border rounded px-3 py-2"
-          placeholder="₱0.00" />
+        <input 
+          type="number"
+          id="deduction"
+          wire:model.lazy="deduction"
+          step="0.01"
+          class="w-full border rounded px-3 py-2"
+          placeholder="₱0.00"
+          />
       </div>
       <div>
         <label for="ewt_amount" class="block mb-1 font-semibold">EWT Amount</label>
-        <input id="ewt_amount" type="number" wire:model.lazy="ewt_amount" class="w-full border rounded px-3 py-2"
-          placeholder="₱0.00" />
+        <input 
+          id="ewt_amount" 
+          type="number" 
+          wire:model.lazy="ewt_amount" 
+          class="w-full border rounded px-3 py-2"
+          placeholder="₱0.00" 
+          step="0.01"
+        />
       </div>
       <div>
         <label for="remarks" class="block mb-1 font-semibold">Remarks</label>
